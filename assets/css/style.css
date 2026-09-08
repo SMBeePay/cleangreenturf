@@ -1,0 +1,189 @@
+/* Clean Green Turf — site stylesheet
+   Minimal, dependency-free CSS. Mobile-first, then min-width breakpoints. */
+
+:root {
+    --green-900: #123821;
+    --green-700: #1f6b3a;
+    --green-600: #2e8b4d;
+    --green-500: #3aa860;
+    --green-100: #e8f5ec;
+    --ink: #1a1f1c;
+    --ink-soft: #4a534c;
+    --paper: #ffffff;
+    --paper-soft: #f6f8f6;
+    --border: #dde5df;
+    --amber: #e8a13a;
+    --radius: 10px;
+    --shadow: 0 2px 10px rgba(18, 56, 33, 0.08);
+    --max-width: 1200px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.6;
+    font-size: 17px;
+}
+img { max-width: 100%; height: auto; display: block; border-radius: var(--radius); }
+a { color: var(--green-700); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { line-height: 1.2; color: var(--green-900); margin: 0 0 0.5em; }
+h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+h2, h3 { font-size: clamp(1.3rem, 2.5vw, 1.6rem); margin-top: 1.5em; }
+h4 { font-size: 1.1rem; margin-top: 1.2em; }
+p { margin: 0 0 1em; }
+ul, ol { padding-left: 1.3em; }
+blockquote { margin: 1.5em 0; padding: 1em 1.2em; background: var(--paper-soft); border-left: 4px solid var(--green-500); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote footer { margin-top: 0.5em; color: var(--ink-soft); font-size: 0.95em; }
+
+.btn {
+    display: inline-block;
+    padding: 0.75em 1.5em;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn--primary { background: var(--green-600); color: #fff; }
+.btn--primary:hover { background: var(--green-700); transform: translateY(-1px); box-shadow: var(--shadow); }
+
+/* ---- Header ---- */
+.site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+}
+.site-header__inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0.75em 1.25em;
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+}
+.site-header__logo {
+    display: flex; align-items: center; gap: 0.5em;
+    font-weight: 700; font-size: 1.1rem; color: var(--green-900);
+    flex-shrink: 0;
+}
+.site-header__logo img { border-radius: 6px; }
+.site-header__phone {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--green-700);
+    white-space: nowrap;
+}
+.site-header__menu-toggle {
+    display: none;
+    background: none; border: none; font-size: 1.5rem; cursor: pointer;
+}
+
+.site-nav__list {
+    list-style: none; display: flex; gap: 1.25em; margin: 0; padding: 0;
+    align-items: center;
+}
+.site-nav__has-dropdown { position: relative; }
+.site-nav__dropdown {
+    display: none;
+    position: absolute; top: 100%; left: 0;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    list-style: none; margin: 0.4em 0 0; padding: 0.5em;
+    min-width: 200px;
+    max-height: 60vh; overflow-y: auto;
+}
+.site-nav__has-dropdown:hover .site-nav__dropdown,
+.site-nav__has-dropdown:focus-within .site-nav__dropdown { display: block; }
+.site-nav__dropdown li a { display: block; padding: 0.4em 0.6em; border-radius: 6px; }
+.site-nav__dropdown li a:hover { background: var(--green-100); text-decoration: none; }
+
+@media (max-width: 880px) {
+    .site-header__menu-toggle { display: block; order: 3; }
+    .site-nav { order: 4; width: 100%; display: none; }
+    .site-header__inner { flex-wrap: wrap; }
+    .site-header.is-open .site-nav { display: block; }
+    .site-nav__list { flex-direction: column; align-items: stretch; gap: 0.25em; }
+    .site-nav__dropdown { position: static; display: block; box-shadow: none; border: none; padding-left: 1em; }
+    .site-header__phone { order: 2; }
+}
+
+/* ---- Main content ---- */
+main { max-width: var(--max-width); margin: 0 auto; padding: 2em 1.25em 4em; }
+main > img:first-child {
+    width: 100%; max-height: 420px; object-fit: cover; margin-bottom: 1em;
+}
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75em;
+    margin: 1em 0;
+}
+.gallery img { width: 100%; height: 160px; object-fit: cover; }
+
+/* ---- Quote form ---- */
+.quote-form {
+    max-width: 640px;
+    background: var(--paper-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5em;
+    margin: 1.5em 0;
+}
+.quote-form__row { margin-bottom: 1em; }
+.quote-form__row label { display: block; font-weight: 600; margin-bottom: 0.3em; }
+.quote-form__row input,
+.quote-form__row select,
+.quote-form__row textarea {
+    width: 100%;
+    padding: 0.65em 0.8em;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+.quote-form__row--checkboxes { display: flex; flex-direction: column; gap: 0.6em; }
+.quote-form__row--checkboxes label {
+    display: flex; align-items: center; gap: 0.5em;
+    font-weight: 400;
+}
+.quote-form__row--checkboxes input { width: auto; flex-shrink: 0; }
+.quote-form__group-label { display: block; font-weight: 600; margin-bottom: 0.5em; }
+.quote-form__hp { position: absolute; left: -9999px; }
+
+/* ---- Footer ---- */
+.site-footer { background: var(--green-900); color: #dcebe1; margin-top: 3em; }
+.site-footer a { color: #cdeedb; }
+.site-footer__inner {
+    max-width: var(--max-width); margin: 0 auto;
+    padding: 3em 1.25em 2em;
+    display: grid;
+    grid-template-columns: 2fr repeat(4, 1fr);
+    gap: 2em;
+}
+.site-footer h2, .site-footer h3 { color: #fff; margin-top: 0; }
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li { margin-bottom: 0.4em; }
+.site-footer__social a { margin-right: 1em; }
+.site-footer__bottom {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    text-align: center; padding: 1em; font-size: 0.9rem; color: #a9c6b6;
+}
+@media (max-width: 880px) {
+    .site-footer__inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+    .site-footer__inner { grid-template-columns: 1fr; }
+}
+
+/* ---- 404 ---- */
+.error-404 { text-align: center; padding: 3em 0; }
+
+/* ---- Article ---- */
+.article__meta { color: var(--ink-soft); font-size: 0.9em; margin-bottom: 1.5em; }

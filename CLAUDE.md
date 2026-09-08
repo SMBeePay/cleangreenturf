@@ -36,6 +36,18 @@ it because it's cleaner. See requirement #33 in the doc above.
   business-info config) so NAP/tracking IDs/etc. exist in exactly one place.
 - `/sitemap.xml`, `/robots.txt` — canonical, indexable URLs only.
 
+## Local testing
+
+`dev_router.php` emulates the `.htaccess` rewrite rules for PHP's built-in
+server, since `php -S` doesn't read `.htaccess`. It is dev-only, not used in
+production (Apache + `.htaccess` handles routing there):
+
+```
+php -S localhost:8000 dev_router.php
+```
+
+Regenerate `sitemap.xml` after adding/removing a route: `php bin/generate-sitemap.php`.
+
 ## Architecture constraints
 
 - No `.php` extensions exposed in public URLs (route/rewrite via `.htaccess`).
@@ -45,7 +57,44 @@ it because it's cleaner. See requirement #33 in the doc above.
 - Never commit secrets (SMTP creds, API keys, Hostinger creds). Use a
   `.gitignore` and a config mechanism kept out of git for anything sensitive.
 
-## Current status
+## Current status (as of the initial rebuild commit)
 
-See task list / conversation for live progress. As of project start: doing
-a full inventory crawl of the live site before writing any new code.
+Phase 1 (preserve) is largely built and passing local smoke tests:
+
+- All 36 live URLs inventoried (`docs/url-inventory.md`), backed up
+  (`docs/site-backup-2026-09-08/`), and re-implemented in the new PHP
+  architecture at the exact same URLs (`config/routes.php`).
+- Front-controller routing (`index.php` + `.htaccess`) with no `.php` in any
+  public URL, HTTPS + non-www enforced, real 404s, a 301 map for stale
+  pre-existing indexed URLs (`config/redirects.php`).
+- Content migrated per-page into `content/pages/*.php`, preserving H1s,
+  body copy, internal links, and images (self-hosted under
+  `assets/images/`, converted to WebP). Known bugs found in the audit were
+  fixed (see `docs/audit-findings.md`) — mismatched titles, duplicate brand
+  suffixes, duplicate meta descriptions, the About page's missing H1 and
+  phone-number typo, and the 5 placeholder blog posts (rewritten with real
+  content per owner decision).
+- GA4 (`G-SWCYCC0DG8`) and HubSpot tracking preserved sitewide via
+  `includes/tracking.php`. Added (didn't have before): Organization +
+  LocalBusiness JSON-LD via `includes/schema.php`.
+- New lead-capture form (`includes/quote-form.php` +
+  `forms/handle-quote.php`) replacing the old Hostinger-proprietary form
+  backend — currently uses PHP `mail()` to `andrew@cleangreenturf.com`;
+  needs SMTP credentials to harden deliverability before launch (see
+  requirement #19 and the TODO in `forms/handle-quote.php`).
+- Fresh responsive design (`assets/css/style.css`), verified with real
+  screenshots at desktop and mobile widths.
+- `sitemap.xml` / `robots.txt` regenerated for the new architecture
+  (`bin/generate-sitemap.php`).
+
+**Not done yet:**
+- Deployment to Hostinger isn't wired up (decided: Hostinger's Git
+  integration; needs the user to actually connect the repo in hPanel and
+  confirm the deploy path matches this repo's root-as-webroot layout).
+- SMTP for the form handler (currently PHP `mail()`, not production-hardened).
+- Phase 2 (new Repair/Installation pages, deeper location-page strategy,
+  breadcrumb schema) — intentionally deferred per requirement #34.
+- Full pre-launch crawl (#28) and old-vs-new comparison (#29) against the
+  *live* new site once it's actually deployed somewhere reachable.
+- Google Search Console verification carryover (no verification meta tag
+  was found on the live site — needs to be confirmed via DNS or GSC directly).

@@ -2,10 +2,51 @@
 
 Per migration requirement #33 ("ask before destroying SEO value"), these are
 existing issues/oddities found on the live production site during the initial
-crawl. **Nothing has been changed.** Each needs a decision before or during
-the rebuild. Default action if you don't specify otherwise: preserve exactly
-as-is and carry the defect forward unchanged (never silently "fix" during
-migration).
+crawl. Each needed a decision before or during the rebuild. Default action
+when not otherwise specified: preserve exactly as-is and carry the defect
+forward unchanged (never silently "fix" during migration).
+
+## Resolution status (updated once the rebuild started)
+
+1. Mismatched titles (austin-tx, turf-sports-field-maintenance) — **fixed**
+   in `config/routes.php`.
+2. Duplicate brand suffix in titles — **fixed**.
+3. Duplicate meta description (`/contact` vs `/dfw-turf-cleaning-request-ga`)
+   — **fixed**, both now unique; `/dfw-turf-cleaning-request-ga` also got a
+   unique title (it was duplicating `/contact`'s title too, found after this
+   doc was first written).
+4. `/about` missing H1 — **fixed**, added `<h1>About Clean Green Turf</h1>`.
+5. Five placeholder blog posts — **resolved per owner decision**: wrote real,
+   unique articles for all five (see `content/pages/blog-post{,1,2,3,4}.php`).
+6. Phone typo on `/about` — **resolved per owner decision**: corrected to
+   469-796-0034 (the TX number) in both regional blocks, not 925-238-3178 as
+   originally recommended. Also fixed an additional typo found while editing:
+   the TX address block read "McKinney, **CA** 75071" (wrong state code).
+7. No LocalBusiness/Organization schema — **added** (`includes/schema.php`),
+   additive only, nothing removed.
+8. Proprietary lead-form backend — **rebuilt**: `includes/quote-form.php` +
+   `forms/handle-quote.php`, emailing andrew@cleangreenturf.com per owner
+   decision. Uses PHP `mail()` for now; needs SMTP before launch.
+9. Images on the builder's CDN — **done**: all 67 referenced images
+   downloaded, converted to WebP, self-hosted under `assets/images/`, with
+   width/height attributes and lazy-loading on everything except each page's
+   first (hero) image.
+10. Stale unredirected 404s from an earlier site iteration — **fixed** for
+    the two with a clear equivalent (`config/redirects.php`).
+    `/artificial-turf-repair` intentionally left un-redirected — no
+    equivalent page exists yet (that's Phase 2).
+
+Two more things found while migrating (not in the original list):
+- The homepage hero image had `alt="black and white bed linen"` — a leftover
+  generic stock-template image unrelated to turf. Swapped for a real turf
+  photo already used elsewhere on the page, as part of the visual redesign.
+- Two galleries (`/contact`, `/dfw-turf-cleaning-request-success`) rendered
+  the same set of photos twice in different orders — a builder desktop/mobile
+  duplication artifact, not real content. Deduplicated during migration.
+
+---
+
+## Original findings (as first written, before the fixes above)
 
 ## 1. Mismatched `<title>` tags (existing bugs, likely from the AI builder)
 
