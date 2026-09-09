@@ -35,6 +35,5 @@ $navTxCities = [
         <li><a href="/ca-turf-cleaning-service-areas"<?= $currentPath === '/ca-turf-cleaning-service-areas' ? ' aria-current="page"' : '' ?>>California Service Areas</a></li>
         <li><a href="/about"<?= $currentPath === '/about' ? ' aria-current="page"' : '' ?>>About</a></li>
         <li><a href="/contact"<?= $currentPath === '/contact' ? ' aria-current="page"' : '' ?>>Contact</a></li>
-        <li><a href="/#free-quote" class="btn btn--primary">FREE QUOTE</a></li>
     </ul>
 </nav>

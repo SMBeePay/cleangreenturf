@@ -77,6 +77,41 @@ headings, or URLs:
 - Testimonials restyled as real cards; the homepage's 3 process steps
   restyled as icon cards with a stats strip.
 
+### Design v2 — reference-driven typography/color overhaul
+
+The first design pass (above) was judged "still ugly and boring." The owner
+pointed to two reference sites (dfwparkinglotservices.com,
+eastdfwtrailers.com) as the bar to hit. Both were fetched and their actual
+CSS analyzed directly (colors, font-family declarations, type scale) rather
+than guessed from a screenshot. Both independently use the same formula:
+a bold condensed/uppercase display font for headings (Oswald / Bebas Neue),
+a warm off-white ground (not sterile white), a single punchy saturated
+accent color used sparingly, and sharp/minimal border-radius instead of soft
+pill shapes — the opposite of the first pass's soft rounded Plus-Jakarta-Sans
+sentence-case look.
+
+Applied that formula while keeping Clean Green Turf's own green brand
+identity (didn't copy the reference sites' red/orange as primary — green
+stays primary, a burnt-orange became the accent/CTA color):
+- Self-hosted Oswald (headings, uppercase, tracked) alongside the existing
+  Plus Jakarta Sans (body) — `assets/fonts/oswald-*.woff2`.
+- Warm cream background (`--cream`) replacing pure white.
+- Punchier, more saturated green + a real burnt-orange accent
+  (`--rust-*`) replacing the previous soft pastel amber.
+- Sharper corners sitewide (4-10px, was up to 22px) with a colored
+  top/left accent border on cards, the quote form, and testimonials.
+- Dark forest header/trust-bar/footer/CTA-band (was light/white header)
+  for higher contrast, matching both reference sites' dark-bar pattern.
+- Much larger, bolder hero headline scale.
+- Removed a duplicate "FREE QUOTE" button that ended up sitting right next
+  to the header's real CTA button once the nav got bolder — nav now only
+  carries page links, the CTA button is the single free-quote affordance
+  in the header (mobile still gets it via the sticky bottom bar).
+
+No structural/template changes were needed for this pass — same class
+names throughout, only `assets/css/style.css` (and `includes/navigation.php`
+for the duplicate-button fix) changed.
+
 ---
 
 ## Original findings (as first written, before the fixes above)
