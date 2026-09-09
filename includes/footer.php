@@ -3,6 +3,7 @@
  * Sitewide footer. Reproduces the live site's NAP, service-area lists, and
  * internal links. See docs/business-info.md for where each value came from.
  */
+require_once __DIR__ . '/icons.php';
 $tx = $businessInfo['regions']['tx'];
 $ca = $businessInfo['regions']['ca'];
 
@@ -11,23 +12,20 @@ function slugify_city($city) {
 }
 ?>
 <footer class="site-footer">
-    <div class="site-footer__inner">
+    <div class="site-footer__top">
         <div class="site-footer__about">
             <h2><?= htmlspecialchars($businessInfo['name']) ?></h2>
-            <p>Proudly serving the <strong>Dallas Fort-Worth</strong> metroplex and surrounding areas, and the <strong>California Bay Area</strong>.</p>
-            <p>
-                <a href="mailto:<?= htmlspecialchars($businessInfo['email']) ?>"><?= htmlspecialchars($businessInfo['email']) ?></a><br>
-                <?= htmlspecialchars($tx['address']['street']) ?>, <?= htmlspecialchars($tx['address']['city']) ?>, <?= htmlspecialchars($tx['address']['state']) ?> <?= htmlspecialchars($tx['address']['zip']) ?><br>
-                <?= htmlspecialchars($ca['address']['street']) ?>, <?= htmlspecialchars($ca['address']['city']) ?>, <?= htmlspecialchars($ca['address']['state']) ?> <?= htmlspecialchars($ca['address']['zip']) ?>
-            </p>
-            <p>
-                TX Phone: <a href="tel:<?= htmlspecialchars($tx['phone_e164']) ?>"><?= htmlspecialchars($tx['phone_display']) ?></a><br>
-                CA Phone: <a href="tel:<?= htmlspecialchars($ca['phone_e164']) ?>"><?= htmlspecialchars($ca['phone_display']) ?></a>
-            </p>
-            <p class="site-footer__social">
-                <a href="<?= htmlspecialchars($businessInfo['social']['facebook']) ?>">Facebook</a>
-                <a href="<?= htmlspecialchars($businessInfo['social']['instagram']) ?>">Instagram</a>
-            </p>
+            <p>Proudly serving the Dallas Fort-Worth metroplex and surrounding areas, and the California Bay Area.</p>
+
+            <div class="site-footer__nap"><?= icon('mail') ?> <a href="mailto:<?= htmlspecialchars($businessInfo['email']) ?>"><?= htmlspecialchars($businessInfo['email']) ?></a></div>
+            <div class="site-footer__nap"><?= icon('pin') ?> <span><?= htmlspecialchars($tx['address']['street']) ?>, <?= htmlspecialchars($tx['address']['city']) ?>, <?= htmlspecialchars($tx['address']['state']) ?> <?= htmlspecialchars($tx['address']['zip']) ?></span></div>
+            <div class="site-footer__nap"><?= icon('pin') ?> <span><?= htmlspecialchars($ca['address']['street']) ?>, <?= htmlspecialchars($ca['address']['city']) ?>, <?= htmlspecialchars($ca['address']['state']) ?> <?= htmlspecialchars($ca['address']['zip']) ?></span></div>
+            <div class="site-footer__nap"><?= icon('phone') ?> <span>TX: <a href="tel:<?= htmlspecialchars($tx['phone_e164']) ?>"><?= htmlspecialchars($tx['phone_display']) ?></a> &nbsp;·&nbsp; CA: <a href="tel:<?= htmlspecialchars($ca['phone_e164']) ?>"><?= htmlspecialchars($ca['phone_display']) ?></a></span></div>
+
+            <div class="site-footer__social">
+                <a href="<?= htmlspecialchars($businessInfo['social']['facebook']) ?>" aria-label="Facebook"><?= icon('facebook') ?></a>
+                <a href="<?= htmlspecialchars($businessInfo['social']['instagram']) ?>" aria-label="Instagram"><?= icon('instagram') ?></a>
+            </div>
         </div>
 
         <div class="site-footer__areas">
@@ -72,7 +70,7 @@ function slugify_city($city) {
                 <li><a href="/blog-post1">Pet Turf Odor Guide</a></li>
                 <li><a href="/blog-post2">Turf Infill 101</a></li>
                 <li><a href="/blog-post3">DIY vs. Professional Cleaning</a></li>
-                <li><a href="/blog-post4">Climate & Turf Maintenance</a></li>
+                <li><a href="/blog-post4">Climate &amp; Turf Maintenance</a></li>
             </ul>
         </div>
     </div>

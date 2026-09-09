@@ -47,6 +47,7 @@ if ($route === null) {
 <?php require __DIR__ . '/templates/' . $route['template'] . '.php'; ?>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>
+<?php require __DIR__ . '/includes/mobile-cta-bar.php'; ?>
 <script src="/assets/js/main.js" defer></script>
 </body>
 </html>

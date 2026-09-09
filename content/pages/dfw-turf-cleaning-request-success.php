@@ -1,7 +1,31 @@
-<?php // Migrated content — see docs/site-backup-2026-09-08/pages/dfw-turf-cleaning-request-success.html for the original source ?>
-<img src="/assets/images/img-1438-amq1qlojlqtwkxyo.webp" alt="" loading="lazy" width="1440" height="499"><h1>Thank You for Contacting Us!</h1>
+<?php // Migrated content — see docs/site-backup-2026-09-08/pages/dfw-turf-cleaning-request-success.html for the original source.
+// "A Few Of Our Past Jobs" was <strong> text, not a real heading — restored
+// as h4. The 18-photo strip is now a proper gallery grid with descriptive
+// alt text (the originals all had alt="", a pre-existing gap). ?>
+<img src="/assets/images/img-1438-amq1qlojlqtwkxyo.webp" alt="Artificial turf cleaning technician at work" loading="eager" width="1440" height="499">
+<h1>Thank You for Contacting Us!</h1>
 <p>We will respond within 24 hours of your request!</p>
 
 <h3>Check out what our customers have to say about us</h3>
-<strong>A Few Of Our Past Jobs</strong>
-<a href="https://g.co/kgs/gWX5FJP">OUR GOOGLE BUSINESS PAGE</a><img src="/assets/images/img-1894-m6lzlwq012ilnplv.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2701-m6lzpbbxjeskod4m.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2591-mp4orvmr3ksyq6zg.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3868-yx4l3rxqyehpepx1.webp" alt="" loading="lazy" width="375" height="375"><img src="/assets/images/img-3643-yyv98r0w9ouoowvj.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3788-yz981rjgxyc6oerg.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2491-dwxvzrogbksevemk.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2487-mv0wgrjkrjso6ap3.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3801-avl7mravd4hq7ld1.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2095-ybg7rnbq1kszdop0.webp" alt="" loading="lazy" width="375" height="375"><img src="/assets/images/img-3757-amq1rk8galtpxzeo.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-2271-aq2w4rjkgnfmmaan.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3824-m7v3rab7nvumn8qa.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3796-mnlwqrjxxqfmjbll.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3636-mv0wgrjklvs3donl.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3578-yz981rjgoghzd09n.webp" alt="" loading="lazy" width="375" height="500"><img src="/assets/images/img-3823-alper4pn9vhanrbm.webp" alt="" loading="lazy" width="375" height="375"><img src="/assets/images/img-3707-yx4l3rxqbat8pnjg.webp" alt="" loading="lazy" width="375" height="375">
+<h4>A Few Of Our Past Jobs</h4>
+<p><a href="https://g.co/kgs/gWX5FJP">See Our Google Business Page</a></p>
+<div class="gallery">
+<img src="/assets/images/img-1894-m6lzlwq012ilnplv.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2701-m6lzpbbxjeskod4m.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2591-mp4orvmr3ksyq6zg.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3868-yx4l3rxqyehpepx1.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="375">
+<img src="/assets/images/img-3643-yyv98r0w9ouoowvj.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3788-yz981rjgxyc6oerg.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2491-dwxvzrogbksevemk.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2487-mv0wgrjkrjso6ap3.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3801-avl7mravd4hq7ld1.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2095-ybg7rnbq1kszdop0.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="375">
+<img src="/assets/images/img-3757-amq1rk8galtpxzeo.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-2271-aq2w4rjkgnfmmaan.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3824-m7v3rab7nvumn8qa.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3796-mnlwqrjxxqfmjbll.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3636-mv0wgrjklvs3donl.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3578-yz981rjgoghzd09n.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="500">
+<img src="/assets/images/img-3823-alper4pn9vhanrbm.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="375">
+<img src="/assets/images/img-3707-yx4l3rxqbat8pnjg.webp" alt="Clean Green Turf recent job" loading="lazy" width="375" height="375">
+</div>

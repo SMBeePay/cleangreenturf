@@ -36,13 +36,46 @@ forward unchanged (never silently "fix" during migration).
     `/artificial-turf-repair` intentionally left un-redirected — no
     equivalent page exists yet (that's Phase 2).
 
-Two more things found while migrating (not in the original list):
+More things found while migrating (not in the original list):
 - The homepage hero image had `alt="black and white bed linen"` — a leftover
   generic stock-template image unrelated to turf. Swapped for a real turf
   photo already used elsewhere on the page, as part of the visual redesign.
 - Two galleries (`/contact`, `/dfw-turf-cleaning-request-success`) rendered
   the same set of photos twice in different orders — a builder desktop/mobile
   duplication artifact, not real content. Deduplicated during migration.
+- **`/contact` and `/dfw-turf-cleaning-request-ga` had no working form at
+  all** after the initial content extraction (form fields aren't "content"
+  so the extraction script correctly dropped them, but a real form was never
+  added back for these two pages — only the homepage got one in the first
+  pass). Both now have the real quote form. `/dfw-turf-cleaning-request-ga`
+  is a Google Ads landing page, so this was a real, live gap in ad-driven
+  lead capture until fixed — worth independently confirming no ad spend ran
+  against a brokenly-migrated version of this page.
+- Several pages used `<strong>` text as pseudo-headings instead of real
+  heading tags (e.g. "A Few Of Our Past Jobs", the 3 process steps on the
+  Google Ads landing page) — same pre-existing pattern as the homepage's
+  process steps. Restored as proper `<h4>`s during the design pass, same
+  copy, same emphasis.
+
+## Design overhaul (post-launch-prep, per owner request)
+
+The initial rebuild (above) intentionally used a plain, low-risk stylesheet
+to validate the migration first. The owner then requested a full visual
+redesign ("world class... clean, polished, professional... maximize SEO and
+lead capture"). That pass added, all without touching any preserved copy,
+headings, or URLs:
+- A real design system: self-hosted Plus Jakarta Sans (no external font
+  request), a forest-green/amber color system, consistent spacing/type scale.
+- A proper hero band on every page (built generically in
+  `templates/page.php`/`home.php`/`article.php` by extracting each page's
+  existing leading image + H1 via regex — no per-page content rewrites).
+- Sitewide trust bar, top utility bar, redesigned header/footer with inline
+  SVG icons (`includes/icons.php`) instead of a text-only footer.
+- A reusable bottom-of-page CTA banner (`includes/cta-banner.php`) and a
+  mobile sticky call/quote bar (`includes/mobile-cta-bar.php`) — standard
+  high-conversion patterns for home-service sites.
+- Testimonials restyled as real cards; the homepage's 3 process steps
+  restyled as icon cards with a stats strip.
 
 ---
 

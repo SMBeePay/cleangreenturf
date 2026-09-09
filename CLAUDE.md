@@ -82,10 +82,20 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   backend — currently uses PHP `mail()` to `andrew@cleangreenturf.com`;
   needs SMTP credentials to harden deliverability before launch (see
   requirement #19 and the TODO in `forms/handle-quote.php`).
-- Fresh responsive design (`assets/css/style.css`), verified with real
-  screenshots at desktop and mobile widths.
 - `sitemap.xml` / `robots.txt` regenerated for the new architecture
   (`bin/generate-sitemap.php`).
+- **Full design overhaul** (per explicit owner request, after the initial
+  plain-stylesheet rebuild): self-hosted Plus Jakarta Sans, a real
+  green/amber design system, a generic hero-band extraction (leading
+  image+H1 pulled out of migrated content via regex in
+  `templates/page.php`/`home.php`/`article.php` — no per-page rewrites
+  needed), sitewide trust bar + top bar, inline SVG icons
+  (`includes/icons.php`), a reusable bottom CTA banner, and a mobile sticky
+  call/quote bar. See `docs/audit-findings.md` "Design overhaul" section.
+- While rewiring the homepage's form, found and fixed a real gap: `/contact`
+  and the Google-Ads landing page `/dfw-turf-cleaning-request-ga` had **no
+  working form at all** after the initial migration pass (only the homepage
+  got one first time round). Both now have the real quote form.
 
 **Not done yet:**
 - Deployment to Hostinger isn't wired up (decided: Hostinger's Git
