@@ -241,3 +241,55 @@ iteration that were never redirected. Not something this migration broke,
 but worth fixing now: we can 301 these to their closest current equivalent
 (e.g. `/tx-turf-cleaning-service-areas` → `/texas-service-areas`) to recover
 any residual link equity/impressions, per requirement #3.
+
+## California service discontinued (owner-directed business change, not an SEO/migration decision)
+
+The business no longer services California — this is a real operational
+change, not a design or SEO call, and it came from the owner directly.
+Explicit instruction: don't remove the CA city pages (keep them live for
+search/SEO), but stop presenting California as a currently-served region
+anywhere prominent (NAP blocks, schema, trust bar, nav).
+
+What changed:
+- **Removed entirely**: the CA `LocalBusiness` JSON-LD entry
+  (`includes/schema.php`) — this was the one place actively telling search
+  engines "we have a business location/service area in California," which
+  is now factually wrong and worth being strict about.
+- **Removed the CA address/phone** from the sitewide footer NAP block
+  (`includes/footer.php`) and the top-bar service-area line
+  (`includes/top-bar.php`).
+- **Removed the "California Service Areas" top-nav link**
+  (`includes/navigation.php`) and the trust-bar's "Bay Area" mention
+  (`includes/trust-bar.php`).
+- **`/about`**: removed the California half of "Serving Two Regions" (now
+  "Where We're Based," Texas only).
+- **Titles/descriptions**: `/about` and `/contact` no longer say "California
+  and Texas" (`config/routes.php`).
+- **`/blog-post4`**: this article's entire premise was a DFW-vs-Bay-Area
+  climate comparison — not preservable, so it's a full rewrite ("How DFW's
+  Wild Weather Swings Affect Your Artificial Turf," Texas-only: heat, hail,
+  freezes, drought). Same URL/slot, new content and title/description.
+  `/blog-post` and `/blog-post2` had one Bay-Area aside each, trimmed to
+  Texas-only.
+
+What deliberately did NOT change (per explicit instruction — keep for SEO):
+- All 10 CA city pages and `/ca-turf-cleaning-service-areas` are untouched:
+  same URLs, same content, same "we clean turf in [city], CA" copy. They're
+  no longer linked from primary nav or the sitewide trust bar, but they're
+  still reachable via the footer (column heading softened from "CA Service
+  Areas" to "California" — still a real link, just framed as a location
+  list rather than an active service claim) and `sitemap.xml`, so they stay
+  crawlable and don't become orphaned.
+- `config/business-info.php` still carries the CA region's address/phone
+  and city list — needed for the footer's CA link loop and as a record of
+  where those numbers/addresses came from. It's just no longer surfaced as
+  an active NAP anywhere.
+
+Open question for the owner: the CA pages themselves still actively invite
+calls ("Get a Free Quote" → the same TX phone number, since page-level CTAs
+were never region-specific to begin with). If a Bay Area visitor calls
+expecting service, that's a real customer-experience gap this change alone
+doesn't close. Worth deciding later whether those pages need a brief
+"we've paused Bay Area service, but here's what we learned serving this
+area" note, get formally noindexed, or stay exactly as-is — flagging rather
+than deciding unilaterally, per requirement #33.

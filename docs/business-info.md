@@ -13,12 +13,18 @@ hard-code independently per page/template.
 
 ## Service regions & NAP
 
-Clean Green Turf operates as (at least) two regional business units under one brand:
+⚠️ **California service discontinued** (owner-directed, see
+`docs/audit-findings.md` "California service discontinued"). The table below
+is the original as-captured record; the CA row is kept here for reference
+only — it is no longer surfaced as an active NAP anywhere on the site
+(removed from schema, footer, top bar, trust bar, nav, and `/about`). The CA
+city landing pages themselves are left untouched and still live, per
+explicit instruction, for search/SEO purposes.
 
-| Region | Address | Phone |
-|---|---|---|
-| Texas / DFW | 11900 Presario Road, McKinney, TX 75071 | (469) 796-0034 / 469-796-0034 |
-| California / Bay Area | 2709 Holly Oak Ct, Brentwood, CA 94513 | 925-238-3178 |
+| Region | Address | Phone | Status |
+|---|---|---|---|
+| Texas / DFW | 11900 Presario Road, McKinney, TX 75071 | (469) 796-0034 / 469-796-0034 | Active |
+| California / Bay Area | 2709 Holly Oak Ct, Brentwood, CA 94513 | 925-238-3178 | **Discontinued** |
 
 ⚠️ **Discrepancy found:** `/about` also displays the phone number **925-378-3506**
 once, embedded in body copy, which matches neither official number above. Likely

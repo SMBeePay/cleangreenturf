@@ -20,8 +20,8 @@ return [
     '/about' => [
         'slug' => 'about',
         'template' => 'page',
-        'title' => 'Expert Artificial Turf Cleaning Services in California and Texas | Clean Green Turf',
-        'description' => 'Clean Green Turf specializes in rejuvenating, deodorizing, and sanitizing artificial turf. Serving the California Bay Area and Dallas Fort Worth Metroplex, we restore your turf to its original beauty, ensuring a clean and fresh outdoor space for you and your family.',
+        'title' => 'About Clean Green Turf | Artificial Turf Cleaning in DFW, TX',
+        'description' => 'Clean Green Turf specializes in rejuvenating, deodorizing, and sanitizing artificial turf. Serving the Dallas Fort Worth Metroplex, we restore your turf to its original beauty, ensuring a clean and fresh outdoor space for you and your family.',
         'schema_types' => ['WebPage'],
     ],
     '/addison-tx-turf-cleaning' => [
@@ -97,8 +97,8 @@ return [
     '/contact' => [
         'slug' => 'contact',
         'template' => 'page',
-        'title' => 'Expert Artificial Turf Cleaning in California and Texas | Clean Green Turf',
-        'description' => 'Contact Clean Green Turf for professional artificial turf cleaning, rejuvenation, deodorization, and sanitization services. We serve the California Bay Area and Dallas Fort Worth Metroplex, ensuring your turf looks as pristine as the day it was installed. Reach out to us today!',
+        'title' => 'Contact Clean Green Turf | Artificial Turf Cleaning in DFW, TX',
+        'description' => 'Contact Clean Green Turf for professional artificial turf cleaning, rejuvenation, deodorization, and sanitization services in the Dallas Fort Worth Metroplex. Reach out to us today!',
         'schema_types' => ['WebPage'],
     ],
     '/dallas-tx-turf-cleaning' => [
@@ -263,8 +263,8 @@ return [
     '/blog-post4' => [
         'slug' => 'blog-post4',
         'template' => 'article',
-        'title' => 'How Texas Heat and Bay Area Rain Affect Artificial Turf Differently | Clean Green Turf',
-        'description' => 'Why DFW and Bay Area artificial turf face different maintenance challenges, and how climate should shape your cleaning schedule.',
+        'title' => 'How DFW Weather Extremes Affect Artificial Turf | Clean Green Turf',
+        'description' => 'How North Texas heat, hail, freezes, and drought each affect artificial turf differently, and how to adjust your cleaning schedule for DFW weather.',
         'schema_types' => ['Article'],
         'date_published' => '2026-09-08',
     ],

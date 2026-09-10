@@ -4,12 +4,14 @@
  * each live page (see $route['schema_types'], sourced from the pre-migration
  * crawl) and adds an Organization + LocalBusiness graph sitewide — additive
  * only, per docs/audit-findings.md finding #7 (the live site had no
- * LocalBusiness schema at all).
+ * LocalBusiness schema at all). Only a TX LocalBusiness entry is emitted —
+ * the CA LocalBusiness entry was removed since the business no longer
+ * services California; see docs/audit-findings.md "California service
+ * discontinued" for the full list of what changed.
  */
 $schemaGraph = [];
 
 $tx = $businessInfo['regions']['tx'];
-$ca = $businessInfo['regions']['ca'];
 
 $schemaGraph[] = [
     '@type' => 'Organization',
@@ -35,23 +37,6 @@ $schemaGraph[] = [
         'addressCountry' => 'US',
     ],
     'areaServed' => array_map(fn($c) => $c . ', TX', $businessInfo['service_areas']['dfw']),
-    'parentOrganization' => ['@id' => $businessInfo['domain'] . '/#organization'],
-];
-
-$schemaGraph[] = [
-    '@type' => 'LocalBusiness',
-    'name' => $businessInfo['name'] . ' — ' . $ca['label'],
-    'telephone' => $ca['phone_display'],
-    'email' => $businessInfo['email'],
-    'address' => [
-        '@type' => 'PostalAddress',
-        'streetAddress' => $ca['address']['street'],
-        'addressLocality' => $ca['address']['city'],
-        'addressRegion' => $ca['address']['state'],
-        'postalCode' => $ca['address']['zip'],
-        'addressCountry' => 'US',
-    ],
-    'areaServed' => array_map(fn($c) => $c . ', CA', $businessInfo['service_areas']['ca']),
     'parentOrganization' => ['@id' => $businessInfo['domain'] . '/#organization'],
 ];
 

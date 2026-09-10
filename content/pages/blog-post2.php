@@ -23,4 +23,4 @@
 <h2>How often it needs replenishing</h2>
 <p>Most yards need infill levels checked and topped off roughly once a year, more often for high-traffic yards, dog runs, or commercial/pet-facility installations. It's a quick add-on during a scheduled cleaning rather than a separate visit.</p>
 
-<p>If your turf feels thinner or harder than it used to, that's an infill issue, not just a cleaning issue. <a href="/#free-quote">Get a free quote</a> — we check infill levels as part of every full-service cleaning across our <a href="/texas-service-areas">Texas</a> and <a href="/ca-turf-cleaning-service-areas">California</a> service areas.</p>
+<p>If your turf feels thinner or harder than it used to, that's an infill issue, not just a cleaning issue. <a href="/#free-quote">Get a free quote</a> — we check infill levels as part of every full-service cleaning across our <a href="/texas-service-areas">Texas service areas</a>.</p>

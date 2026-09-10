@@ -1,10 +1,11 @@
 <?php
 /**
- * Sitewide navigation. Matches the live site's nav structure exactly for
- * Phase 1 (Home | Texas Service Areas dropdown | About | Contact | Free
- * Quote). CA pages are linked from the footer (see footer.php), matching
- * current behavior. See docs/audit-findings.md for the note on eventually
- * giving CA/Austin more nav visibility as a Phase 2 improvement.
+ * Sitewide navigation: Home | Texas Service Areas dropdown | About |
+ * Contact. The top-level "California Service Areas" link was removed
+ * (business no longer services CA — see docs/audit-findings.md
+ * "California service discontinued"). CA city pages stay live and are
+ * still linked from the footer and sitemap.xml for SEO, just not promoted
+ * in primary navigation.
  */
 $navTxCities = [
     '/addison-tx-turf-cleaning' => 'Addison, TX',
@@ -32,7 +33,6 @@ $navTxCities = [
                 <?php endforeach; ?>
             </ul>
         </li>
-        <li><a href="/ca-turf-cleaning-service-areas"<?= $currentPath === '/ca-turf-cleaning-service-areas' ? ' aria-current="page"' : '' ?>>California Service Areas</a></li>
         <li><a href="/about"<?= $currentPath === '/about' ? ' aria-current="page"' : '' ?>>About</a></li>
         <li><a href="/contact"<?= $currentPath === '/contact' ? ' aria-current="page"' : '' ?>>Contact</a></li>
     </ul>

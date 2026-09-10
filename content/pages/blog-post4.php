@@ -1,21 +1,29 @@
-<?php // Originally an unpublished placeholder ("Your blog post" / "My post content").
-// New, unique article authored per owner's decision — see docs/audit-findings.md finding #5. ?>
-<h1>How Texas Heat and Bay Area Rain Affect Artificial Turf Differently</h1>
-<p>Clean Green Turf maintains yards in two very different climates — the Dallas Fort Worth Metroplex and California's Bay Area — and the maintenance challenges in each region aren't the same. If you've moved between the two, or just want to understand why your neighbor's turf problems don't match yours, here's the difference.</p>
+<?php // Originally an unpublished placeholder ("Your blog post" / "My post content"),
+// then rewritten as a TX-vs-Bay-Area comparison piece. Rewritten again here
+// since the business no longer services California — see
+// docs/audit-findings.md "California service discontinued" for the full
+// list of what changed and why. New topic, same slot/URL. ?>
+<h1>How DFW's Wild Weather Swings Affect Your Artificial Turf</h1>
+<p>North Texas doesn't have mild weather — it has extremes, sometimes in the same week. Scorching heat, sudden hailstorms, hard freezes, and long dry spells all put different kinds of stress on artificial turf. Here's what each one actually does to your yard, and what to watch for.</p>
 
-<h2>Texas: heat accelerates everything</h2>
-<p>Across our <a href="/texas-service-areas">DFW service areas</a>, the dominant issue is heat. Artificial turf can reach surface temperatures 40–70°F hotter than the surrounding air on a sunny Texas afternoon. That heat does two things: it speeds up bacterial growth (making pet odor worse, faster) and it accelerates infill compaction as the material expands and contracts through daily heat cycles. Texas yards typically need more frequent odor treatment and closer attention to infill levels than a similar yard in a milder climate.</p>
+<h2>Extreme heat: the big one</h2>
+<p>DFW summers routinely push artificial turf surface temperatures 40–70°F hotter than the air around it. That heat accelerates bacterial growth (worse pet odor, faster) and speeds up infill compaction as the material expands and contracts through daily heat cycles. If your maintenance schedule is going to flex anywhere during the year, July and August is where it matters most.</p>
 
-<h2>California Bay Area: drainage and organic debris</h2>
-<p>In our <a href="/ca-turf-cleaning-service-areas">California service areas</a>, the bigger factor is seasonal rain combined with tree cover common in Bay Area neighborhoods. Heavy rain events can temporarily overwhelm drainage if debris has built up in the infill layer, and falling leaves, seed pods, and pollen accumulate faster in yards near mature trees. The result isn't usually odor — it's slower drainage and a duller, matted appearance if debris isn't cleared regularly through fall and winter.</p>
+<h2>Hail and severe storms</h2>
+<p>Quality artificial turf is built to take a hit — the fibers are designed to flex rather than snap — but a bad hailstorm can still mat fibers down hard and drive debris deep into the base. After a significant storm, it's worth checking whether fibers are springing back upright on their own or need a power-brushing pass to recover fully.</p>
 
-<h2>What stays the same everywhere</h2>
-<p>Regardless of climate, the fundamentals don't change: debris has to be removed before it compacts into the fibers, infill needs periodic redistribution and topping off, and pet waste needs full extraction rather than surface rinsing. The frequency and seasonal timing are what shift based on where you live.</p>
+<h2>Sudden freezes</h2>
+<p>Texas freezes are unpredictable — 70°F one week, a hard freeze the next. Artificial turf itself doesn't get damaged by cold the way natural grass does, but drainage can be a problem: if debris has built up in the infill layer, freezing water can slow drainage further right when winter rain and ice need somewhere to go.</p>
 
-<h2>A quick regional checklist</h2>
+<h2>Drought and water restrictions</h2>
+<p>This is where artificial turf earns its keep. During DFW's periodic watering restrictions, artificial turf yards don't need a drop, while natural lawns brown out or violate watering schedules. The tradeoff: without rain to naturally rinse the surface, dust, pollen, and pet residue can build up faster during dry stretches, which is exactly when a cleaning is easy to forget because "it's not getting used as much."</p>
+
+<h2>A simple year-round approach</h2>
 <ul>
-<li><strong>Texas / DFW:</strong> prioritize odor control and infill checks through peak summer months</li>
-<li><strong>Bay Area, CA:</strong> prioritize debris clearing and drainage checks heading into the rainy season</li>
+<li>Tighten your cleaning schedule through peak summer heat (see our <a href="/blog-post">seasonal maintenance guide</a>)</li>
+<li>Do a quick fiber check after any major hail or windstorm</li>
+<li>Keep debris cleared going into winter so freeze cycles don't compound drainage issues</li>
+<li>Don't skip cleanings during dry spells just because the yard "looks fine" from a distance</li>
 </ul>
 
-<p>Whichever region you're in, we tailor the cleaning schedule to your climate and yard use rather than applying a one-size-fits-all visit. <a href="/#free-quote">Get a free quote</a> for your area.</p>
+<p>Whatever DFW's weather throws at your yard this year, we tailor the cleaning schedule to match it rather than applying a one-size-fits-all visit. <a href="/#free-quote">Get a free quote</a> for your yard.</p>

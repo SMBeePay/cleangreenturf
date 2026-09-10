@@ -29,16 +29,10 @@
 </blockquote>
 <p><a href="/#free-quote">Contact us for a free quote</a></p>
 
-<h3>Serving Two Regions</h3>
+<h3>Where We're Based</h3>
 <div>
 <h4>Texas — Dallas Fort-Worth</h4>
 <p>Serving the Dallas Fort Worth Metroplex with expert artificial turf cleaning services.</p>
 <p>11900 Presario Road, McKinney, TX 75071<br>
-Phone: <a href="tel:469-796-0034">469-796-0034</a></p>
-</div>
-<div>
-<h4>California — Bay Area</h4>
-<p>Serving the California Bay Area.</p>
-<p>2709 Holly Oak Ct, Brentwood, CA 94513<br>
 Phone: <a href="tel:469-796-0034">469-796-0034</a></p>
 </div>
