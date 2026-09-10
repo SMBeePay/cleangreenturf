@@ -341,9 +341,18 @@ unreachable fake host and confirmed it fails gracefully (logs the error,
 redirects to `/contact?error=send_failed`) rather than throwing an
 uncaught exception.
 
-**Still needed from the owner**: a real mailbox/SMTP credentials from
-Hostinger hPanel (Emails section) or another provider, placed in a `.env`
-file on the actual server (never committed).
+**Still needed from the owner**: a real mailbox/SMTP credentials, placed in
+a `.env` file on the actual server (never committed).
+
+**Update**: confirmed `andrew@cleangreenturf.com` is a Google Workspace
+address (not Hostinger-hosted email), so the config defaults and
+`.env.example` were updated to target Gmail's SMTP relay
+(`smtp.gmail.com`) authenticated as that same mailbox via a Google app
+password, rather than a separate Hostinger mailbox. This also means leads
+get sent from `andrew@cleangreenturf.com` to itself — the same self-
+addressed pattern most small-business contact forms use, and it avoids
+Gmail's relay rejecting a mismatched From address. Setup steps are in
+`.env.example`.
 
 ## Real form fields confirmed (owner shared an actual lead notification email)
 

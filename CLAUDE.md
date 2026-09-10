@@ -83,8 +83,8 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   (PHPMailer, vendored in `vendor/phpmailer/` — no Composer needed) when
   `config/mail.php` finds credentials (real env vars or a local `.env`,
   see `.env.example`); falls back to PHP `mail()` if none are set yet.
-  **Still needs real SMTP credentials from Hostinger** (or another
-  provider) before launch — see "Not done yet" below.
+  **Still needs a real Gmail app password** (andrew@cleangreenturf.com is
+  Google Workspace — see "Not done yet" below).
 - `sitemap.xml` / `robots.txt` regenerated for the new architecture
   (`bin/generate-sitemap.php`).
 - **Full design overhaul** (per explicit owner request, after the initial
@@ -120,9 +120,14 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   `.env.example`) — just needs real credentials, see "Not done yet."
 
 **Not done yet:**
-- **SMTP credentials**: get a mailbox (e.g. `no-reply@cleangreenturf.com`)
-  from Hostinger hPanel > Emails, then create `.env` from `.env.example`
-  on the server with its SMTP host/username/password. Never commit `.env`.
+- **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
+  Workspace, so this is a Gmail app password, not a Hostinger mailbox — see
+  `.env.example` for the exact steps (turn on 2-Step Verification, generate
+  an app password at https://myaccount.google.com/apppasswords). Create
+  `.env` from `.env.example` on the server with that password. Never
+  commit `.env`. If deploying via Hostinger's Git integration, this file
+  needs to be placed on the server directly (it isn't in the repo) —
+  confirm a redeploy doesn't wipe it.
 - Deployment to Hostinger isn't wired up (decided: Hostinger's Git
   integration; needs the user to actually connect the repo in hPanel and
   confirm the deploy path matches this repo's root-as-webroot layout).
