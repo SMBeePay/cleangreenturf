@@ -2,9 +2,13 @@
 /**
  * The site's lead-capture form. The original site's form posted to a
  * Hostinger-Website-Builder-only endpoint that can't be reused (see
- * docs/business-info.md) — this is a from-scratch replacement collecting
- * the same fields, submitting to forms/handle-quote.php, which emails
- * andrew@cleangreenturf.com per the owner's explicit instruction.
+ * docs/business-info.md) — this is a from-scratch replacement submitting
+ * to forms/handle-quote.php, which emails andrew@cleangreenturf.com per
+ * the owner's explicit instruction. Fields match a real notification email
+ * from the live form (see docs/audit-findings.md "Real form fields
+ * confirmed") — Name, Phone, Email, Full Address, Approx Size of Turf
+ * Area, and a cleaning-frequency field the first rebuild had guessed wrong
+ * as a services checklist.
  */
 require_once __DIR__ . '/icons.php';
 ?>
@@ -41,12 +45,17 @@ require_once __DIR__ . '/icons.php';
                 <option value="Not sure">Not sure</option>
             </select>
         </div>
-        <div class="quote-form__row quote-form__row--checkboxes">
-            <span class="quote-form__group-label">What do you need? (check all that apply)</span>
-            <label><input type="checkbox" name="services[]" value="Turf Cleaning"> Turf Cleaning</label>
-            <label><input type="checkbox" name="services[]" value="Pet Odor Removal"> Pet Odor Removal</label>
-            <label><input type="checkbox" name="services[]" value="Infill Replenishment"> Infill Replenishment</label>
-            <label><input type="checkbox" name="services[]" value="Commercial / Sports Field"> Commercial / Sports Field</label>
+        <div class="quote-form__row">
+            <label for="qf-frequency">How Frequently Would You Like Your Turf Cleaned?*</label>
+            <select id="qf-frequency" name="frequency" required>
+                <option value="">Select one</option>
+                <option value="One-Time">One-Time</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Bi-Annual">Bi-Annual</option>
+                <option value="Annual">Annual</option>
+                <option value="Not sure">Not sure</option>
+            </select>
         </div>
         <div class="quote-form__row">
             <label for="qf-notes">Any additional notes we should know about?</label>

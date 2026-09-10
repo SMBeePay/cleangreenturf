@@ -45,7 +45,7 @@ $phone = trim((string)($_POST['phone'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
 $address = trim((string)($_POST['address'] ?? ''));
 $turfSize = trim((string)($_POST['turf_size'] ?? ''));
-$services = array_map('strval', (array)($_POST['services'] ?? []));
+$frequency = trim((string)($_POST['frequency'] ?? ''));
 $notes = trim((string)($_POST['notes'] ?? ''));
 
 if ($name === '' || $phone === '' || $email === '' || $address === '') {
@@ -72,10 +72,10 @@ $body = "New turf cleaning quote request from cleangreenturf.com\n\n";
 $body .= "Name: $name\n";
 $body .= "Phone: $phone\n";
 $body .= "Email: $email\n";
-$body .= "Address: $address\n";
-$body .= "Approx. turf size: " . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n";
-$body .= "Services requested: " . (count($services) ? implode(', ', $services) : 'Not specified') . "\n";
-$body .= "Notes: " . ($notes !== '' ? $notes : 'None') . "\n";
+$body .= "Full Address: $address\n";
+$body .= "Approx Size of Turf Area: " . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n";
+$body .= "How Frequently Would You Like Your Turf Cleaned?: " . ($frequency !== '' ? $frequency : 'Not specified') . "\n";
+$body .= "Any additional notes we should know about?: " . ($notes !== '' ? $notes : 'None') . "\n";
 
 $sent = false;
 

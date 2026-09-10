@@ -81,16 +81,21 @@ a hosted form service) that collects the same fields and delivers leads the
 same way you currently receive them. See open questions below for what "the
 same way" means today.
 
-## Form fields (as found on `/contact` and `/dfw-turf-cleaning-request-ga`)
+## Form fields (confirmed from a real lead notification email — see
+docs/audit-findings.md "Real form fields confirmed")
 
 - Name (text)
 - Phone (text)
-- Email (text)
+- Email — labeled "Short answer email" in the original builder, a leftover
+  default field name, not meaningful copy; rebuilt form just labels it "Email"
 - Full Address (text)
-- Several checkboxes (service-interest options — the live HTML uses opaque
-  builder-generated IDs, not readable labels; we'll need to view the rendered
-  page to capture the actual checkbox labels before rebuilding this form)
-- Additional notes (textarea)
+- Approx Size of Your Turf Area (dropdown)
+- How Frequently Would You Like Your Turf Cleaned? (dropdown — confirmed
+  real field; an earlier pass had incorrectly guessed a services checklist
+  here instead, since the original checkbox/field labels weren't visible in
+  the static HTML. Fixed once a real submission email surfaced the actual
+  field.)
+- Any additional notes we should know about? (textarea)
 
 ## Favicon
 

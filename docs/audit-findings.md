@@ -344,3 +344,31 @@ uncaught exception.
 **Still needed from the owner**: a real mailbox/SMTP credentials from
 Hostinger hPanel (Emails section) or another provider, placed in a `.env`
 file on the actual server (never committed).
+
+## Real form fields confirmed (owner shared an actual lead notification email)
+
+The first rebuild of the quote form guessed at the checkbox fields since
+the live HTML only exposed opaque builder-generated field IDs (see
+`docs/business-info.md`'s original note). The owner then shared a real
+notification email from the live Hostinger form
+(`noreply@notifications.hostinger.com`), which shows the actual fields:
+Name, Phone, "Short answer email," Full Address, Approx Size of Your Turf
+Area, **"How Frequently Would You Like Your Turf Cleaned?"** (dropdown,
+seen with value "Annual"), and a notes field.
+
+There was no services checklist ("Turf Cleaning / Pet Odor Removal /
+Infill Replenishment / Commercial") — that was a guess in the first
+rebuild pass, and it was wrong. Replaced it with the real cleaning-
+frequency dropdown in `includes/quote-form.php` and
+`forms/handle-quote.php` (One-Time / Monthly / Quarterly / Bi-Annual /
+Annual / Not sure — exact option set inferred from the one visible value,
+"Annual," since the full dropdown list wasn't visible in the screenshot).
+
+Also confirmed from that email: the owner's existing workflow is to click
+the customer's email address in the notification body to open a reply
+addressed to the customer directly (Gmail auto-linkifies plain email
+addresses/phone numbers, so this works the same whether the notification
+is HTML or plain text). The rebuilt form already does better than this by
+setting a `Reply-To` header to the customer's address — the owner can just
+hit their mail client's native Reply button and it goes straight to the
+lead, no need to click through the body text.
