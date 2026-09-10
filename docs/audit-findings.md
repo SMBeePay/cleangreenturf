@@ -112,6 +112,30 @@ No structural/template changes were needed for this pass — same class
 names throughout, only `assets/css/style.css` (and `includes/navigation.php`
 for the duplicate-button fix) changed.
 
+### Design v3 — accent color pulled from the actual logo
+
+Owner feedback: didn't like the burnt-orange accent from v2. Asked for
+something that contrasts with the greens already in use — "could even be a
+brighter green" — and to reference the actual logo to stay on-brand.
+
+Sampled the logo pixels directly (`assets/images/logo.png`) instead of
+guessing: it's built from a deep teal-forest (`#0a4650`) and a soft sage
+(`#b4dcbe`), not the pure black-green this project had been using. Rebuilt
+the palette around those two real brand colors:
+- `--forest-950/900/800` shifted from a near-black green to the logo's
+  actual teal-forest hue.
+- `--green-700/600/500` (mid-tone, card borders/step icons/links) shifted
+  toward the same teal-green family.
+- The accent variable was renamed `--rust-*` → `--accent-*` and recolored
+  to a bright, saturated green (`#22c05a`) — distinct enough in brightness
+  to still pop as the CTA/highlight color against the darker teal-greens,
+  without introducing an unrelated hue like the orange did.
+
+Same mechanism as v2: only CSS variable values changed, every component
+rule already referenced the variable names, so no template/markup changes
+were needed beyond the rename itself (self-contained to
+`assets/css/style.css`).
+
 ---
 
 ## Original findings (as first written, before the fixes above)
