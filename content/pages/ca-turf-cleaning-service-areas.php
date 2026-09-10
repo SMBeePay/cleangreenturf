@@ -1,5 +1,5 @@
 <?php // Migrated content — see docs/site-backup-2026-09-08/pages/ca-turf-cleaning-service-areas.html for the original source ?>
-<img src="/assets/images/image0-1-mp4o42kx77fbbo3y.webp" alt="" loading="lazy" width="768" height="589"><h1>California Service Areas for Clean Green Turf Artificial Turf Cleaning</h1>
+<img src="/assets/images/image0-1-mp4o42kx77fbbo3y.webp" alt="Artificial turf cleaning service in California" loading="lazy" width="768" height="589"><h1>California Service Areas for Clean Green Turf Artificial Turf Cleaning</h1>
 
 <ul>
 <li><a href="/antioch-ca-turf-cleaning">Antioch, CA</a></li>

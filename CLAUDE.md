@@ -79,9 +79,12 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   LocalBusiness JSON-LD via `includes/schema.php`.
 - New lead-capture form (`includes/quote-form.php` +
   `forms/handle-quote.php`) replacing the old Hostinger-proprietary form
-  backend — currently uses PHP `mail()` to `andrew@cleangreenturf.com`;
-  needs SMTP credentials to harden deliverability before launch (see
-  requirement #19 and the TODO in `forms/handle-quote.php`).
+  backend, sending to `andrew@cleangreenturf.com`. Sends via SMTP
+  (PHPMailer, vendored in `vendor/phpmailer/` — no Composer needed) when
+  `config/mail.php` finds credentials (real env vars or a local `.env`,
+  see `.env.example`); falls back to PHP `mail()` if none are set yet.
+  **Still needs real SMTP credentials from Hostinger** (or another
+  provider) before launch — see "Not done yet" below.
 - `sitemap.xml` / `robots.txt` regenerated for the new architecture
   (`bin/generate-sitemap.php`).
 - **Full design overhaul** (per explicit owner request, after the initial
@@ -96,15 +99,36 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   and the Google-Ads landing page `/dfw-turf-cleaning-request-ga` had **no
   working form at all** after the initial migration pass (only the homepage
   got one first time round). Both now have the real quote form.
+- **Design v2/v3**: reworked typography/color twice against owner feedback
+  — see `docs/audit-findings.md` "Design v2" and "Design v3" for the
+  reference-site analysis and the logo-color-sampling that drove the final
+  palette.
+- **California service discontinued**: removed CA from schema, footer NAP,
+  nav, trust bar, and `/about`; kept the 10 CA city pages + overview page
+  live and footer-linked for SEO per explicit instruction. See
+  `docs/audit-findings.md` "California service discontinued."
+- **Pre-launch crawl** (#28) run against the local build: fixed 3 images
+  missing alt text and one real orphan page (`/ca-turf-cleaning-service-areas`
+  lost its only internal link when the CA nav item was removed — now
+  reachable again via the footer's "California" heading). Everything else
+  (titles, descriptions, canonicals, H1s, internal links, robots meta)
+  came back clean. `/dfw-turf-cleaning-request-ga` and
+  `/dfw-turf-cleaning-request-success` are orphans by design (a PPC landing
+  page and a post-submit thank-you page respectively aren't meant to be
+  linked from navigation).
+- **SMTP scaffolding** built (`config/mail.php`, `vendor/phpmailer/`,
+  `.env.example`) — just needs real credentials, see "Not done yet."
 
 **Not done yet:**
+- **SMTP credentials**: get a mailbox (e.g. `no-reply@cleangreenturf.com`)
+  from Hostinger hPanel > Emails, then create `.env` from `.env.example`
+  on the server with its SMTP host/username/password. Never commit `.env`.
 - Deployment to Hostinger isn't wired up (decided: Hostinger's Git
   integration; needs the user to actually connect the repo in hPanel and
   confirm the deploy path matches this repo's root-as-webroot layout).
-- SMTP for the form handler (currently PHP `mail()`, not production-hardened).
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
-- Full pre-launch crawl (#28) and old-vs-new comparison (#29) against the
+- Old-vs-new comparison (#29) against the
   *live* new site once it's actually deployed somewhere reachable.
 - Google Search Console verification carryover (no verification meta tag
   was found on the live site — needs to be confirmed via DNS or GSC directly).

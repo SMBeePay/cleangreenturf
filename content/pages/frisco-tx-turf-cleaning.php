@@ -3,7 +3,7 @@
 
 <a href="/#free-quote">GET FREE QUOTE</a><p>Frisco backyards work hard. Dogs, kids, Texas heat, and afternoon thunderstorms all take a toll on artificial turf. Clean Green Turf provides professional turf cleaning throughout Frisco, fully extracting pet odors and deep-cleaning synthetic grass so it looks, smells, and performs like new. Locally owned, DFW-based, and built around one thing: genuinely clean turf.</p>
 
-<h2><strong>Our Turf Cleaning Services in Frisco</strong></h2><img src="/assets/images/img-3051-copy-osmx51tthkiidia3.webp" alt="" loading="lazy" width="768" height="553"><h3><strong>Pet Odor and Urine Extraction</strong></h3>
+<h2><strong>Our Turf Cleaning Services in Frisco</strong></h2><img src="/assets/images/img-3051-copy-osmx51tthkiidia3.webp" alt="Pet odor and urine extraction from artificial turf in Frisco, TX" loading="lazy" width="768" height="553"><h3><strong>Pet Odor and Urine Extraction</strong></h3>
 <p>This is where we are different. We don't mask urine odor with fragrance. We extract it. Our process pulls urine out of the turf fibers and infill at the source using an enzyme-based, pet-safe solution. When we're done, the smell is gone because the source is gone.</p>
 <h3><strong>Turf Reblooming and Fiber Restoration</strong></h3>
 <p>Heavy foot traffic and pet activity mat turf fibers flat. We brush and rebloom the blades so your turf stands upright and looks full again.</p>

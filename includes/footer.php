@@ -48,7 +48,7 @@ function slugify_city($city) {
         </div>
 
         <div class="site-footer__areas">
-            <h3>California</h3>
+            <h3><a href="/ca-turf-cleaning-service-areas">California</a></h3>
             <ul>
                 <?php foreach ($businessInfo['service_areas']['ca'] as $city):
                     $slug = slugify_city($city) . '-ca-turf-cleaning';

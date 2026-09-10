@@ -293,3 +293,54 @@ doesn't close. Worth deciding later whether those pages need a brief
 "we've paused Bay Area service, but here's what we learned serving this
 area" note, get formally noindexed, or stay exactly as-is — flagging rather
 than deciding unilaterally, per requirement #33.
+
+## Pre-launch crawl (requirement #28) and SMTP hardening
+
+With the design approved, moved to launch-readiness per the requirements
+doc's phased order.
+
+### Pre-launch crawl findings
+
+Ran a full internal-link/metadata crawl against the local build (all 36
+routes). Findings and fixes:
+- 3 images were missing alt text (`/antioch-ca-turf-cleaning`,
+  `/ca-turf-cleaning-service-areas`, `/frisco-tx-turf-cleaning`) — added
+  descriptive alt text to each.
+- **Real orphan introduced by the California change**:
+  `/ca-turf-cleaning-service-areas` lost its only internal link when the
+  "California Service Areas" nav item was removed. Fixed by making the
+  footer's "California" column heading link to it — restores
+  discoverability/link equity without reintroducing prominent promotion.
+- Everything else came back clean: no broken internal links, no duplicate
+  titles/descriptions, no missing canonicals, exactly one H1 per page, no
+  accidental noindex, all canonicals self-referencing and correct.
+- `/dfw-turf-cleaning-request-ga` (Google Ads landing page) and
+  `/dfw-turf-cleaning-request-success` (post-submit thank-you page) are
+  orphans by design — standard practice for a PPC landing page and a
+  redirect-only thank-you page respectively. Not treated as defects.
+
+### SMTP hardening
+
+Vendored PHPMailer directly (`vendor/phpmailer/{PHPMailer,SMTP,Exception}.php`,
+pulled from the official GitHub source, MIT licensed) rather than requiring
+Composer, since Hostinger shared hosting may not have Composer available
+and this keeps deployment to a plain file copy.
+
+`config/mail.php` reads SMTP credentials from real server environment
+variables first, falling back to a local `.env` file (gitignored;
+`.env.example` documents the expected keys and is the only one committed).
+`forms/handle-quote.php` now sends via SMTP when credentials are present,
+and falls back to PHP `mail()` when they're not — so the form keeps working
+either way, it just won't be deliverability-hardened until real credentials
+are added.
+
+Tested both paths locally: the `mail()` fallback fails gracefully in this
+sandbox (no local MTA, expected — not a code issue) with proper error
+handling and no crash; the SMTP path was tested against a deliberately
+unreachable fake host and confirmed it fails gracefully (logs the error,
+redirects to `/contact?error=send_failed`) rather than throwing an
+uncaught exception.
+
+**Still needed from the owner**: a real mailbox/SMTP credentials from
+Hostinger hPanel (Emails section) or another provider, placed in a `.env`
+file on the actual server (never committed).

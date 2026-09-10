@@ -4,16 +4,24 @@
  * form backend (see docs/business-info.md) with a plain PHP mail handler
  * that sends to andrew@cleangreenturf.com, per explicit owner instruction.
  *
- * Production note: PHP's mail() relies on the host's mail transport and is
- * frequently marked as spam without a properly configured sender domain.
- * Once Hostinger SMTP credentials are available, swap the mail() call below
- * for SMTP (e.g. PHPMailer) using credentials from environment variables —
- * never hard-code them here. See docs/migration-requirements.md #19.
+ * Sends via SMTP (PHPMailer, vendored in vendor/phpmailer/ — no Composer
+ * needed) when config/mail.php finds SMTP credentials (env vars or a local
+ * .env file, see .env.example). Falls back to PHP's mail() otherwise,
+ * which works but is not production-reliable for deliverability — see
+ * docs/migration-requirements.md #19.
  */
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../vendor/phpmailer/Exception.php';
+require_once __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
+require_once __DIR__ . '/../vendor/phpmailer/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+
 $businessInfo = require __DIR__ . '/../config/business-info.php';
+$mailConfig = require __DIR__ . '/../config/mail.php';
 
 function redirect_with_error(string $reason): never {
     header('Location: /contact?error=' . urlencode($reason));
@@ -69,16 +77,50 @@ $body .= "Approx. turf size: " . ($turfSize !== '' ? $turfSize : 'Not provided')
 $body .= "Services requested: " . (count($services) ? implode(', ', $services) : 'Not specified') . "\n";
 $body .= "Notes: " . ($notes !== '' ? $notes : 'None') . "\n";
 
-$headers = [
-    'From: ' . $businessInfo['name'] . ' Website <no-reply@cleangreenturf.com>',
-    'Reply-To: ' . $name . ' <' . $email . '>',
-    'Content-Type: text/plain; charset=UTF-8',
-];
+$sent = false;
 
-$sent = mail($to, $subject, $body, implode("\r\n", $headers));
+if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($mailConfig['password'])) {
+    // SMTP path — reliable delivery, won't land in spam as easily as mail().
+    $mailer = new PHPMailer(true);
+    try {
+        $mailer->isSMTP();
+        $mailer->Host = $mailConfig['host'];
+        $mailer->Port = $mailConfig['port'];
+        $mailer->SMTPAuth = true;
+        $mailer->Username = $mailConfig['username'];
+        $mailer->Password = $mailConfig['password'];
+        if ($mailConfig['encryption'] === 'ssl') {
+            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($mailConfig['encryption'] === 'tls') {
+            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        } else {
+            $mailer->SMTPAutoTLS = false;
+        }
+
+        $mailer->setFrom($mailConfig['from_email'], $mailConfig['from_name']);
+        $mailer->addAddress($to);
+        $mailer->addReplyTo($email, $name);
+        $mailer->Subject = $subject;
+        $mailer->Body = $body;
+        $mailer->isHTML(false);
+
+        $sent = $mailer->send();
+    } catch (PHPMailerException $e) {
+        error_log('Quote form SMTP send failed: ' . $mailer->ErrorInfo);
+        $sent = false;
+    }
+} else {
+    // No SMTP configured yet — fall back to mail().
+    $headers = [
+        'From: ' . $mailConfig['from_name'] . ' <' . $mailConfig['from_email'] . '>',
+        'Reply-To: ' . $name . ' <' . $email . '>',
+        'Content-Type: text/plain; charset=UTF-8',
+    ];
+    $sent = mail($to, $subject, $body, implode("\r\n", $headers));
+}
 
 if (!$sent) {
-    error_log('Quote form mail() failed for submission from ' . $email);
+    error_log('Quote form submission failed to send for ' . $email);
     redirect_with_error('send_failed');
 }
 

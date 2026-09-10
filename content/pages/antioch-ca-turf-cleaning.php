@@ -1,5 +1,5 @@
 <?php // Migrated content — see docs/site-backup-2026-09-08/pages/antioch-ca-turf-cleaning.html for the original source ?>
-<img src="/assets/images/antioch-artificial-turf-cleaning-yx4l9yk4r8fzr45w.webp" alt="" loading="lazy" width="1600" height="1600"><h1>Revolutionize Your Artificial Turf in Antioch, CA | Clean Green Turf</h1>
+<img src="/assets/images/antioch-artificial-turf-cleaning-yx4l9yk4r8fzr45w.webp" alt="Artificial turf cleaning in Antioch, CA" loading="lazy" width="1600" height="1600"><h1>Revolutionize Your Artificial Turf in Antioch, CA | Clean Green Turf</h1>
 
 <p>Revolutionize your Antioch, CA landscape with our Cutting-Edge Artificial Turf Cleaning Services! Experience the epitome of efficiency and eco-friendliness with Clean Green Turf. Our advanced cleaning solutions redefine the standards for artificial turf maintenance.</p>
 <p>Say goodbye to conventional cleaning methods! Embrace a greener approach that not only preserves the lush aesthetics of your turf but also aligns with environmental consciousness. Our expert team ensures a meticulous cleaning process, leaving your turf spotless and revitalized.</p>

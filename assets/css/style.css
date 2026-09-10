@@ -499,6 +499,8 @@ blockquote img {
 }
 .site-footer h2 { color: #fff; margin-top: 0; font-size: var(--step-1); }
 .site-footer h3 { color: #fff; margin-top: 0; font-size: var(--step--1); letter-spacing: 0.08em; }
+.site-footer h3 a { color: inherit; }
+.site-footer h3 a:hover { color: var(--accent-500); }
 .site-footer ul { list-style: none; padding: 0; margin: 0; }
 .site-footer li { margin-bottom: 0.55em; font-size: var(--step--1); }
 .site-footer__about p { color: #b9ccbc; font-size: var(--step--1); }
