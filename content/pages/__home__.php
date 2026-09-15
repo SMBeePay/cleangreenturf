@@ -3,11 +3,12 @@
 // Removal) were plain unmarked text in the live site — restored as h4s here,
 // not a content change. The original hero image had alt="black and white bed
 // linen" (a leftover generic stock-template image, unrelated to turf) — swapped
-// for a real turf photo already used elsewhere on this page as part of the
-// visual redesign; see docs/audit-findings.md addendum. The three process
+// for a real turf photo as part of the visual redesign, then swapped again
+// for a better-looking one per owner feedback (see docs/audit-findings.md
+// "Hero image swapped"). The three process
 // steps are now presented as cards and the stats line as a stats strip —
 // visual treatment only, same copy, same headings. ?>
-<img src="/assets/images/img-3051-copy-rxhjg364wvwwul4l.webp" alt="Artificial turf yard cleaned in Little Elm, Texas" loading="eager" width="768" height="589">
+<img src="/assets/images/img-1438-amq1qlojlqtwkxyo.webp" alt="Freshly cleaned artificial turf lawn with crisp mow-pattern lines" loading="eager" width="1440" height="499">
 <h1>Expert Artificial Turf Cleaning Services</h1>
 <h4>Clean · Deodorize · Rejuvenate</h4>
 <p>Rated 5 stars by customers ★★★★★</p>
@@ -15,7 +16,7 @@
 
 <h3>DFW Artificial Turf Experts</h3>
 <p>DFW summers are brutal on pet turf. We built our cleaning process specifically for Texas heat and Texas dogs — a pet-safe formula that fully extracts urine instead of masking it, so your backyard actually smells clean and stays that way. No gimmicks, no perfume cover-ups. Just clean turf.</p>
-<img src="/assets/images/img-1438-amq1qlojlqtwkxyo.webp" alt="Artificial turf cleaning technician at work" loading="lazy" width="1440" height="499">
+<img src="/assets/images/bat-photo5-m7v3qvwpl1hjk71q.webp" alt="Artificial turf cleaning technician at work" loading="lazy" width="1600" height="1200">
 
 <div class="stats-strip">
     <div class="stats-strip__item"><span class="stats-strip__number">300+</span><span class="stats-strip__label">Sq Ft Cleaned</span></div>

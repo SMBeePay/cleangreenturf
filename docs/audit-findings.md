@@ -384,6 +384,20 @@ the preserved H1 or tagline, and it does not create dedicated
 remains Phase 2 scope per requirement #34 and CLAUDE.md's "Not done yet" —
 flagging rather than expanding scope unilaterally, per requirement #33.
 
+## Hero image swapped (owner-directed)
+
+Owner didn't like the homepage hero photo. Rather than sourcing something
+new, swapped in `img-1438-amq1qlojlqtwkxyo.webp` — already in
+`assets/images/`, already used further down the same page, and already
+cropped almost exactly to hero-banner proportions (1440×499) — a crisp,
+professionally striped/brushed turf lawn with no clutter in frame. Since
+that image was already doing a job lower on the page (illustrating "DFW
+Artificial Turf Experts"), swapped a different, previously-unused photo
+into that spot instead (`bat-photo5-m7v3qvwpl1hjk71q.webp`, a technician
+actively pressure-washing next to a clean turf yard) so nothing on the
+page ended up duplicated. `content/pages/__home__.php` updated; alt text
+rewritten for both to match what's actually in each photo.
+
 ## Stray homepage image removed (owner-directed)
 
 Owner flagged a specific image on the homepage, between the process-step
