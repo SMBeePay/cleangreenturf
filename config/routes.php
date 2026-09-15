@@ -206,6 +206,21 @@ return [
         'description' => 'Artificial turf cleaning in Rockwall, TX serving Chandler Creek, Heath, and lakefront communities. Full pet odor extraction. Pet-safe, family-safe. Free quote: (469) 796-0034.',
         'schema_types' => ['WebPage'],
     ],
+    '/reschedule' => [
+        'slug' => 'reschedule',
+        'template' => 'page',
+        'title' => 'Reschedule Your Estimate | Clean Green Turf',
+        'description' => 'Reschedule or cancel your turf installation estimate appointment.',
+        'schema_types' => [],
+        'robots' => 'noindex, nofollow',
+    ],
+    '/schedule-turf-installation-estimate' => [
+        'slug' => 'schedule-turf-installation-estimate',
+        'template' => 'page',
+        'title' => 'Schedule a Free Turf Installation Estimate | Clean Green Turf',
+        'description' => 'Pick a day and time for a free in-person artificial turf installation estimate in the DFW metroplex. Fast confirmation, text reminder the day before.',
+        'schema_types' => ['WebPage'],
+    ],
     '/texas-service-areas' => [
         'slug' => 'texas-service-areas',
         'template' => 'page',

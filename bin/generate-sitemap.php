@@ -21,7 +21,7 @@ $xml->startElement('urlset');
 $xml->writeAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
 foreach ($routes as $path => $route) {
-    if (($route['robots'] ?? '') === 'noindex, follow' || ($route['robots'] ?? '') === 'noindex') {
+    if (str_starts_with($route['robots'] ?? '', 'noindex')) {
         continue;
     }
     $xml->startElement('url');

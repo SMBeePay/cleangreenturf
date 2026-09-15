@@ -170,6 +170,28 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   actual computed box dimensions in a headless browser, not just a
   screenshot. See `docs/audit-findings.md` "Hero image was actually
   collapsed to zero height."
+- **Turf installation estimate scheduler (new capability, owner-directed)**:
+  the business is expanding into installation, not just cleaning. Built a
+  fully custom (not Acuity-embedded, per owner's explicit choice)
+  day/time booking system: `/schedule-turf-installation-estimate` (public
+  booking page, vanilla-JS calendar, no external library),
+  `/reschedule?token=...` (reschedule/cancel via a random unguessable
+  token sent only in emails/texts, `noindex,nofollow`), `/admin/` (simple
+  password-gated dashboard to see bookings), and
+  `bin/send-reminders.php` (day-before SMS reminder, meant to run via a
+  Hostinger cron job — hPanel setup is a manual step, not something this
+  project can do itself). Storage is SQLite at `data/scheduler.sqlite`
+  (zero setup on shared hosting, same philosophy as the mail() fallback)
+  — blocked from direct web access in `.htaccess` + its own deny-all
+  `.htaccess`, and gitignored (customer PII) with one explicit exception
+  so that `.htaccess` file itself still ships. Booking confirmations and
+  owner notifications work today via the same SMTP/mail() pattern as the
+  quote form; the day-before **text** needs real Twilio credentials
+  before it sends (see "Not done yet"). Double-booking is prevented
+  server-side (every slot re-validated against live availability at
+  request time), verified end-to-end locally: book, double-book-rejected,
+  reschedule, cancel, double-cancel-rejected. See
+  `docs/audit-findings.md` "Turf installation estimate scheduler."
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
@@ -187,6 +209,17 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   so the Git-integration deploy alone won't have put it there — and then
   test the quote form end-to-end on live infrastructure. Domain cutover
   (pointing cleangreenturf.com at this hosting) has not happened yet.
+- **Scheduler follow-ups**: (1) Twilio credentials for the day-before SMS
+  reminder — see `.env.example`'s `TWILIO_*` section for the ~5-minute
+  signup; without it the scheduler still fully works (booking, email
+  confirmation, reschedule, cancel), it just skips the text. (2) A daily
+  Hostinger cron job needs to be set up in hPanel to actually run
+  `bin/send-reminders.php` — see that file's header comment for the exact
+  command. (3) Not yet linked from anywhere on the site (no nav entry, no
+  homepage CTA) — reachable only by direct URL for now; owner mentioned
+  having ad copy for a turf-installation landing page, which would
+  naturally link to this scheduler once shared. (4) `ADMIN_PASSWORD` needs
+  to be set in `.env` before `/admin/appointments.php` is usable.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the

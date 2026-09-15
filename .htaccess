@@ -13,7 +13,7 @@ RewriteRule ^(.*)$ https://cleangreenturf.com/%{REQUEST_URI} [L,R=301]
 
 # 3) Never serve source/content directories directly (defense in depth —
 #    each also has its own "deny all" .htaccess)
-RewriteRule ^(config|content|includes|templates|bin|docs|vendor)(/|$) - [F,L]
+RewriteRule ^(config|content|includes|templates|bin|docs|vendor|data)(/|$) - [F,L]
 
 # 4) Real files/directories (assets, forms/*.php) pass through untouched
 RewriteCond %{REQUEST_FILENAME} -f [OR]

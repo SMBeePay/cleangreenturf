@@ -4,3 +4,7 @@
 *.log
 .DS_Store
 node_modules/
+
+# Scheduler's SQLite database — runtime data with customer PII, never committed.
+/data/*
+!/data/.htaccess

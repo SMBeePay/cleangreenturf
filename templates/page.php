@@ -44,7 +44,7 @@ if (preg_match('/^\s*(?:(<img\b[^>]*>)\s*)?<h1[^>]*>(.*?)<\/h1>/is', $content, $
 </div>
 
 <?php
-$skipCtaBanner = ['contact', 'dfw-turf-cleaning-request-success', 'dfw-turf-cleaning-request-ga'];
+$skipCtaBanner = ['contact', 'dfw-turf-cleaning-request-success', 'dfw-turf-cleaning-request-ga', 'schedule-turf-installation-estimate', 'reschedule'];
 if (!in_array($route['slug'], $skipCtaBanner, true)):
     require __DIR__ . '/../includes/cta-banner.php';
 endif;

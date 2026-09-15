@@ -439,6 +439,101 @@ screenshots on both the homepage and an inner location page (the image was
 visible on both once this landed — `.page-hero` is shared by every
 template).
 
+## Turf installation estimate scheduler (owner-directed, new capability)
+
+The business is expanding beyond cleaning into installation. Owner's ask,
+based on a friend's company having sold "1000s of installs" this way: a
+simple page where a lead picks a day/time for a free in-person install
+estimate, gets an email confirmation immediately, and a text reminder the
+day before with an easy reschedule link. Owner explicitly chose a fully
+custom build over embedding Acuity Scheduling (the real product their
+friend used) — no recurring third-party subscription, full control, at
+the cost of building booking logic ourselves.
+
+This is new functionality, not a migration of anything from the live site
+— nothing here touches the preserved cleaning-business content/URLs/SEO.
+It's also, functionally, the start of Phase 2 (new Installation-service
+capability, requirement #34's "new Repair/Installation pages") — flagging
+that per requirement #33 rather than treating "Phase 1 first" as a hard
+blocker against a direct, explicit owner request to build it now.
+
+**What it is:**
+- `/schedule-turf-installation-estimate` — public booking page. A vanilla-
+  JS month calendar (`assets/js/scheduler.js`, no external calendar
+  library) fetches open slots from `scheduler/availability.php` and posts
+  a completed booking to `scheduler/book.php`.
+- `/reschedule?token=...` — same calendar widget in reschedule mode, plus
+  a cancel option. The token is a random 32-hex-char string
+  (`bin2hex(random_bytes(16))`), sent only in the confirmation email/
+  reminder text, never guessable. `noindex, nofollow` and left out of
+  `sitemap.xml` since it's a private per-customer link.
+- `/admin/index.php` + `/admin/appointments.php` — the "how does Andrew
+  see the calendar" piece. Simple session-login gated by an `ADMIN_PASSWORD`
+  in `.env` (same out-of-git-secrets pattern as SMTP), listing upcoming/
+  all/cancelled appointments. Deliberately outside the public template
+  shell (own minimal HTML) — this is an operator tool, not a marketing
+  page, same reasoning as `forms/handle-quote.php` being a standalone
+  script rather than a routed page.
+- `bin/send-reminders.php` — meant to run daily via a Hostinger cron job
+  (hPanel &gt; Advanced &gt; Cron Jobs — this project has no way to set that
+  up itself, it's a manual one-time hPanel step). Texts anyone with a
+  confirmed appointment tomorrow that hasn't already gotten a reminder,
+  with a link to reschedule.
+
+**Storage — SQLite, not MySQL, on purpose:** zero setup on Hostinger
+shared hosting, no separate database credentials to configure before this
+can go live, same "works out of the box" philosophy as the mail()
+fallback in `config/mail.php`. Lives at `data/scheduler.sqlite`, created
+automatically on first booking. `/data/` is blocked from direct web
+access two ways — the top-level `.htaccess`'s blocked-directories rule
+(now includes `data` alongside `config|content|includes|templates|bin|
+docs|vendor`) and its own deny-all `.htaccess` — since it holds customer
+name/phone/email/address. `/data/` is gitignored (runtime PII, never
+committed) with one explicit exception so its `.htaccess` itself still
+ships: `.gitignore` has `/data/*` then `!/data/.htaccess`.
+
+**SMTP works today; SMS needs one more setup step, same as the original
+quote form did:** booking confirmations and the notification to
+`andrew@cleangreenturf.com` reuse the exact SMTP-with-mail()-fallback
+pattern from `forms/handle-quote.php` (pulled into a shared
+`includes/mailer.php` so `scheduler/book.php` and `scheduler/reschedule.php`
+don't each reimplement it) — so booking, confirming, rescheduling, and
+cancelling all work fully right now. The day-before **text** reminder is
+the one piece that needs real Twilio credentials
+(`TWILIO_ACCOUNT_SID`/`TWILIO_AUTH_TOKEN`/`TWILIO_FROM_NUMBER` in `.env` —
+see `.env.example` for the ~5-minute signup steps) before it actually
+sends; until then `bin/send-reminders.php` logs and skips instead of
+failing, exactly like the mail() fallback did before the Gmail app
+password was set up.
+
+**Double-booking prevention is server-side, not just UI:** every submitted
+slot (new booking or reschedule) is re-derived from business hours/lead
+time/blackout dates/booking window and cross-checked against the database
+at request time (`scheduler_slot_is_valid_and_open()` in
+`includes/scheduler.php`) — a client never gets to just assert a slot is
+open. Verified locally end-to-end: booking a slot, attempting to double-
+book the same slot (rejected 409), rescheduling (old slot freed, new slot
+blocked), cancelling, and attempting to cancel an already-cancelled
+appointment (rejected).
+
+**Not done as part of this build** (flagging, not deciding unilaterally):
+- Not linked from primary nav or any existing page — reachable only by
+  direct URL for now, e.g. from an ad landing page. Owner mentioned having
+  "the copy framework for an ads landing page" for turf installation;
+  once that's shared, the natural move is a dedicated
+  `/[something]-turf-installation` landing page (same pattern as
+  `/dfw-turf-cleaning-request-ga`) with its CTA pointing at this
+  scheduler — not yet built, waiting on that copy.
+- Business hours/slot length/lead time/booking window are in
+  `config/scheduler.php` with reasonable defaults (Mon&ndash;Fri 9&ndash;5,
+  Sat 9&ndash;1, 60-minute slots, 24hr lead time, 21-day window) — plain
+  PHP array, easy to hand-edit, not exposed in any admin UI.
+- No cap on how many estimates can be booked in the same slot across
+  multiple installers/crews (assumes one estimate visit at a time,
+  single-person/single-crew scheduling) — fine at current scale, would
+  need a "resources" concept if multiple installers run estimates
+  simultaneously.
+
 ## Austin and California fully hidden from footer (owner-directed, round 3)
 
 Owner instruction: hide all mention of Austin and California from the

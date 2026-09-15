@@ -2,7 +2,7 @@
 // Local-only dev router to emulate the .htaccess rewrite rules for PHP's
 // built-in server (php -S). Not used in production (Apache/.htaccess is).
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (preg_match('#^/(config|content|includes|templates|bin|docs|vendor)(/|$)#', $path)) {
+if (preg_match('#^/(config|content|includes|templates|bin|docs|vendor|data)(/|$)#', $path)) {
     http_response_code(403);
     echo 'Forbidden';
     return true;

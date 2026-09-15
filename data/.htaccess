@@ -1,0 +1,4 @@
+# Defense in depth: the top-level .htaccess already blocks /data/ entirely,
+# but this file contains customer PII (the scheduler's SQLite database),
+# so it gets its own deny-all too.
+Require all denied
