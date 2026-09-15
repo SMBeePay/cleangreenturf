@@ -128,12 +128,22 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   commit `.env`. If deploying via Hostinger's Git integration, this file
   needs to be placed on the server directly (it isn't in the repo) —
   confirm a redeploy doesn't wipe it.
-- Deployment to Hostinger isn't wired up (decided: Hostinger's Git
-  integration; needs the user to actually connect the repo in hPanel and
-  confirm the deploy path matches this repo's root-as-webroot layout).
+- Deployment to Hostinger: in progress. A new (non-Website-Builder) website
+  was created in hPanel and connected to this GitHub repo via Git
+  integration, but no deploy has run yet — blocked on a Hostinger-wide
+  hPanel outage (acknowledged by Hostinger on X, "no data will be lost and
+  your websites are not affected," tied to their recent hPanel UI
+  redesign). The site itself (temporary `*.hostingersite.com` URL) is up
+  and reachable throughout — only the panel UI is affected. Once hPanel is
+  usable again: confirm the Git branch is set to
+  `claude/cleangreenturf-seo-rebuild-usnvul` (nothing is on `main` yet),
+  confirm the deploy path is the site's document root, and click Deploy.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the
   *live* new site once it's actually deployed somewhere reachable.
-- Google Search Console verification carryover (no verification meta tag
-  was found on the live site — needs to be confirmed via DNS or GSC directly).
+- **Google Search Console verification — confirmed unaffected.** Owner
+  checked GSC directly: verification method is "Domain name provider" (a
+  DNS TXT record at the registrar/DNS host), not an HTML tag or file
+  served by the website. This migration — including the eventual hosting
+  cutover — has no effect on it. No action needed.
