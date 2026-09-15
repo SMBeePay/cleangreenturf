@@ -147,6 +147,15 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   routes/pages yet (still Phase 2, requirement #34). See
   `docs/audit-findings.md` "Hero form reverted, cache-busting added,
   services teaser."
+- **Austin/California fully hidden from footer (round 3)**: owner asked to
+  hide all mention of both from the footer, not just de-emphasize them.
+  Removed the two footer columns entirely (`includes/footer.php`) and
+  adjusted the footer grid from 5 columns to 3 so it still fills evenly.
+  Flagged (not blocked on): `/austin-tx`, `/ca-turf-cleaning-service-areas`,
+  and the 10 CA city pages now have zero internal links anywhere on the
+  site — reachable only via `sitemap.xml`. Still live, still indexed, just
+  worth knowing that's the current tradeoff. See `docs/audit-findings.md`
+  "Austin and California fully hidden from footer."
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google

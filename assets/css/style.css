@@ -483,7 +483,7 @@ blockquote img {
 .site-footer__top {
     max-width: var(--max-width); margin: 0 auto;
     padding: var(--space-7) 1.5rem var(--space-5);
-    display: grid; grid-template-columns: 1.6fr repeat(4, 1fr); gap: var(--space-5);
+    display: grid; grid-template-columns: 1.6fr repeat(2, 1fr); gap: var(--space-5);
 }
 .site-footer h2 { color: #fff; margin-top: 0; font-size: var(--step-1); }
 .site-footer h3 { color: #fff; margin-top: 0; font-size: var(--step--1); letter-spacing: 0.08em; }

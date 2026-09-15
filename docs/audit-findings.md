@@ -384,6 +384,34 @@ the preserved H1 or tagline, and it does not create dedicated
 remains Phase 2 scope per requirement #34 and CLAUDE.md's "Not done yet" —
 flagging rather than expanding scope unilaterally, per requirement #33.
 
+## Austin and California fully hidden from footer (owner-directed, round 3)
+
+Owner instruction: hide all mention of Austin and California from the
+footer, going further than the earlier de-emphasis (which had already
+dropped both from schema/NAP/trust-bar/nav but kept one link each in the
+footer specifically so `/austin-tx`, `/ca-turf-cleaning-service-areas`, and
+the 10 CA city pages stayed reachable by an internal link, not just
+`sitemap.xml`).
+
+What changed: removed the "Austin, TX" and "California" columns from
+`includes/footer.php` entirely. The footer's `.site-footer__top` grid was
+hard-coded to 5 columns (`1.6fr repeat(4, 1fr)`); dropped to 3
+(`1.6fr repeat(2, 1fr)`) to match, so the remaining columns (About, DFW
+Service Areas, Turf Cleaning Resources) fill the row evenly instead of
+leaving a blank gap on the right.
+
+**Flagging per requirement #33, since this crosses into orphan-page
+territory**: as of this change, `/austin-tx`, `/ca-turf-cleaning-service-
+areas`, and (transitively, since the overview page is their only inbound
+link) all 10 CA city pages have zero internal links pointing to them
+anywhere on the site. They're still live, still in `sitemap.xml`, and still
+`index, follow` — so Google can still find and crawl them via the sitemap —
+but internal link equity/discovery to that whole cluster is now effectively
+zero. If that's more than intended, the fix is cheap (e.g. one quiet
+footer line, or a mention in the relevant TX city pages' copy) — flagging
+rather than deciding unilaterally whether that tradeoff is acceptable long
+term.
+
 ## Pre-launch crawl (requirement #28) and SMTP hardening
 
 With the design approved, moved to launch-readiness per the requirements

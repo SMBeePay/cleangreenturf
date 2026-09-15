@@ -2,6 +2,12 @@
 /**
  * Sitewide footer. Reproduces the live site's NAP, service-area lists, and
  * internal links. See docs/business-info.md for where each value came from.
+ *
+ * Austin and California are intentionally not linked here (owner
+ * instruction — see docs/audit-findings.md "Austin and California fully
+ * hidden from footer"). /austin-tx, /ca-turf-cleaning-service-areas, and
+ * the 10 CA city pages stay live and in sitemap.xml, but as of this change
+ * have no internal links pointing to them from anywhere on the site.
  */
 require_once __DIR__ . '/icons.php';
 $tx = $businessInfo['regions']['tx'];
@@ -34,25 +40,6 @@ function slugify_city($city) {
                     $hasPage = isset($routes['/' . $slug]);
                 ?>
                 <li><?php if ($hasPage): ?><a href="/<?= htmlspecialchars($slug) ?>"><?= htmlspecialchars($city) ?>, TX</a><?php else: ?><?= htmlspecialchars($city) ?>, TX<?php endif; ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-
-        <div class="site-footer__areas">
-            <h3><a href="/austin-tx">Austin, TX</a></h3>
-            <ul>
-                <li><a href="/austin-tx">Turf Cleaning in Austin</a></li>
-            </ul>
-        </div>
-
-        <div class="site-footer__areas">
-            <h3><a href="/ca-turf-cleaning-service-areas">California</a></h3>
-            <ul>
-                <?php foreach ($businessInfo['service_areas']['ca'] as $city):
-                    $slug = slugify_city($city) . '-ca-turf-cleaning';
-                    $hasPage = isset($routes['/' . $slug]);
-                ?>
-                <li><?php if ($hasPage): ?><a href="/<?= htmlspecialchars($slug) ?>"><?= htmlspecialchars($city) ?>, CA</a><?php else: ?><?= htmlspecialchars($city) ?>, CA<?php endif; ?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
