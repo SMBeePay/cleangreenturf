@@ -253,7 +253,7 @@ strong { color: var(--forest-950); font-weight: 700; }
     height: 62vh;
     min-height: 500px;
     max-height: 720px;
-    align-items: end;
+    align-items: center;
     color: #fff;
     isolation: isolate;
     margin-bottom: var(--space-7);
