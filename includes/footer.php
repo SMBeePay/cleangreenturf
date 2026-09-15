@@ -39,11 +39,9 @@ function slugify_city($city) {
         </div>
 
         <div class="site-footer__areas">
-            <h3>Austin Service Areas</h3>
+            <h3><a href="/austin-tx">Austin, TX</a></h3>
             <ul>
-                <?php foreach ($businessInfo['service_areas']['austin'] as $city): ?>
-                <li><?= htmlspecialchars($city) ?>, TX</li>
-                <?php endforeach; ?>
+                <li><a href="/austin-tx">Turf Cleaning in Austin</a></li>
             </ul>
         </div>
 

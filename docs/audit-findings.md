@@ -294,6 +294,63 @@ doesn't close. Worth deciding later whether those pages need a brief
 area" note, get formally noindexed, or stay exactly as-is — flagging rather
 than deciding unilaterally, per requirement #33.
 
+## Austin de-emphasized (owner-directed, same treatment as California)
+
+Austin isn't a current priority/viable market — owner instruction was to
+stop advertising it prominently but not delete `/austin-tx` (keep it live
+for search). Same pattern as the CA discontinuation above, scaled to what
+Austin actually had: it was never a separate NAP/schema entry, just a
+"DFW & Austin" framing in sitewide chrome plus a full suburb list in the
+footer that never had real pages behind it.
+
+What changed:
+- **Trust bar**: "Serving DFW & Austin, TX" → "Serving the DFW Metroplex"
+  (`includes/trust-bar.php`).
+- **Primary nav**: removed `/austin-tx` from the "Texas Service Areas"
+  dropdown (`includes/navigation.php`), same as the CA nav-link removal.
+- **Footer**: the "Austin Service Areas" column listed 11 suburb cities
+  (Round Rock, Cedar Park, etc.) as plain unlinked text — none of them have
+  pages, so this was pure promotion of a market that's paused, not a real
+  crawlable path to anything. Replaced with a single real link to
+  `/austin-tx` (`includes/footer.php`), same shape as the CA column.
+
+What deliberately did NOT change: `/austin-tx` itself is untouched and
+still in `sitemap.xml` and the footer, so it isn't orphaned or deindexed —
+just no longer pushed sitewide. `config/business-info.php`'s
+`service_areas.austin` city list is kept as reference data (same reasoning
+as the retained CA region data).
+
+## Top bar removed, hero rebuilt (owner-directed design fix)
+
+Owner feedback on the deployed homepage, with an annotated screenshot:
+nothing above the nav, don't advertise Austin (see above), and the hero was
+"way too big and empty" — no page content visible without scrolling, no
+lead capture up top.
+
+- **Top bar removed entirely** (`includes/top-bar.php` deleted, its
+  `require` dropped from `includes/header.php`, its CSS removed). It only
+  ever held the email address and social icons — both already live in the
+  footer, so nothing was lost, just no longer duplicated above the nav.
+- **Real layout bug fixed, not just a size tweak**: `.page-hero__media`
+  had no explicit height, so its `<img>` rendered at its natural aspect
+  ratio scaled to full page width — on a wide viewport that put the hero
+  well over 1000px tall with the H1 anchored at the bottom, i.e. off-screen
+  until scrolling. Fixed by giving `.page-hero` an actual capped height
+  (`46vh`, `380–560px`) and making the image `position: absolute; inset: 0`
+  inside it, so it's cropped to the section instead of dictating the
+  section's size. Applies sitewide (every `page-hero` page benefits, not
+  just home).
+- **Homepage hero specifically** now runs a two-column layout: headline/
+  tagline/CTAs on the left, the same quote form that used to sit
+  several sections down the page hoisted into a card on the right
+  (`templates/home.php`, `includes/quote-form.php` — the form itself is
+  unchanged, just extracted via an HTML-comment marker and rendered in the
+  hero instead of further down; it is not duplicated, `content/pages/
+  __home__.php` is unchanged). This puts what the business does and a way
+  to convert in front of the visitor immediately, per the "front and
+  center, maybe even a lead capture" instruction. On mobile it stacks
+  (image → headline/CTA → form), still no top-bar clutter above it.
+
 ## Pre-launch crawl (requirement #28) and SMTP hardening
 
 With the design approved, moved to launch-readiness per the requirements

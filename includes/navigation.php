@@ -5,12 +5,14 @@
  * (business no longer services CA — see docs/audit-findings.md
  * "California service discontinued"). CA city pages stay live and are
  * still linked from the footer and sitemap.xml for SEO, just not promoted
- * in primary navigation.
+ * in primary navigation. Same treatment for "Austin, TX" — Austin isn't a
+ * current priority market (owner-directed, see docs/audit-findings.md
+ * "Austin de-emphasized"), so it's out of this dropdown; /austin-tx stays
+ * live and linked from the footer.
  */
 $navTxCities = [
     '/addison-tx-turf-cleaning' => 'Addison, TX',
     '/allen-tx-turf-cleaning' => 'Allen, TX',
-    '/austin-tx' => 'Austin, TX',
     '/celina-tx-turf-cleaning' => 'Celina, TX',
     '/dallas-tx-turf-cleaning' => 'Dallas, TX',
     '/frisco-tx-turf-cleaning' => 'Frisco, TX',

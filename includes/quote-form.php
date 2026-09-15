@@ -12,6 +12,7 @@
  */
 require_once __DIR__ . '/icons.php';
 ?>
+<!-- quote-form:start -->
 <div class="quote-form-wrap" id="free-quote">
     <div class="quote-form-wrap__head">
         <h3>Get Your Free Turf Cleaning Quote</h3>
@@ -70,3 +71,4 @@ require_once __DIR__ . '/icons.php';
         <p class="quote-form__trust"><?= icon('shield-check') ?> No spam. Your info is only used to send your quote.</p>
     </form>
 </div>
+<!-- quote-form:end -->

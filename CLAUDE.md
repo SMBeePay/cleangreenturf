@@ -118,6 +118,22 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   linked from navigation).
 - **SMTP scaffolding** built (`config/mail.php`, `vendor/phpmailer/`,
   `.env.example`) — just needs real credentials, see "Not done yet."
+- **First live deployment succeeded**: pushed to Hostinger staging
+  (`blueviolet-beaver-954302.hostingersite.com`) via the Git integration.
+  Verified live: all 36 routes 200 with exactly one H1 each, static assets
+  (CSS/fonts/logo/JS) loading, sitemap.xml/robots.txt serving, real 404s,
+  and `config/`/`vendor/` correctly blocked with 403.
+- **Post-deploy visual feedback fixes**: owner reviewed the live staging
+  site and flagged the top utility bar (redundant with the footer, removed
+  entirely), Austin being advertised sitewide (de-emphasized the same way
+  California was — nav/trust-bar/footer, page kept live), and a real hero
+  layout bug (an unconstrained image height was blowing the hero section
+  well past the fold with no visible content). Hero rebuilt: capped height
+  sitewide, and the homepage hero now runs headline+CTA next to the
+  lead-capture form (hoisted up from lower on the page, not duplicated) so
+  what the business does and a way to convert are visible without
+  scrolling. See `docs/audit-findings.md` "Austin de-emphasized" and "Top
+  bar removed, hero rebuilt."
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
@@ -128,16 +144,13 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   commit `.env`. If deploying via Hostinger's Git integration, this file
   needs to be placed on the server directly (it isn't in the repo) —
   confirm a redeploy doesn't wipe it.
-- Deployment to Hostinger: in progress. A new (non-Website-Builder) website
-  was created in hPanel and connected to this GitHub repo via Git
-  integration, but no deploy has run yet — blocked on a Hostinger-wide
-  hPanel outage (acknowledged by Hostinger on X, "no data will be lost and
-  your websites are not affected," tied to their recent hPanel UI
-  redesign). The site itself (temporary `*.hostingersite.com` URL) is up
-  and reachable throughout — only the panel UI is affected. Once hPanel is
-  usable again: confirm the Git branch is set to
-  `claude/cleangreenturf-seo-rebuild-usnvul` (nothing is on `main` yet),
-  confirm the deploy path is the site's document root, and click Deploy.
+- Deployment to Hostinger: staging deploy is live and verified (see above).
+  The earlier hPanel-wide outage that blocked the first deploy attempt has
+  resolved. Still pending: confirm whether the real `.env` (Gmail app
+  password) has been placed on the server yet — it's gitignored by design,
+  so the Git-integration deploy alone won't have put it there — and then
+  test the quote form end-to-end on live infrastructure. Domain cutover
+  (pointing cleangreenturf.com at this hosting) has not happened yet.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the

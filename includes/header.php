@@ -4,7 +4,6 @@ require_once __DIR__ . '/icons.php';
 $primaryPhone = $businessInfo['regions']['tx']['phone_display'];
 $primaryPhoneTel = $businessInfo['regions']['tx']['phone_e164'];
 ?>
-<?php require __DIR__ . '/top-bar.php'; ?>
 <header class="site-header">
     <div class="site-header__inner">
         <a href="/" class="site-header__logo" aria-label="<?= htmlspecialchars($businessInfo['name']) ?> — Home">
