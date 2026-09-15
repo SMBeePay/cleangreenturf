@@ -351,6 +351,39 @@ lead capture up top.
   center, maybe even a lead capture" instruction. On mobile it stacks
   (image → headline/CTA → form), still no top-bar clutter above it.
 
+## Hero form reverted, cache-busting added, services teaser (owner feedback round 2)
+
+Owner reviewed the deployed "top bar removed, hero rebuilt" change above and
+sent a screenshot of the *live* site still showing the old broken hero (huge
+empty image, no visible text) even though the top bar was gone and the trust
+bar already said "Serving the DFW Metroplex" — i.e. the new PHP/HTML had
+deployed, but the hero still looked broken.
+
+Root cause: `includes/seo-head.php` linked `/assets/css/style.css` with no
+cache-busting parameter. Hostinger's front end (Cloudflare) was serving the
+pre-fix stylesheet indefinitely regardless of deploys, so the new hero
+markup was rendering against old CSS. Fixed by appending `?v=<?=
+filemtime(...) ?>` to the stylesheet link — every CSS change now forces a
+fresh fetch on the next deploy.
+
+Separately, actual design feedback on the two-column hero-with-embedded-form
+approach from the previous round: rejected. Reverted the homepage hero back
+to the same single-column "text overlaid on the image with a gradient"
+pattern used by every other page — no form in the hero, just the headline,
+tagline, and CTA buttons (`templates/home.php`, and the now-unused
+`.page-hero--home` two-column CSS removed). The quote form stays exactly
+where it already was, further down the homepage — not duplicated, never
+was.
+
+Also incorporated, per the owner mentioning the business is now expanding
+into installation and repair, not just cleaning: a new line under the
+hero tagline reading "Turf Cleaning · Installation · Repair"
+(`.page-hero__services`). This is additive copy only — it does not touch
+the preserved H1 or tagline, and it does not create dedicated
+`/installation` or `/repair` pages, routes, nav entries, or schema. That
+remains Phase 2 scope per requirement #34 and CLAUDE.md's "Not done yet" —
+flagging rather than expanding scope unilaterally, per requirement #33.
+
 ## Pre-launch crawl (requirement #28) and SMTP hardening
 
 With the design approved, moved to launch-readiness per the requirements

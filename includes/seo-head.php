@@ -25,7 +25,7 @@ $robots = $route['robots'] ?? 'index, follow';
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/favicon-192.png">
 <link rel="apple-touch-icon" href="/assets/images/favicon-180.png">
 
-<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
 
 <?php require __DIR__ . '/schema.php'; ?>
 <?php require __DIR__ . '/tracking.php'; ?>

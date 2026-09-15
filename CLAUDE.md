@@ -134,6 +134,19 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   what the business does and a way to convert are visible without
   scrolling. See `docs/audit-findings.md` "Austin de-emphasized" and "Top
   bar removed, hero rebuilt."
+- **Round 2 owner feedback on the deployed hero**: the two-column
+  form-in-hero approach was rejected on sight — owner wanted the classic
+  pattern (headline on the image with a gradient, CTA buttons, no
+  embedded form) matching every other page. Also surfaced a real bug:
+  `style.css` had no cache-busting parameter, so Hostinger's front end was
+  serving the pre-fix stylesheet after deploy, making the previous fix
+  look like it hadn't shipped at all — fixed with a `filemtime()`-based
+  `?v=` query string on the stylesheet link. Also added a "Turf Cleaning ·
+  Installation · Repair" line under the homepage hero tagline, since the
+  business is expanding into installation/repair — copy only, no new
+  routes/pages yet (still Phase 2, requirement #34). See
+  `docs/audit-findings.md` "Hero form reverted, cache-busting added,
+  services teaser."
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
