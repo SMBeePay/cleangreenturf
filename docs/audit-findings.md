@@ -384,6 +384,35 @@ the preserved H1 or tagline, and it does not create dedicated
 remains Phase 2 scope per requirement #34 and CLAUDE.md's "Not done yet" —
 flagging rather than expanding scope unilaterally, per requirement #33.
 
+## Hero image was actually collapsed to zero height (real bug, not a cache issue)
+
+Owner kept reporting no hero image after the previous "fixes," including
+after a hard refresh, a cache clear, and an incognito window — correctly
+refusing to accept "it's your cache" once they'd ruled that out
+themselves. That pushback was right: it was never a caching problem. My
+own "verification" screenshot from the cache-busting round was wrong too —
+I looked at a flat gradient and read it as a photo; it wasn't.
+
+Actual bug: `.page-hero` is a CSS grid container with `align-items: end`
+(to bottom-align the headline). `.page-hero__media` was a grid item
+(`grid-area: 1/1`) with no explicit height, and its only child (`<img>`)
+was `position: absolute` — which takes it out of normal flow and
+contributes zero height to its parent. With `align-items: end`, a grid
+item without `stretch` sizes to its own content instead of filling the
+row, so `.page-hero__media` computed to `height: 0`, and the image's
+`height: 100%` then resolved against that zero-height box — also `0`.
+Verified directly via computed box dimensions in a headless browser
+(`mediaRect.height` was literally `0`), not just by eyeballing a
+screenshot this time.
+
+Fix: `.page-hero__media` is now `position: absolute; inset: 0` directly
+against `.page-hero` (which is already `position: relative`), instead of
+depending on CSS grid stretch behavior it was never getting. Confirmed via
+the same computed-dimensions check (now 100% of the hero's height) and
+screenshots on both the homepage and an inner location page (the image was
+visible on both once this landed — `.page-hero` is shared by every
+template).
+
 ## Austin and California fully hidden from footer (owner-directed, round 3)
 
 Owner instruction: hide all mention of Austin and California from the

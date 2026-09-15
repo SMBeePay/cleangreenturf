@@ -156,6 +156,20 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   site — reachable only via `sitemap.xml`. Still live, still indexed, just
   worth knowing that's the current tradeoff. See `docs/audit-findings.md`
   "Austin and California fully hidden from footer."
+- **Hero image was actually collapsed to zero height (real bug, found
+  after wrongly blaming cache)**: owner correctly pushed back after a hard
+  refresh, cache clear, and incognito window all still showed no image —
+  it was never a caching issue, and my earlier "verified, it's rendering"
+  screenshot was a misread of a flat gradient. Real bug: `align-items: end`
+  on the `.page-hero` grid container let `.page-hero__media` (a grid item
+  with no explicit height) collapse to `height: 0`, since its only child
+  was `position: absolute` and contributed no height — the image's
+  `height: 100%` then resolved against that zero-height box. Fixed by
+  making `.page-hero__media` `position: absolute; inset: 0` directly
+  against `.page-hero` instead of relying on grid stretch. Verified with
+  actual computed box dimensions in a headless browser, not just a
+  screenshot. See `docs/audit-findings.md` "Hero image was actually
+  collapsed to zero height."
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
