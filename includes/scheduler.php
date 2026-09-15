@@ -33,6 +33,7 @@ function scheduler_db(): PDO {
         notes TEXT,
         slot_start TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'confirmed',
+        sms_opt_in INTEGER NOT NULL DEFAULT 0,
         reschedule_token TEXT NOT NULL UNIQUE,
         reminder_sent_at TEXT,
         created_at TEXT NOT NULL,
@@ -40,6 +41,15 @@ function scheduler_db(): PDO {
     )");
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_appointments_slot_start ON appointments(slot_start)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_appointments_token ON appointments(reschedule_token)');
+
+    // Lightweight migration: sms_opt_in was added after this table may have
+    // already been created (e.g. on a live site with real bookings) — add
+    // it if it's missing instead of assuming a fresh CREATE TABLE ran.
+    $columns = $pdo->query('PRAGMA table_info(appointments)')->fetchAll(PDO::FETCH_COLUMN, 1);
+    if (!in_array('sms_opt_in', $columns, true)) {
+        $pdo->exec('ALTER TABLE appointments ADD COLUMN sms_opt_in INTEGER NOT NULL DEFAULT 0');
+    }
+
     return $pdo;
 }
 
@@ -157,8 +167,8 @@ function scheduler_create_appointment(array $data): array {
     $pdo = scheduler_db();
     $token = bin2hex(random_bytes(16));
     $now = gmdate('Y-m-d\TH:i:s\Z');
-    $stmt = $pdo->prepare('INSERT INTO appointments (name, phone, email, address, notes, slot_start, status, reschedule_token, created_at, updated_at)
-        VALUES (:name, :phone, :email, :address, :notes, :slot_start, \'confirmed\', :token, :now, :now)');
+    $stmt = $pdo->prepare('INSERT INTO appointments (name, phone, email, address, notes, slot_start, status, sms_opt_in, reschedule_token, created_at, updated_at)
+        VALUES (:name, :phone, :email, :address, :notes, :slot_start, \'confirmed\', :sms_opt_in, :token, :now, :now)');
     $stmt->execute([
         ':name' => $data['name'],
         ':phone' => $data['phone'],
@@ -166,6 +176,7 @@ function scheduler_create_appointment(array $data): array {
         ':address' => $data['address'],
         ':notes' => $data['notes'] ?? '',
         ':slot_start' => $data['slot_start'],
+        ':sms_opt_in' => !empty($data['sms_opt_in']) ? 1 : 0,
         ':token' => $token,
         ':now' => $now,
     ]);
@@ -180,10 +191,10 @@ function scheduler_get_by_token(string $token): ?array {
     return $row ?: null;
 }
 
-function scheduler_reschedule(string $token, string $newSlotStart): bool {
+function scheduler_reschedule(string $token, string $newSlotStart, bool $smsOptIn): bool {
     $pdo = scheduler_db();
-    $stmt = $pdo->prepare("UPDATE appointments SET slot_start = ?, status = 'confirmed', reminder_sent_at = NULL, updated_at = ? WHERE reschedule_token = ?");
-    return $stmt->execute([$newSlotStart, gmdate('Y-m-d\TH:i:s\Z'), $token]);
+    $stmt = $pdo->prepare("UPDATE appointments SET slot_start = ?, status = 'confirmed', sms_opt_in = ?, reminder_sent_at = NULL, updated_at = ? WHERE reschedule_token = ?");
+    return $stmt->execute([$newSlotStart, $smsOptIn ? 1 : 0, gmdate('Y-m-d\TH:i:s\Z'), $token]);
 }
 
 function scheduler_cancel(string $token): bool {
@@ -192,10 +203,10 @@ function scheduler_cancel(string $token): bool {
     return $stmt->execute([gmdate('Y-m-d\TH:i:s\Z'), $token]);
 }
 
-/** @return array[] confirmed appointments for $dateYmd that haven't had a reminder sent yet. */
+/** @return array[] confirmed, SMS-opted-in appointments for $dateYmd that haven't had a reminder sent yet. */
 function scheduler_appointments_needing_reminder(string $dateYmd): array {
     $pdo = scheduler_db();
-    $stmt = $pdo->prepare("SELECT * FROM appointments WHERE status = 'confirmed' AND date(slot_start) = ? AND reminder_sent_at IS NULL");
+    $stmt = $pdo->prepare("SELECT * FROM appointments WHERE status = 'confirmed' AND sms_opt_in = 1 AND date(slot_start) = ? AND reminder_sent_at IS NULL");
     $stmt->execute([$dateYmd]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

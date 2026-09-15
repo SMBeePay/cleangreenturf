@@ -227,6 +227,12 @@
                 confirmEl.hidden = false;
                 var whenEl = confirmEl.querySelector('[data-confirm-when]');
                 if (whenEl) { whenEl.textContent = data.when || ''; }
+                var smsLineEl = confirmEl.querySelector('[data-confirm-sms-line]');
+                if (smsLineEl) {
+                    smsLineEl.textContent = data.sms_opt_in
+                        ? 'A confirmation has been sent to your email, and we’ll text you a reminder the day before with a link to reschedule if anything changes.'
+                        : 'A confirmation has been sent to your email. You can always use this same link to reschedule if anything changes.';
+                }
             })
             .catch(function () {
                 showError('Something went wrong submitting that. Please try again or call us.');

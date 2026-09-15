@@ -53,13 +53,14 @@ th { font-family: var(--font-display); text-transform: uppercase; letter-spacing
 <p class="admin-empty">No appointments to show.</p>
 <?php else: ?>
 <table>
-<thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Notes</th><th>Status</th></tr></thead>
+<thead><tr><th>When</th><th>Name</th><th>Phone</th><th>SMS OK</th><th>Email</th><th>Address</th><th>Notes</th><th>Status</th></tr></thead>
 <tbody>
 <?php foreach ($appointments as $a): ?>
 <tr class="<?= $a['status'] === 'cancelled' ? 'status-cancelled' : '' ?>">
     <td><?= htmlspecialchars(scheduler_format_display($a['slot_start'], $schedulerConfig)) ?></td>
     <td><?= htmlspecialchars($a['name']) ?></td>
     <td><a href="tel:<?= htmlspecialchars(preg_replace('/[^0-9+]/', '', $a['phone'])) ?>"><?= htmlspecialchars($a['phone']) ?></a></td>
+    <td><?= !empty($a['sms_opt_in']) ? 'Yes' : 'No' ?></td>
     <td><a href="mailto:<?= htmlspecialchars($a['email']) ?>"><?= htmlspecialchars($a['email']) ?></a></td>
     <td><?= htmlspecialchars($a['address']) ?></td>
     <td><?= htmlspecialchars($a['notes'] !== '' ? $a['notes'] : '—') ?></td>

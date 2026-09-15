@@ -53,6 +53,12 @@ $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
                 <label for="sch-notes">Anything we should know before we come out?</label>
                 <textarea id="sch-notes" name="notes" rows="3"><?= htmlspecialchars($existing['notes'] ?? '') ?></textarea>
             </div>
+            <div class="scheduler-consent">
+                <label>
+                    <input type="checkbox" name="sms_opt_in" value="1" <?= !empty($existing['sms_opt_in']) ? 'checked' : '' ?>>
+                    <span>Yes, text me a reminder the day before my appointment. Message frequency: 1 message per scheduled appointment. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent isn&rsquo;t required to book &mdash; you&rsquo;ll get an email either way.</span>
+                </label>
+            </div>
             <div class="quote-form__hp" aria-hidden="true">
                 <label for="sch-website">Leave this field blank</label>
                 <input type="text" id="sch-website" name="website" tabindex="-1" autocomplete="off">
@@ -65,7 +71,7 @@ $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
         <?= icon('check-circle', 'scheduler__confirm-icon') ?>
         <h3><?= $mode === 'reschedule' ? "You&rsquo;re Rebooked!" : "You&rsquo;re Booked!" ?></h3>
         <p>We&rsquo;ll see you <strong data-confirm-when></strong>.</p>
-        <p>A confirmation has been sent to your email, and we&rsquo;ll text you a reminder the day before with a link to reschedule if anything changes.</p>
+        <p data-confirm-sms-line>A confirmation has been sent to your email, and we&rsquo;ll text you a reminder the day before with a link to reschedule if anything changes.</p>
     </div>
 
     <?php if ($mode === 'reschedule'): ?>

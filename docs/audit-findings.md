@@ -534,6 +534,47 @@ appointment (rejected).
   need a "resources" concept if multiple installers run estimates
   simultaneously.
 
+## Real SMS opt-in checkbox added (compliance, not just Twilio paperwork)
+
+Owner hit Twilio's toll-free verification step, which asks for proof of a
+real SMS opt-in flow — and asked for a screenshot to submit. The booking
+form at that point had no opt-in checkbox at all: it just collected a
+phone number and texted a reminder automatically. Generating a mockup
+screenshot of consent language that didn't actually exist on the site
+would have been submitting false compliance documentation to Twilio, not
+just an inconvenience — so the actual fix was to build the real thing
+first, then screenshot that.
+
+**What changed:**
+- `includes/scheduler-widget.php`: added an actual SMS-consent checkbox to
+  the booking/reschedule form, unchecked by default, with the language
+  carriers/Twilio require — message frequency, "Msg & data rates may
+  apply," STOP/HELP instructions, and an explicit "consent isn't required
+  to book" (required per TCPA — SMS consent can never be a condition of
+  service).
+- `appointments` table gained an `sms_opt_in` column (`includes/scheduler.php`,
+  with a runtime `ALTER TABLE` for any database already created before
+  this — the feature may already be live). `scheduler_create_appointment()`
+  and `scheduler_reschedule()` now take it; `scheduler_appointments_needing_reminder()`
+  filters on `sms_opt_in = 1`, so `bin/send-reminders.php` only ever texts
+  someone who actually checked the box — verified locally with one opted-in
+  and one opted-out test appointment for the same date, confirming only
+  the opted-in one was even returned by the query.
+- Confirmation email/on-screen message now says the honest thing
+  ("we'll text you" vs. "you didn't opt in, so we won't") instead of
+  always claiming a text is coming.
+- `admin/appointments.php` got an "SMS OK" column so the owner can see
+  opt-in status per booking.
+
+**What to actually submit to Twilio**: their own form says to link the
+live page where users opt in, and only fall back to a hosted screenshot
+if that page is behind a login or unpublished — this one is neither.
+Once this deploys, `https://cleangreenturf.com/schedule-turf-installation-estimate`
+is itself the correct thing to paste into their "Opt-in policy proof"
+field. A screenshot of the real (not mocked) checkbox was generated and
+sent to the owner as a fallback in case they want to submit before the
+next deploy finishes.
+
 ## Austin and California fully hidden from footer (owner-directed, round 3)
 
 Owner instruction: hide all mention of Austin and California from the

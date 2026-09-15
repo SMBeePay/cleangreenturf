@@ -38,6 +38,7 @@ $email = trim((string)($_POST['email'] ?? ''));
 $address = trim((string)($_POST['address'] ?? ''));
 $notes = trim((string)($_POST['notes'] ?? ''));
 $slotStart = trim((string)($_POST['slot_start'] ?? ''));
+$smsOptIn = !empty($_POST['sms_opt_in']);
 
 if ($name === '' || $phone === '' || $email === '' || $address === '' || $slotStart === '') {
     scheduler_json_fail('missing_fields');
@@ -67,16 +68,20 @@ $result = scheduler_create_appointment([
     'address' => $address,
     'notes' => $notes,
     'slot_start' => $slotStart,
+    'sms_opt_in' => $smsOptIn,
 ]);
 
 $prettyWhen = scheduler_format_display($slotStart, $schedulerConfig);
 $rescheduleUrl = $businessInfo['domain'] . '/reschedule?token=' . $result['reschedule_token'];
 $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
+$reminderLine = $smsOptIn
+    ? "We'll text you a reminder the day before."
+    : "You didn't opt in to text reminders, so we won't text you — but you can always come back to this link if plans change:";
 
 $customerBody = "Hi $name,\n\n"
     . "You're confirmed for a free in-person turf installation estimate:\n\n"
     . "$prettyWhen\n$address\n\n"
-    . "We'll text you a reminder the day before. Need to change your appointment? Use this link any time:\n"
+    . "$reminderLine Need to change your appointment? Use this link any time:\n"
     . "$rescheduleUrl\n\n"
     . "See you then!\n{$businessInfo['name']}\n$phoneDisplay\n";
 
@@ -103,4 +108,4 @@ send_transactional_email(
     $name
 );
 
-echo json_encode(['success' => true, 'when' => $prettyWhen, 'reschedule_url' => $rescheduleUrl]);
+echo json_encode(['success' => true, 'when' => $prettyWhen, 'reschedule_url' => $rescheduleUrl, 'sms_opt_in' => $smsOptIn]);

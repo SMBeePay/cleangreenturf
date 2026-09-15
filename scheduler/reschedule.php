@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $token = trim((string)($_POST['token'] ?? ''));
 $action = trim((string)($_POST['action'] ?? 'reschedule'));
 $slotStart = trim((string)($_POST['slot_start'] ?? ''));
+$smsOptIn = !empty($_POST['sms_opt_in']);
 
 if ($token === '' || !preg_match('/^[a-f0-9]{32}$/', $token)) {
     scheduler_json_fail('invalid_token');
@@ -74,7 +75,7 @@ if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $token)) {
     scheduler_json_fail('slot_unavailable', 409);
 }
 
-scheduler_reschedule($token, $slotStart);
+scheduler_reschedule($token, $slotStart, $smsOptIn);
 $prettyWhen = scheduler_format_display($slotStart, $schedulerConfig);
 
 send_transactional_email(
@@ -95,4 +96,4 @@ send_transactional_email(
     "{$appt['name']} moved their estimate to $prettyWhen.\n"
 );
 
-echo json_encode(['success' => true, 'when' => $prettyWhen]);
+echo json_encode(['success' => true, 'when' => $prettyWhen, 'sms_opt_in' => $smsOptIn]);
