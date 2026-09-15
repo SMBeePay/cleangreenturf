@@ -250,9 +250,9 @@ strong { color: var(--forest-950); font-weight: 700; }
 .page-hero {
     position: relative;
     display: grid;
-    height: 50vh;
-    min-height: 420px;
-    max-height: 620px;
+    height: 62vh;
+    min-height: 500px;
+    max-height: 720px;
     align-items: end;
     color: #fff;
     isolation: isolate;
