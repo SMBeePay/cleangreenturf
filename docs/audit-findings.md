@@ -384,6 +384,18 @@ the preserved H1 or tagline, and it does not create dedicated
 remains Phase 2 scope per requirement #34 and CLAUDE.md's "Not done yet" —
 flagging rather than expanding scope unilaterally, per requirement #33.
 
+## Stray homepage image removed (owner-directed)
+
+Owner flagged a specific image on the homepage, between the process-step
+cards and the "Clean Artificial Turf Yards" gallery, as "floating odd."
+It was a stock photo (`photo-1565309849855-0e30dde06cb4.webp`, "Lush green
+artificial turf bordered by a concrete edge") sized 400×280 — noticeably
+smaller than the two real job-site photos immediately above it
+(768×538 each), which is exactly why it looked out of place stacked with
+them. Removed the `<img>` tag from `content/pages/__home__.php`; the two
+consistently-sized photos remain. The unused image file itself was left in
+`assets/images/` (unreferenced now, but not worth a separate cleanup pass).
+
 ## Hero image was actually collapsed to zero height (real bug, not a cache issue)
 
 Owner kept reporting no hero image after the previous "fixes," including

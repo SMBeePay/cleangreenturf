@@ -49,7 +49,6 @@
 </div>
 <img src="/assets/images/resized-20231010-135838-mxb4bz7pnatp2r6p.webp" alt="Deep debris extraction from artificial turf" loading="lazy" width="768" height="538">
 <img src="/assets/images/img-1624-m5kmkwbvzgul1kwr.webp" alt="Odor removal and turf sanitization treatment" loading="lazy" width="768" height="538">
-<img src="/assets/images/photo-1565309849855-0e30dde06cb4.webp" alt="Lush green artificial turf bordered by a concrete edge" loading="lazy" width="400" height="280">
 
 <h3>Clean Artificial Turf Yards</h3>
 <div class="gallery">
