@@ -311,6 +311,9 @@ main { display: block; }
     border-radius: var(--radius); box-shadow: var(--shadow-sm);
     margin: var(--space-4) 0;
 }
+.about-photo-caption {
+    margin: -0.75rem 0 var(--space-4); font-size: var(--step--1); font-style: italic; color: var(--ink-faint);
+}
 .prose a:not(.btn) { text-decoration: underline; text-decoration-color: var(--accent-100); text-underline-offset: 3px; font-weight: 600; color: var(--accent-600); }
 .prose a:not(.btn):hover { text-decoration-color: var(--accent-500); color: var(--accent-700); }
 .prose > ul, .prose > ol { margin-left: 0; }

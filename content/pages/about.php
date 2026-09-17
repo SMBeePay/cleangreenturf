@@ -2,29 +2,30 @@
 // Fixes applied per docs/audit-findings.md: added a missing H1 (finding #4),
 // corrected "McKinney, CA 75071" -> "McKinney, TX 75071" (state-abbreviation
 // typo), and corrected the CA-section phone number to 469-796-0034 per
-// explicit owner instruction (see docs/audit-findings.md finding #6). ?>
+// explicit owner instruction (see docs/audit-findings.md finding #6).
+// Family photo added per owner request, see docs/audit-findings.md
+// "About page cleanup + family photo restored." ?>
 <h1>About Clean Green Turf</h1>
 <h3>Your Trusted Artificial Turf Cleaning Experts</h3>
 <p>With hundreds of happy customers, Clean Green Turf is your go-to expert on artificial turf cleaning and rejuvenation.</p>
 <p>After working in artificial turf installation, Andrew Neal pivoted his experience to start one of the first dedicated artificial turf cleaning companies that focused on cleaning, deodorizing, sanitizing and rejuvenating artificial turf yards.</p>
 <p>"I saw countless customers struggling to find someone to come clean and maintain their turf yard after it was installed. Many installation companies don't offer cleaning or maintenance, so I stepped in to bridge the gap and become the trusted professional who regularly cleans and maintains your turf yard."</p>
+<img src="/assets/images/andrew-neal-family.webp" alt="Andrew Neal with his wife and three kids" loading="lazy" width="640" height="480">
+<p class="about-photo-caption">Andrew and his family &mdash; the reason he cares about keeping yards clean, safe, and pet-friendly.</p>
 <p>Based in DFW, Andrew started growing this business back in 2023, and it has continued to grow as more and more people transform their backyards with beautiful artificial turf.</p>
 <p>At Clean Green Turf, we understand the importance of maintaining a clean and healthy outdoor space, which is why we go above and beyond to deliver exceptional results every time. Our team of skilled technicians is equipped with the latest tools and equipment, and we only use eco-friendly cleaning solutions that are safe for your family and pets.</p>
 <p>So whether you're a homeowner, business owner, or property manager, you can trust Clean Green Turf to provide the best artificial turf cleaning services around. Contact us today to schedule a cleaning appointment and experience the difference for yourself!</p>
 
 <h3>What Our Customers Say</h3>
 <blockquote>
-<img src="/assets/images/turf-cleaning-celina-tx-yz989xjbleixxeg5.webp" alt="Artificial turf cleaning in Celina, TX" loading="lazy" width="765" height="589">
 <p>"Hey guys, can't emphasize it enough! I know some of you have artificial turf, right? Low maintenance, convenient... so set it and forget it, right? Nooooo! You've gotta <strong>get your turf cleaned</strong>. Trust! With the sun beaming down on it, kids running around on it, pets doing their business on it, etc. — it loses its luster! <strong>Gotta call Andrew at Clean Green Turf.</strong> He can bring it back to life and also extend the life of your turf with regular cleaning. Believe me, when I first got my turf I thought I could just leave it, but when Clean Green came to clean it I was like <strong>whoaaa</strong>! Looked like I just had it placed. <strong>Thanks, Andrew!</strong> Great work, I love it. I sound like a commercial!"</p>
 <footer>— Barbie, F.</footer>
 </blockquote>
 <blockquote>
-<img src="/assets/images/img-2815-avl7mragprhrqrkr.webp" alt="Andrew Neal, owner of Clean Green Turf" loading="lazy" width="768" height="791">
 <p>"Andrew did a fantastic job! He was highly professional and took great care of our turf. Will be using his services for all future cleanings!"</p>
 <footer>— Marissa, M.</footer>
 </blockquote>
 <blockquote>
-<img src="/assets/images/photo-1498423511839-e0b46405090f.webp" alt="Artificial turf sports field" loading="lazy" width="48" height="48">
 <p>"★★★★★"</p>
 </blockquote>
 <p><a href="/#free-quote">Contact us for a free quote</a></p>

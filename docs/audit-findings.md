@@ -439,6 +439,42 @@ screenshots on both the homepage and an inner location page (the image was
 visible on both once this landed — `.page-hero` is shared by every
 template).
 
+## About page cleanup + family photo restored (owner-directed)
+
+Owner asked to clean up the text styling on `/about` and add back the
+photo of him and his family. Investigating the "styling" complaint found
+a real content/CSS mismatch, not just a cosmetic tweak:
+
+- `blockquote img` is styled sitewide as a 56px circular avatar (float
+  left, `object-fit: cover`) — the right treatment for an actual customer
+  headshot (this is exactly how the homepage's one legitimate testimonial
+  photo works). But all three testimonial blockquotes on `/about` had
+  images that were **not** customer headshots: a photo of cleaned turf
+  (Barbie's review), a family photo with alt text "Andrew Neal, owner of
+  Clean Green Turf" oddly attached to a *different* customer's review
+  (Marissa's), and a generic stock sports-field photo on an empty 5-star
+  review. Cropped into small circles, none of these read as anything
+  coherent — this is what looked like broken "text styling." These were
+  pre-existing leftovers from the original Hostinger builder site (same
+  category as the other mismatched-content bugs already documented above),
+  not something introduced during migration.
+- Fix: removed the image from all three testimonial blockquotes
+  (`content/pages/about.php`) — plain text testimonials read cleanly and
+  don't fight the avatar-circle styling meant for real headshots.
+- The family photo wasn't actually missing from the site (it was the one
+  misattached to Marissa's review above) — but it's now placed properly:
+  in the bio section, right after Andrew's pull-quote, sized as a normal
+  content photo (not a forced circle) with a real caption. Owner uploaded
+  a fresh copy directly to GitHub (`IMG_2815.jpeg`, 640×480) rather than
+  reuse the old one already in `assets/images/` (a differently-cropped
+  768×791 export of what looks like the same photo) — used the fresh
+  upload per that explicit action, converted to WebP at
+  `assets/images/andrew-neal-family.webp` (self-hosted WebP is the site's
+  standing convention), and removed the stray unconverted JPEG from the
+  repo root afterward. The old, now-unused copy was left in place rather
+  than hunted down, consistent with how other superseded assets have been
+  handled elsewhere in this project.
+
 ## Turf installation estimate scheduler (owner-directed, new capability)
 
 The business is expanding beyond cleaning into installation. Owner's ask,
