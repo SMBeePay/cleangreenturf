@@ -218,8 +218,11 @@ strong { color: var(--forest-950); font-weight: 700; }
     .site-header__inner { flex-wrap: wrap; }
     .site-header__logo { order: 1; }
     .site-header__menu-toggle { display: block; order: 2; margin-left: auto; }
-    .site-header__cta { order: 3; margin-left: 0; }
-    .site-header__cta .btn--primary { display: none; }
+    /* Phone number + Free Quote button both drop on mobile — the sticky
+       bottom Call Now / Free Quote bar (mobile-cta-bar) already covers
+       both, so keeping them in the header too was pure duplicated real
+       estate above the fold. */
+    .site-header__cta { display: none; }
     .site-nav { order: 4; width: 100%; display: none; }
     .site-header.is-open .site-nav { display: block; }
     .site-nav__list { flex-direction: column; align-items: stretch; gap: 0; padding: 0.5em 0; }
@@ -227,9 +230,6 @@ strong { color: var(--forest-950); font-weight: 700; }
     .site-nav__dropdown { position: static; display: block; box-shadow: none; border: none; border-top: none; padding-left: 0.5em; transform: none; width: auto; columns: 1; background: transparent; }
     .site-nav__dropdown li a { color: #cfe0d3; }
     .site-nav__dropdown li a:hover { background: rgba(255,255,255,0.08); color: #fff; }
-}
-@media (max-width: 560px) {
-    .site-header__phone small { display: none; }
 }
 
 /* ---- Trust bar ---- */
@@ -245,6 +245,13 @@ strong { color: var(--forest-950); font-weight: 700; }
     white-space: nowrap;
 }
 .trust-bar__item svg { width: 17px; height: 17px; color: var(--accent-500); flex-shrink: 0; }
+@media (max-width: 900px) {
+    /* Same reasoning as the header phone/CTA: these four trust badges eat
+       up a lot of vertical space above the fold on a phone, and none of
+       them are actions — worth trading for getting to real content
+       faster. Still shown on desktop where there's room to spare. */
+    .trust-bar { display: none; }
+}
 
 /* ---- Hero ---- */
 .page-hero {

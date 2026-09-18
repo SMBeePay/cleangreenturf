@@ -486,6 +486,42 @@ than a full site-wide rewrite, not an oversight.
   targeting is a bigger ranking decision than a description tweak, and
   not made unilaterally here).
 
+## Mobile header simplified (owner-directed, post mobile-responsiveness check)
+
+Owner asked for a full mobile pass to confirm the site scales correctly.
+Ran an automated horizontal-overflow check against all 36 routes at both
+390px and 320px viewport widths — zero overflow anywhere — plus a visual
+check of the highest-risk pages (home, about, contact form, a location
+page, the scheduler's interactive calendar). Everything worked; nothing
+was broken.
+
+Off the back of that check, owner asked to simplify the mobile header
+specifically: the phone number row and the 4-item trust bar
+(5.0 Rated / Pet & Family-Safe / Serving DFW / Free Quotes) were both
+always visible on mobile, on top of the logo+hamburger row, pushing real
+page content below the fold before a visitor saw anything.
+
+Both are genuinely redundant on mobile, not just visually heavy: the
+sticky bottom bar (`mobile-cta-bar`, already shown on every mobile page)
+provides the same Call Now and Free Quote actions the header phone
+number and button offered. Trust badges aren't actions at all, and
+desktop still shows all four with room to spare.
+
+**What changed** (`assets/css/style.css`, `@media (max-width: 900px)`):
+- `.site-header__cta` (the phone number + Free Quote button) now
+  `display: none` — previously only the button was hidden, leaving a
+  bare phone number in the header.
+- `.trust-bar` now `display: none`.
+- Removed the now-dead `.site-header__phone small { display: none; }`
+  rule at the old 560px breakpoint (its parent is hidden at 900px, so it
+  was unreachable).
+
+Result: on a phone, the header is just logo + hamburger, and the actual
+hero headline/CTA is visible immediately below it instead of after two
+extra rows. Desktop is unaffected. Verified with a fresh mobile
+screenshot and re-ran both the full route regression and the
+horizontal-overflow scan — no regressions.
+
 ## About page cleanup + family photo restored (owner-directed)
 
 Owner asked to clean up the text styling on `/about` and add back the
