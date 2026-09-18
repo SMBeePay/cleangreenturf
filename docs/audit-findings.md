@@ -882,3 +882,48 @@ since none currently exists. Regenerated `sitemap.xml` (39 URLs, up from
 38) and verified all 39 routes return 200 with exactly one `<h1>` each,
 plus a mobile (390px) pass confirming no horizontal overflow and that all
 gallery images load correctly.
+
+## Turf repair page added, Services nav dropdown added (owner-directed)
+
+Follow-up to the installation page above. Owner asked whether the site
+needed a "Services" tab in primary nav to house Cleaning/Installation/
+Repair, then confirmed a dedicated repair page was worth building too,
+with a genuinely useful piece of business context: many installation
+companies don't want to come back out for one-off repair jobs (small,
+hard to schedule around a full install calendar), so being the company
+that *does* take repair calls is a real differentiator worth stating on
+the page, not just implying.
+
+**New `/turf-repair` page** (`content/pages/turf-repair.php`,
+`config/routes.php`): why-us copy leading with that differentiator, a
+3-card process overview (diagnose, seam/patch repair, refresh/reset), a
+bulleted list of common repair issues, a numbered repair-visit process,
+an honest "Repair or Replace?" section (isolated issues are repairable;
+turf that's uniformly worn across the whole yard is often better
+replaced — said plainly rather than upselling every job into a repair),
+and CTAs to the quote form (no scheduler for repair — that stays
+installation-only). No dedicated repair photos exist yet, so this page
+intentionally has no leading image; `templates/page.php` already falls
+back to the same plain-gradient hero used on `/about` when a page's `<h1>`
+has no image in front of it, so no new hero pattern was needed.
+
+**"Services" nav dropdown** (`includes/navigation.php`,
+`assets/css/style.css`): added between "Home" and "Texas Service Areas,"
+listing Turf Cleaning (→ `/`), Turf Installation (→ `/turf-installation`),
+Turf Repair (→ `/turf-repair`). "Services" has no single overview page of
+its own, so its top-level label is a plain `<span>` rather than a link
+(only the three dropdown items navigate anywhere) — a small CSS addition
+(`.site-nav__dropdown-label`) matches its hover/typography to the other
+top-level nav links so it doesn't look inert. Added a
+`.site-nav__dropdown--single` modifier (single column, narrower) since
+this dropdown only has 3 short items, unlike the 11-item two-column
+"Texas Service Areas" dropdown.
+
+Updated both homepage service cards ("More Than Just Cleaning") and the
+`/about` installation/repair paragraph to link to their respective new
+pages. Regenerated `sitemap.xml` (40 URLs). Verified: all 40 routes
+return 200 with exactly one `<h1>` each; mobile (390px) pass confirms no
+horizontal overflow on `/`, `/turf-repair`, and `/turf-installation`;
+visually confirmed the Services dropdown on both desktop (hover) and
+mobile (tap-to-open nav, dropdown always expanded inline as an indented
+list under its label, matching the existing Texas Service Areas pattern).

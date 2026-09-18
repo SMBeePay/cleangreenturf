@@ -206,6 +206,23 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   gallery plus 1 as the page hero. Route added, sitemap regenerated
   (39 URLs). See `docs/audit-findings.md` "Turf installation sales page"
   for the full writeup.
+- **Turf repair page + Services nav dropdown (new page + nav, owner-
+  directed)**: owner asked whether a "Services" nav tab was needed to
+  house Cleaning/Installation/Repair, then asked for a real repair page
+  too (a good business point came up: many installers don't want to come
+  back out for one-off repair jobs — being the company that does is a
+  real differentiator, so the page leads with that). Built `/turf-repair`
+  (`content/pages/turf-repair.php`) — why-us copy, a 3-card process
+  overview, common-issues list, numbered repair process, an honest
+  "Repair or Replace?" section, CTAs to the quote form. No repair photos
+  exist yet, so it uses the same plain-gradient hero as `/about` (no
+  leading image). Added a "Services" dropdown to primary nav (Home |
+  **Services** | Texas Service Areas | About | Contact) linking Turf
+  Cleaning/Installation/Repair; the "Services" label itself has no
+  destination page so it's a non-link span, dropdown-only. Homepage's
+  repair card and the `/about` repair mention now link here. Route added,
+  sitemap regenerated (40 URLs). See `docs/audit-findings.md` "Turf
+  repair page added, Services nav dropdown added" for the full writeup.
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google

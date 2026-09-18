@@ -70,7 +70,7 @@
         <?= icon('shield-check', 'step-card__icon') ?>
         <h4>Turf Repair</h4>
         <p>Loose seams, sunken or lumpy patches, sun-damaged fibers, pet-dug edges &mdash; if your turf (installed by us or anyone else) needs a fix instead of a full replacement, we patch, reseam, and re-secure it on-site.</p>
-        <p><a href="/#free-quote">Get a repair quote &rarr;</a></p>
+        <p><a href="/turf-repair">Learn about our repair services &rarr;</a></p>
     </div>
 </div>
 

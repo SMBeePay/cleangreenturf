@@ -242,6 +242,13 @@ return [
         'description' => 'Full artificial turf installation for backyards, front yards, and pet runs across the DFW Metroplex — proper base prep, drainage, and seaming. Schedule a free in-person estimate.',
         'schema_types' => ['WebPage'],
     ],
+    '/turf-repair' => [
+        'slug' => 'turf-repair',
+        'template' => 'page',
+        'title' => 'Artificial Turf Repair in DFW, TX | Clean Green Turf',
+        'description' => 'Artificial turf repair for loose seams, sunken patches, sun-damaged fibers, and pet damage across the DFW Metroplex. Free assessment and quote.',
+        'schema_types' => ['WebPage'],
+    ],
     '/turf-sports-field-maintenance' => [
         'slug' => 'turf-sports-field-maintenance',
         'template' => 'page',
