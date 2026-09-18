@@ -64,7 +64,7 @@
         <?= icon('sparkle', 'step-card__icon') ?>
         <h4>Turf Installation</h4>
         <p>Full artificial turf installation for backyards, side yards, pet runs, and putting greens &mdash; proper base prep, drainage, and seaming done right the first time, from the same team that'll be maintaining it after.</p>
-        <p><a href="/schedule-turf-installation-estimate">Schedule a free installation estimate &rarr;</a></p>
+        <p><a href="/turf-installation">Learn about our installation process &rarr;</a></p>
     </div>
     <div class="card step-card">
         <?= icon('shield-check', 'step-card__icon') ?>

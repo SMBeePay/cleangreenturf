@@ -192,6 +192,20 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   request time), verified end-to-end locally: book, double-book-rejected,
   reschedule, cancel, double-cancel-rejected. See
   `docs/audit-findings.md` "Turf installation estimate scheduler."
+- **Turf installation sales page (new page, owner-directed)**: the
+  homepage's Turf Installation card was linking straight to the booking
+  scheduler with no education in between. Built `/turf-installation`
+  (`content/pages/turf-installation.php`) — a long-form page covering the
+  install process (base prep, drainage/grading, seaming/infill), a photo
+  gallery of real installation work by the owner's business partner
+  (9 of 10 newly uploaded photos used; one excluded for a visible
+  competing-company watermark — flagged, not silently dropped), and CTAs
+  onward to the scheduler. Homepage card and one `/about` mention now link
+  here instead of straight to the scheduler. Route added, sitemap
+  regenerated (39 URLs). See `docs/audit-findings.md` "Turf installation
+  sales page" for the full writeup, including the photo-provenance framing
+  (the photos are Bay Area/CA jobs, not DFW — copy avoids claiming
+  otherwise).
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
@@ -215,11 +229,13 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   confirmation, reschedule, cancel), it just skips the text. (2) A daily
   Hostinger cron job needs to be set up in hPanel to actually run
   `bin/send-reminders.php` — see that file's header comment for the exact
-  command. (3) Not yet linked from anywhere on the site (no nav entry, no
-  homepage CTA) — reachable only by direct URL for now; owner mentioned
-  having ad copy for a turf-installation landing page, which would
-  naturally link to this scheduler once shared. (4) `ADMIN_PASSWORD` needs
-  to be set in `.env` before `/admin/appointments.php` is usable.
+  command. (3) Now linked from the homepage's Turf Installation card and
+  the `/about` installation paragraph via the new `/turf-installation`
+  page (see below) rather than directly, plus still reachable by direct
+  URL; still no primary-nav entry. Owner mentioned having ad copy for a
+  turf-installation landing page, which would naturally link to this
+  scheduler once shared. (4) `ADMIN_PASSWORD` needs to be set in `.env`
+  before `/admin/appointments.php` is usable.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the

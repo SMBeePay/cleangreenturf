@@ -235,6 +235,13 @@ return [
         'description' => 'Discover rapid, eco-friendly artificial turf cleaning with Clean Green Turf in The Colony, TX. Our sustainable, thorough methods keep your turf pristine, vibrant, and bacteria-free—cleanliness meets green living!',
         'schema_types' => ['WebPage'],
     ],
+    '/turf-installation' => [
+        'slug' => 'turf-installation',
+        'template' => 'page',
+        'title' => 'Artificial Turf Installation in DFW, TX | Clean Green Turf',
+        'description' => 'Full artificial turf installation for backyards, front yards, and pet runs across the DFW Metroplex — proper base prep, drainage, and seaming. Schedule a free in-person estimate.',
+        'schema_types' => ['WebPage'],
+    ],
     '/turf-sports-field-maintenance' => [
         'slug' => 'turf-sports-field-maintenance',
         'template' => 'page',

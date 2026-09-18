@@ -818,3 +818,62 @@ is HTML or plain text). The rebuilt form already does better than this by
 setting a `Reply-To` header to the customer's address — the owner can just
 hit their mail client's native Reply button and it goes straight to the
 lead, no need to click through the body text.
+
+## Turf installation sales page (owner-directed, new page)
+
+The homepage's "More Than Just Cleaning" section (added in "Installation
+and repair mentions sprinkled sitewide," above) linked its Turf Installation
+card straight to the booking scheduler
+(`/schedule-turf-installation-estimate`) — a one-sentence blurb into a
+calendar with no education in between. Owner asked for a real page in
+between: "a page about turf installations as opposed to linking straight
+to the estimate scheduler from the home page mention."
+
+Built `/turf-installation` (`content/pages/turf-installation.php`,
+`config/routes.php`), a long-form educational/sales page modeled on the
+site's existing long-form pattern (`turf-sports-field-maintenance.php`):
+why-us copy, a 3-card process overview (base prep, drainage/grading,
+seaming/infill), a detailed numbered process list, a photo gallery, a
+service-area note, and a link over to turf repair for anyone who lands
+here needing a fix instead of a full install. Updated the homepage card's
+link to point here instead of the scheduler; this page's own CTAs point
+on to the scheduler, so the funnel is now card → education → booking
+instead of card → booking directly. Also added one internal link from
+`/about`'s installation/repair paragraph, since that paragraph already
+mentioned installation by name. Added the route to `sitemap.xml` via
+`bin/generate-sitemap.php`.
+
+**Photos**: the owner uploaded 10 new JPEGs directly to the repo root
+(same direct-to-GitHub workflow as the family photo earlier in this doc),
+described as installation work done by the owner's business partner.
+Two things worth flagging:
+- **One photo (`BAT-Photo1.jpeg`) was excluded from the site entirely** —
+  it has a visible competing company's logo/watermark ("Bay Area Turf") in
+  the corner and obviously can't be published as Clean Green Turf's own
+  work. The other 9 were converted to WebP (`assets/images/
+  turf-installation-1.webp` through `-9.webp`, EXIF-orientation-corrected
+  per the process established after the sideways family-photo bug) and
+  used as the page's hero image + gallery. Flagging in case the owner
+  wants the excluded one cropped instead of dropped — as-is, no watermark
+  ever reaches the live site.
+- **The photos appear to be Bay Area/California properties, not Texas**
+  (yard styles, plants, and the watermark on the excluded photo all point
+  the same direction). Since California cleaning service was explicitly
+  discontinued earlier in this project and the business's active
+  install/repair market is DFW, the page copy does not claim these are
+  local DFW job sites — they're introduced as "real installation work
+  completed by our business partner" and "the same crew, materials, and
+  installation standards we bring to every DFW project," which is
+  accurate without implying a specific (wrong) location. Flagging this
+  framing choice in case the owner would rather source or shoot DFW-local
+  install photos instead once available.
+
+Not done as part of this change, flagged rather than assumed: no nav or
+footer link was added for `/turf-installation` — it's reachable via the
+homepage card, the About page link, and the sitemap, matching how other
+non-nav pages (e.g. the Google Ads landing page) are handled on this site,
+but unlike the city pages it isn't yet backed by a "Services" nav entry
+since none currently exists. Regenerated `sitemap.xml` (39 URLs, up from
+38) and verified all 39 routes return 200 with exactly one `<h1>` each,
+plus a mobile (390px) pass confirming no horizontal overflow and that all
+9 gallery images load correctly.
