@@ -439,6 +439,53 @@ screenshots on both the homepage and an inner location page (the image was
 visible on both once this landed — `.page-hero` is shared by every
 template).
 
+## Installation and repair mentions sprinkled sitewide (owner-directed)
+
+Owner asked to make sure enough is said about repair work and full turf
+installations — up to now, awareness of these two services beyond the
+homepage hero's one-line "Turf Cleaning · Installation · Repair" teaser
+(added earlier) and the estimate scheduler was thin: real "repair" copy
+existed on only 2 pages sitewide, and "installation" mentions were mostly
+incidental (referring to other installers, not services offered).
+
+**Scope**: added real, substantive copy to the highest-traffic/highest-
+leverage pages and to sitewide elements, rather than rewriting all 36
+pages — the ~20 hyper-local city pages are each narrowly optimized for
+"[city] turf cleaning" search intent, and stapling installation/repair
+paragraphs onto every one of them risks diluting that focus for
+comparatively little benefit. Full location-page-strategy work (which
+would properly fold in install/repair per-city) is already Phase 2 scope
+per requirement #34 — flagging that this pass is deliberately narrower
+than a full site-wide rewrite, not an oversight.
+
+**What changed:**
+- **Homepage**: new "More Than Just Cleaning" section — three real
+  service cards (Cleaning &amp; Rejuvenation, Installation, Repair), each
+  with substantive copy and its own CTA (installation links to
+  `/schedule-turf-installation-estimate`; repair links to the quote
+  form). Not just a copy change — this is the first place on the site
+  that actually explains what turf repair covers (seams, sunken patches,
+  sun-damaged fibers, pet-dug edges) or what installation covers (base
+  prep, drainage, seaming).
+- **About page**: added a full paragraph connecting Andrew's original
+  installation background (already in the bio) to the business now
+  offering installation and repair again, not just cleaning — a natural
+  narrative fit, not a bolted-on mention. Updated 3 other sentences on
+  the same page for consistency (intro line, closing CTA, "Where We're
+  Based" blurb).
+- **Contact page**: one-line subhead now mentions all three services.
+- **Footer** (sitewide, every page): tagline now reads "...turf cleaning,
+  installation, and repair" instead of cleaning-only.
+- **`includes/schema.php`**: added a real `hasOfferCatalog` with three
+  `Service` entries (Cleaning, Installation, Repair) to the LocalBusiness
+  JSON-LD — this is invisible on the page but is exactly the kind of
+  structured signal that helps search engines understand the full
+  service scope, independent of visible copy.
+- **Meta descriptions** for `/`, `/about`, `/contact` updated to mention
+  all three services (titles left untouched — retitling for new keyword
+  targeting is a bigger ranking decision than a description tweak, and
+  not made unilaterally here).
+
 ## About page cleanup + family photo restored (owner-directed)
 
 Owner asked to clean up the text styling on `/about` and add back the
@@ -474,6 +521,15 @@ a real content/CSS mismatch, not just a cosmetic tweak:
   repo root afterward. The old, now-unused copy was left in place rather
   than hunted down, consistent with how other superseded assets have been
   handled elsewhere in this project.
+
+  **Follow-up fix (same day)**: the first conversion rendered sideways on
+  the live page. The source JPEG had EXIF orientation tag 6 (rotate 90°)
+  — phones commonly store the sensor's raw landscape pixels plus a
+  rotation flag rather than pre-rotating the data, and the initial
+  `PIL.Image.open().save()` conversion copied the raw pixels without
+  applying that flag. Re-converted with `ImageOps.exif_transpose()` first
+  (480×640 after correction, `width`/`height` attributes updated to
+  match) — confirmed upright via a fresh screenshot before shipping.
 
 ## Turf installation estimate scheduler (owner-directed, new capability)
 

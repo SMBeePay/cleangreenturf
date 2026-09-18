@@ -51,6 +51,29 @@
 <img src="/assets/images/resized-20231010-135838-mxb4bz7pnatp2r6p.webp" alt="Deep debris extraction from artificial turf" loading="lazy" width="768" height="538">
 <img src="/assets/images/img-1624-m5kmkwbvzgul1kwr.webp" alt="Odor removal and turf sanitization treatment" loading="lazy" width="768" height="538">
 
+<h3>More Than Just Cleaning</h3>
+<p>Cleaning is where we started, but it's not all we do anymore.</p>
+
+<div class="grid-3">
+    <div class="card step-card">
+        <?= icon('droplet', 'step-card__icon') ?>
+        <h4>Turf Cleaning &amp; Rejuvenation</h4>
+        <p>Our original specialty: deep debris extraction, pet-safe odor elimination, and infill replenishment that brings tired, matted turf back to life. Our full process is above.</p>
+    </div>
+    <div class="card step-card">
+        <?= icon('sparkle', 'step-card__icon') ?>
+        <h4>Turf Installation</h4>
+        <p>Full artificial turf installation for backyards, side yards, pet runs, and putting greens &mdash; proper base prep, drainage, and seaming done right the first time, from the same team that'll be maintaining it after.</p>
+        <p><a href="/schedule-turf-installation-estimate">Schedule a free installation estimate &rarr;</a></p>
+    </div>
+    <div class="card step-card">
+        <?= icon('shield-check', 'step-card__icon') ?>
+        <h4>Turf Repair</h4>
+        <p>Loose seams, sunken or lumpy patches, sun-damaged fibers, pet-dug edges &mdash; if your turf (installed by us or anyone else) needs a fix instead of a full replacement, we patch, reseam, and re-secure it on-site.</p>
+        <p><a href="/#free-quote">Get a repair quote &rarr;</a></p>
+    </div>
+</div>
+
 <h3>Clean Artificial Turf Yards</h3>
 <div class="gallery">
 <img src="/assets/images/img-2045-a1apawwperulkzeb.webp" alt="Pet grooming facility in Frisco, Texas getting clean turf" loading="lazy" width="768" height="589">

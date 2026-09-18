@@ -38,6 +38,36 @@ $schemaGraph[] = [
     ],
     'areaServed' => array_map(fn($c) => $c . ', TX', $businessInfo['service_areas']['dfw']),
     'parentOrganization' => ['@id' => $businessInfo['domain'] . '/#organization'],
+    'hasOfferCatalog' => [
+        '@type' => 'OfferCatalog',
+        'name' => 'Turf Services',
+        'itemListElement' => [
+            [
+                '@type' => 'Offer',
+                'itemOffered' => [
+                    '@type' => 'Service',
+                    'name' => 'Artificial Turf Cleaning',
+                    'description' => 'Deep debris extraction, pet-safe odor elimination, and infill replenishment for artificial turf.',
+                ],
+            ],
+            [
+                '@type' => 'Offer',
+                'itemOffered' => [
+                    '@type' => 'Service',
+                    'name' => 'Artificial Turf Installation',
+                    'description' => 'Full artificial turf installation for backyards, side yards, pet runs, and putting greens.',
+                ],
+            ],
+            [
+                '@type' => 'Offer',
+                'itemOffered' => [
+                    '@type' => 'Service',
+                    'name' => 'Artificial Turf Repair',
+                    'description' => 'Seam and edge repair, patching sunken or lumpy areas, and sun-damaged fiber replacement.',
+                ],
+            ],
+        ],
+    ],
 ];
 
 $schemaTypes = $route['schema_types'] ?? ['WebPage'];

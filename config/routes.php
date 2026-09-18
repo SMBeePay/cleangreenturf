@@ -14,14 +14,14 @@ return [
         'slug' => '__home__',
         'template' => 'home',
         'title' => 'Expert Artificial Turf Cleaning in DFW Texas | Clean Green Turf',
-        'description' => 'Clean Green Turf specializes in rejuvenating, deodorizing, and sanitizing artificial turf cleaning. Serving the Dallas Fort Worth Metroplex, we restore your turf to its original beauty, ensuring a fresh and clean outdoor turf space for your enjoyment.',
+        'description' => 'Clean Green Turf provides artificial turf cleaning, installation, and repair across the Dallas Fort Worth Metroplex. We restore, install, and fix turf so your outdoor space always looks its best.',
         'schema_types' => ['WebSite'],
     ],
     '/about' => [
         'slug' => 'about',
         'template' => 'page',
         'title' => 'About Clean Green Turf | Artificial Turf Cleaning in DFW, TX',
-        'description' => 'Clean Green Turf specializes in rejuvenating, deodorizing, and sanitizing artificial turf. Serving the Dallas Fort Worth Metroplex, we restore your turf to its original beauty, ensuring a clean and fresh outdoor space for you and your family.',
+        'description' => 'Clean Green Turf specializes in artificial turf cleaning, installation, and repair. Serving the Dallas Fort Worth Metroplex, we restore, install, and fix turf for a great-looking outdoor space year-round.',
         'schema_types' => ['WebPage'],
     ],
     '/addison-tx-turf-cleaning' => [
@@ -98,7 +98,7 @@ return [
         'slug' => 'contact',
         'template' => 'page',
         'title' => 'Contact Clean Green Turf | Artificial Turf Cleaning in DFW, TX',
-        'description' => 'Contact Clean Green Turf for professional artificial turf cleaning, rejuvenation, deodorization, and sanitization services in the Dallas Fort Worth Metroplex. Reach out to us today!',
+        'description' => 'Contact Clean Green Turf for professional artificial turf cleaning, installation, and repair in the Dallas Fort Worth Metroplex. Reach out to us today!',
         'schema_types' => ['WebPage'],
     ],
     '/dallas-tx-turf-cleaning' => [

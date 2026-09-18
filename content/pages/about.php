@@ -4,17 +4,20 @@
 // typo), and corrected the CA-section phone number to 469-796-0034 per
 // explicit owner instruction (see docs/audit-findings.md finding #6).
 // Family photo added per owner request, see docs/audit-findings.md
-// "About page cleanup + family photo restored." ?>
+// "About page cleanup + family photo restored." A paragraph on the
+// installation/repair expansion was added per owner request, see
+// "Installation and repair mentions sprinkled sitewide." ?>
 <h1>About Clean Green Turf</h1>
 <h3>Your Trusted Artificial Turf Cleaning Experts</h3>
-<p>With hundreds of happy customers, Clean Green Turf is your go-to expert on artificial turf cleaning and rejuvenation.</p>
+<p>With hundreds of happy customers, Clean Green Turf is your go-to expert on artificial turf cleaning, installation, and repair.</p>
 <p>After working in artificial turf installation, Andrew Neal pivoted his experience to start one of the first dedicated artificial turf cleaning companies that focused on cleaning, deodorizing, sanitizing and rejuvenating artificial turf yards.</p>
 <p>"I saw countless customers struggling to find someone to come clean and maintain their turf yard after it was installed. Many installation companies don't offer cleaning or maintenance, so I stepped in to bridge the gap and become the trusted professional who regularly cleans and maintains your turf yard."</p>
-<img src="/assets/images/andrew-neal-family.webp" alt="Andrew Neal with his wife and three kids" loading="lazy" width="640" height="480">
+<img src="/assets/images/andrew-neal-family.webp" alt="Andrew Neal with his wife and three kids" loading="lazy" width="480" height="640">
 <p class="about-photo-caption">Andrew and his family &mdash; the reason he cares about keeping yards clean, safe, and pet-friendly.</p>
 <p>Based in DFW, Andrew started growing this business back in 2023, and it has continued to grow as more and more people transform their backyards with beautiful artificial turf.</p>
+<p>Since then, we've come full circle: alongside cleaning, Clean Green Turf now also handles full <strong>turf installation</strong> and <strong>turf repair</strong> &mdash; seam and edge repairs, sunken or lumpy patches, sun-damaged fiber replacement, and complete new installs. Same crew, same pet-safe standards, whether we're installing your turf, fixing it, or keeping it clean for years afterward.</p>
 <p>At Clean Green Turf, we understand the importance of maintaining a clean and healthy outdoor space, which is why we go above and beyond to deliver exceptional results every time. Our team of skilled technicians is equipped with the latest tools and equipment, and we only use eco-friendly cleaning solutions that are safe for your family and pets.</p>
-<p>So whether you're a homeowner, business owner, or property manager, you can trust Clean Green Turf to provide the best artificial turf cleaning services around. Contact us today to schedule a cleaning appointment and experience the difference for yourself!</p>
+<p>So whether you're a homeowner, business owner, or property manager, you can trust Clean Green Turf for cleaning, installation, or repair. Contact us today to schedule an appointment and experience the difference for yourself!</p>
 
 <h3>What Our Customers Say</h3>
 <blockquote>
@@ -33,7 +36,7 @@
 <h3>Where We're Based</h3>
 <div>
 <h4>Texas — Dallas Fort-Worth</h4>
-<p>Serving the Dallas Fort Worth Metroplex with expert artificial turf cleaning services.</p>
+<p>Serving the Dallas Fort Worth Metroplex with expert artificial turf cleaning, installation, and repair.</p>
 <p>11900 Presario Road, McKinney, TX 75071<br>
 Phone: <a href="tel:469-796-0034">469-796-0034</a></p>
 </div>

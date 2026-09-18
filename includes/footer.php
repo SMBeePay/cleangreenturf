@@ -20,7 +20,7 @@ function slugify_city($city) {
     <div class="site-footer__top">
         <div class="site-footer__about">
             <h2><?= htmlspecialchars($businessInfo['name']) ?></h2>
-            <p>Proudly serving the Dallas Fort-Worth metroplex and surrounding areas.</p>
+            <p>Proudly serving the Dallas Fort-Worth metroplex and surrounding areas &mdash; turf cleaning, installation, and repair.</p>
 
             <div class="site-footer__nap"><?= icon('mail') ?> <a href="mailto:<?= htmlspecialchars($businessInfo['email']) ?>"><?= htmlspecialchars($businessInfo['email']) ?></a></div>
             <div class="site-footer__nap"><?= icon('pin') ?> <span><?= htmlspecialchars($tx['address']['street']) ?>, <?= htmlspecialchars($tx['address']['city']) ?>, <?= htmlspecialchars($tx['address']['state']) ?> <?= htmlspecialchars($tx['address']['zip']) ?></span></div>

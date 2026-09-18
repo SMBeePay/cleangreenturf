@@ -7,7 +7,7 @@
 // original had no heading for them (an existing gap, not new copy). ?>
 <img src="/assets/images/img-3851-dwxvzrooz5c4g7vw.webp" alt="Clean Green Turf technician on a job site" loading="eager" width="1600" height="2133">
 <h1>Contact Us Today For a Free Quote</h1>
-<p>Fast and free quote for your artificial turf cleaning.</p>
+<p>Fast and free quote for your artificial turf cleaning, installation, or repair.</p>
 
 <?php require __DIR__ . '/../../includes/quote-form.php'; ?>
 
