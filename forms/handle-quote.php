@@ -9,6 +9,13 @@
  * .env file, see .env.example). Falls back to PHP's mail() otherwise,
  * which works but is not production-reliable for deliverability — see
  * docs/migration-requirements.md #19.
+ *
+ * Also pushes the lead into Zoho CRM (Deals module, Turf Cleaning or Turf
+ * Repair pipeline per the `service` field — see includes/zoho-crm.php and
+ * docs/audit-findings.md "Zoho CRM integration"). The CRM push is
+ * best-effort: if Zoho isn't configured yet or the API call fails, the
+ * email still sends and the customer still sees the success page — CRM
+ * sync failures are logged, never surfaced to the visitor.
  */
 
 declare(strict_types=1);
@@ -16,12 +23,14 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/phpmailer/Exception.php';
 require_once __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
 require_once __DIR__ . '/../vendor/phpmailer/SMTP.php';
+require_once __DIR__ . '/../includes/zoho-crm.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
+$zohoConfig = require __DIR__ . '/../config/zoho.php';
 
 function redirect_with_error(string $reason): never {
     header('Location: /contact?error=' . urlencode($reason));
@@ -47,6 +56,10 @@ $address = trim((string)($_POST['address'] ?? ''));
 $turfSize = trim((string)($_POST['turf_size'] ?? ''));
 $frequency = trim((string)($_POST['frequency'] ?? ''));
 $notes = trim((string)($_POST['notes'] ?? ''));
+$service = (string)($_POST['service'] ?? 'cleaning');
+if (!in_array($service, ['cleaning', 'repair', 'cleaning_repair'], true)) {
+    $service = 'cleaning';
+}
 
 if ($name === '' || $phone === '' || $email === '' || $address === '') {
     redirect_with_error('missing_fields');
@@ -122,6 +135,47 @@ if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($ma
 if (!$sent) {
     error_log('Quote form submission failed to send for ' . $email);
     redirect_with_error('send_failed');
+}
+
+// CRM push happens after the email is confirmed sent, and never blocks the
+// redirect — see the file doc and includes/zoho-crm.php.
+[$firstName, $lastName] = zoho_split_name($name);
+$dealDetails = "Phone: $phone\nEmail: $email\nAddress: $address\n"
+    . 'Approx Size of Turf Area: ' . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n"
+    . 'Cleaning Frequency: ' . ($frequency !== '' ? $frequency : 'Not specified') . "\n"
+    . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
+    . 'Source: ' . ($_SERVER['HTTP_REFERER'] ?? 'cleangreenturf.com quote form');
+
+if ($service === 'repair' || $service === 'cleaning_repair') {
+    // "Cleaning + Repair" is filed under Turf Repair, not Turf Cleaning —
+    // repair needs a specific follow-up and is lower-volume, so it's less
+    // likely to get lost there than in the high-volume cleaning pipeline.
+    // The Description below still flags that cleaning was also requested.
+    // See docs/audit-findings.md "Zoho CRM integration" if this default
+    // should be flipped.
+    $dealName = $service === 'cleaning_repair'
+        ? "$name — Turf Repair + Cleaning Quote"
+        : "$name — Turf Repair Quote";
+    zoho_create_deal($zohoConfig, [
+        'Deal_Name' => $dealName,
+        'Pipeline' => 'Turf Repair',
+        'Stage' => ZOHO_STAGE_REPAIR_NEW,
+        'Account_Name' => ['name' => $name],
+        'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+        'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
+        'Description' => ($service === 'cleaning_repair' ? "Also wants routine cleaning.\n\n" : '') . $dealDetails,
+    ]);
+} else {
+    zoho_create_deal($zohoConfig, [
+        'Deal_Name' => "$name — Turf Cleaning Quote",
+        'Pipeline' => 'Turf Cleaning',
+        'Stage' => ZOHO_STAGE_CLEANING_NEW,
+        'Cleaning_Status' => 'New Inquiry',
+        'Account_Name' => ['name' => $name],
+        'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+        'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
+        'Description' => $dealDetails,
+    ]);
 }
 
 header('Location: /dfw-turf-cleaning-request-success');

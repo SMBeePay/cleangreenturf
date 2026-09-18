@@ -5,6 +5,13 @@
  * client) to prevent double-booking, then emails a confirmation to the
  * customer and a notification to the business — same SMTP/mail() pattern
  * as forms/handle-quote.php.
+ *
+ * Also pushes the booking into Zoho CRM's Turf Installation pipeline (see
+ * includes/zoho-crm.php and docs/audit-findings.md "Zoho CRM integration")
+ * with the real scheduled date/time in the Estimate_Scheduled field — this
+ * is the one lead source where we actually know the appointment time up
+ * front, unlike the quote form's placeholder Closing_Date. Best-effort,
+ * same as the quote form: a CRM failure never blocks the booking itself.
  */
 declare(strict_types=1);
 
@@ -12,10 +19,12 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/scheduler.php';
+require_once __DIR__ . '/../includes/zoho-crm.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
 $schedulerConfig = require __DIR__ . '/../config/scheduler.php';
+$zohoConfig = require __DIR__ . '/../config/zoho.php';
 
 function scheduler_json_fail(string $error, int $code = 400): never {
     http_response_code($code);
@@ -107,5 +116,21 @@ send_transactional_email(
     $email,
     $name
 );
+
+[$firstName, $lastName] = zoho_split_name($name);
+$slotDateTime = new DateTime($slotStart, new DateTimeZone($schedulerConfig['timezone']));
+zoho_create_deal($zohoConfig, [
+    'Deal_Name' => "$name — Turf Installation Estimate ($prettyWhen)",
+    'Pipeline' => 'Turf Installation',
+    'Stage' => ZOHO_STAGE_INSTALLATION_NEW,
+    'Account_Name' => ['name' => $name],
+    'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+    'Closing_Date' => $slotDateTime->format('Y-m-d'),
+    'Estimate_Scheduled' => $slotDateTime->format('Y-m-d\TH:i:sP'),
+    'Description' => "Phone: $phone\nEmail: $email\nAddress: $address\nScheduled: $prettyWhen\n"
+        . 'SMS reminder opt-in: ' . ($smsOptIn ? 'Yes' : 'No') . "\n"
+        . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
+        . 'Reschedule/cancel link: ' . $rescheduleUrl,
+]);
 
 echo json_encode(['success' => true, 'when' => $prettyWhen, 'reschedule_url' => $rescheduleUrl, 'sms_opt_in' => $smsOptIn]);

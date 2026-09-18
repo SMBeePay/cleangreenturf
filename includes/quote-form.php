@@ -9,19 +9,34 @@
  * confirmed") — Name, Phone, Email, Full Address, Approx Size of Turf
  * Area, and a cleaning-frequency field the first rebuild had guessed wrong
  * as a services checklist.
+ *
+ * Shared by Home and Contact (the Google Ads landing page has its own copy,
+ * includes/quote-form-ga.php, without this dropdown — see
+ * docs/audit-findings.md "Zoho CRM integration"). The service dropdown
+ * below routes the submission into Zoho CRM's Turf Cleaning or Turf Repair
+ * pipeline in forms/handle-quote.php; it defaults to Turf Cleaning since
+ * that's most of the site's lead volume today.
  */
 require_once __DIR__ . '/icons.php';
 ?>
 <!-- quote-form:start -->
 <div class="quote-form-wrap" id="free-quote">
     <div class="quote-form-wrap__head">
-        <h3>Get Your Free Turf Cleaning Quote</h3>
+        <h3>Get Your Free Quote</h3>
         <p>Fast response, no obligation. We usually reply same-day.</p>
     </div>
     <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate>
         <div class="quote-form__row">
             <label for="qf-name">Name*</label>
             <input type="text" id="qf-name" name="name" required autocomplete="name">
+        </div>
+        <div class="quote-form__row">
+            <label for="qf-service">What do you need?*</label>
+            <select id="qf-service" name="service" required>
+                <option value="cleaning" selected>Turf Cleaning</option>
+                <option value="repair">Turf Repair</option>
+                <option value="cleaning_repair">Both Cleaning &amp; Repair</option>
+            </select>
         </div>
         <div class="quote-form__row">
             <label for="qf-phone">Phone*</label>

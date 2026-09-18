@@ -223,8 +223,43 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   repair card and the `/about` repair mention now link here. Route added,
   sitemap regenerated (40 URLs). See `docs/audit-findings.md` "Turf
   repair page added, Services nav dropdown added" for the full writeup.
+- **Zoho CRM integration (new capability, owner-directed)**: owner signed
+  up for Zoho CRM and asked for the site's forms to feed it, with
+  installation-scheduler bookings landing in a Turf Installation pipeline
+  and cleaning leads in a Cleaning pipeline. Inspected the actual Zoho
+  org rather than guessing: it already has three fully-built Deals
+  pipelines (Turf Installation, Turf Cleaning, Turf Repair) with real
+  stages and custom fields (`Estimate_Scheduled`, `Cleaning_Status`,
+  `Service_Line`, etc.) — none of that was created by this change, only
+  written to. Built `includes/zoho-crm.php` (plain-curl Zoho v8 REST
+  client, no SDK, same philosophy as vendored PHPMailer/Twilio-via-curl)
+  and `config/zoho.php`, wired into `forms/handle-quote.php` (Turf
+  Cleaning or Turf Repair Deal, based on a new service dropdown) and
+  `scheduler/book.php` (Turf Installation Deal with the real booked
+  date/time). Every push is best-effort — a Zoho outage never blocks the
+  lead email. Also split the Google Ads landing page onto its own form
+  (`includes/quote-form-ga.php`, hardcoded to Cleaning, no dropdown) per
+  owner request, keeping the shared form's new 3-option dropdown
+  (Cleaning / Repair / Both, defaulting Cleaning) off the paid-traffic
+  page. **Still needs real Zoho credentials** (see "Not done yet") and a
+  live end-to-end check once added — see `docs/audit-findings.md` "Zoho
+  CRM integration" for the full pipeline/stage/field reference and the
+  judgment calls flagged there (notably: no clean "Website"/"Google Ads"
+  value exists in Zoho's Lead_Channel field yet, so that's left unset
+  rather than mismapped; and "Both Cleaning & Repair" submissions are
+  filed under Turf Repair, not Cleaning).
 
 **Not done yet:**
+- **Zoho CRM credentials**: needs a Self Client Client ID/Secret and a
+  refresh token from https://api-console.zoho.com (andrew@cleangreenturf.com
+  login) — see `.env.example`'s new `ZOHO_*` section for the exact
+  5-minute steps. Without these, the site works exactly as before; the
+  CRM push in `forms/handle-quote.php` and `scheduler/book.php` just
+  silently skips. Once added, submit one real test of each (quote form
+  and scheduler) and check Zoho directly to confirm the Deal lands in the
+  right pipeline with a correctly linked Account/Contact — the
+  auto-create-by-name behavior this relies on could not be verified
+  end-to-end from this environment.
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
   Workspace, so this is a Gmail app password, not a Hostinger mailbox — see
   `.env.example` for the exact steps (turn on 2-Step Verification, generate

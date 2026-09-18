@@ -927,3 +927,109 @@ horizontal overflow on `/`, `/turf-repair`, and `/turf-installation`;
 visually confirmed the Services dropdown on both desktop (hover) and
 mobile (tap-to-open nav, dropdown always expanded inline as an indented
 list under its label, matching the existing Texas Service Areas pattern).
+
+## Zoho CRM integration (owner-directed, new capability)
+
+Owner signed up for Zoho CRM and asked for the site's forms to feed it —
+specifically, the turf-installation scheduler should create a lead in the
+Turf Installation pipeline, and it's fine for cleaning leads to land in a
+Cleaning pipeline, "all info pulls into zoho."
+
+**What was found, not assumed**: the Zoho org (an Enterprise-trial account
+created the same day as this work, trial expires 2026-10-02) already had
+a fully built-out Deals module — not a blank trial default. It uses
+Zoho's single-Deals-module, multi-pipeline design (one "Pipeline" picklist
+field, each pipeline value carrying its own Stage picklist via field
+mapping) with three pipelines already configured, each with real stages:
+- **Turf Installation** (the default pipeline): New Lead → Estimate
+  Booked → Estimate Completed → Quote Sent → Follow-Up → Won – Install
+  Scheduled → Won – Installed / Lost. Quirk: this pipeline reused Zoho's
+  original system Stage field, so the underlying API value for "New Lead"
+  is the string `Qualification`, not "New Lead" — display label and
+  actual value only match on the other two pipelines. Documented as
+  `ZOHO_STAGE_INSTALLATION_NEW` in `includes/zoho-crm.php` so this isn't
+  re-discovered the hard way later.
+- **Turf Cleaning**: New Cleaning Inquiry → Contacted → Awaiting Response
+  → Cleaning Scheduled → Cleaning Completed → Invoice Sent → Paid.
+- **Turf Repair**: New Repair Inquiry → Contacted → Awaiting Response →
+  Repair Scheduled → Repair Completed → Invoice Sent → Paid.
+
+Also already present: custom Deals fields clearly built for this exact
+business (`Estimate_Scheduled`, `Est_Turf_Sq_Ft`, `Cleaning_Status`,
+`Service_Line`, `Lead_Channel`, `Install_Crew_Sub`, `Wave_Invoice_Number`,
+`Actual_Job_Cost`, `Profit_Margin`, and more). This code only writes to
+fields that already existed — no modules, pipelines, stages, or custom
+fields were created by this change.
+
+**What this code does**: `includes/zoho-crm.php` is a plain-curl Zoho CRM
+v8 REST client (no SDK/Composer, same philosophy as the vendored
+PHPMailer and the Twilio-via-curl SMS code) with two operations — refresh
+an OAuth access token (cached in `data/zoho-token-cache.json`, already
+covered by the existing `/data/` deny-all + gitignore rules) and create a
+Deal. Every call is best-effort and never throws: a Zoho outage, expired
+token, or missing `.env` config logs an error and returns `false` without
+blocking the actual lead email, exactly like the SMTP/mail() fallback
+pattern. Wired into:
+- **`forms/handle-quote.php`** (the shared quote form on Home and
+  Contact) — creates a Deal in Turf Cleaning or Turf Repair depending on
+  the new `service` field (see below), after the confirmation email is
+  confirmed sent.
+- **`scheduler/book.php`** — creates a Deal in Turf Installation with the
+  real booked date/time in `Estimate_Scheduled`, after both confirmation
+  emails send. This is the one lead source where the appointment date is
+  actually known at creation time, unlike the quote form's placeholder
+  `Closing_Date` (`+14 days`, since Zoho requires a Closing_Date and none
+  of the website's forms collect a real expected-close date).
+
+**Service-routing decision, made after asking the owner**: the shared
+quote form (Home, Contact) previously had no way to distinguish a
+cleaning request from a repair request — both were "the quote form."
+Asked the owner how to route repair through it; the answer: give the
+Google Ads landing page (`/dfw-turf-cleaning-request-ga`) its own
+separate form instead of sharing the main one, and add a 3-option
+dropdown ("Turf Cleaning" / "Turf Repair" / "Both Cleaning & Repair",
+defaulting to Turf Cleaning since that's most of current lead volume) to
+the shared form.
+- New `includes/quote-form-ga.php` — a standalone copy of the shared form
+  without the dropdown, `service` fixed to `cleaning` via a hidden field.
+  Keeps the paid-traffic landing page's conversion path isolated from
+  future edits to the shared form, and avoids adding dropdown friction to
+  a page whose whole premise is already "cleaning."
+- `includes/quote-form.php` gained the dropdown; its heading changed from
+  "Get Your Free Turf Cleaning Quote" to "Get Your Free Quote" since it
+  now genuinely serves both services.
+- **"Both Cleaning & Repair" is filed under the Turf Repair pipeline**,
+  not Cleaning — a judgment call, not something the owner specified:
+  repair is the lower-volume, higher-touch service, so routing the combo
+  there makes it less likely to get lost in the high-volume cleaning
+  queue. The Deal's Description notes that cleaning was also requested.
+  Flagging this in case the owner would rather it default the other way;
+  it's one `if` branch in `forms/handle-quote.php` to flip.
+
+**Left unmapped, flagged rather than guessed**: neither `Lead_Source` nor
+the custom `Lead_Channel` picklist has a clean "Website" or "Google Ads"
+value today (`Lead_Channel`'s options are Thumbtack / Referral /
+Google/Organic / Repeat Customer / Other — "Google/Organic" would
+misrepresent the paid Google Ads landing page as organic traffic, and
+doesn't accurately describe organic-site-visit leads either). Rather than
+force a misleading bucket, both fields are left unset and the exact
+source (page referrer for quote-form leads, "booked via scheduler" for
+installation) is written into the Deal's Description instead. Add
+"Website" and "Google Ads" as `Lead_Channel` options in Zoho and this is
+a one-line change to wire up correctly.
+
+**Also not done, needs the owner's Zoho login**: `Account_Name` and
+`Contact_Name` are sent as name-only objects (`{"name": "..."}` for
+Account, `{"First_Name", "Last_Name"}` for Contact) relying on Zoho's
+documented auto-create-by-name behavior for Deals lookups — this could
+not be verified end-to-end against the live org from this environment
+(no real API credentials were available here; see `.env.example`'s new
+`ZOHO_*` section for the ~5-minute Self Client setup). **The first real
+form submission or booking after credentials are added should be checked
+in Zoho** to confirm Deals land in the right pipeline with a properly
+linked Account/Contact, not just that the HTTP call returns success.
+
+Not attempted: creating the pipelines/stages/custom fields themselves via
+API — the Zoho CRM API (and the tools available here) don't expose
+pipeline/layout creation; that's a Setup-UI-only operation, moot anyway
+since the owner had already built all three out.

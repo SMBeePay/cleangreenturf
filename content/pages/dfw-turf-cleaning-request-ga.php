@@ -24,9 +24,7 @@
 <p><strong>The grand finale brings the real game-changer</strong> – we rinse your turf with our powerhouse cleaning solution that doesn't mess around. This isn't your typical rinse-and-hope approach. Our formula goes to war against pet odors, tackles common viruses head-on, eliminates pet-specific bugs, and delivers hospital-grade disinfection to every square inch.</p>
 <p>Our solution penetrates deep into the turf fibers for a true sanitization that actually solves the problem instead of just covering it up. And here's the kicker – it's completely safe for your furry friends and family to enjoy right after we're done.</p>
 
-<div id="lander-free-quote">
-<?php require __DIR__ . '/../../includes/quote-form.php'; ?>
-</div>
+<?php require __DIR__ . '/../../includes/quote-form-ga.php'; ?>
 
 <h3>What DFW Customers Say</h3>
 <div class="testimonial-grid">
