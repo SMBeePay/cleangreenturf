@@ -844,29 +844,34 @@ mentioned installation by name. Added the route to `sitemap.xml` via
 `bin/generate-sitemap.php`.
 
 **Photos**: the owner uploaded 10 new JPEGs directly to the repo root
-(same direct-to-GitHub workflow as the family photo earlier in this doc),
-described as installation work done by the owner's business partner.
-Two things worth flagging:
-- **One photo (`BAT-Photo1.jpeg`) was excluded from the site entirely** —
-  it has a visible competing company's logo/watermark ("Bay Area Turf") in
-  the corner and obviously can't be published as Clean Green Turf's own
-  work. The other 9 were converted to WebP (`assets/images/
-  turf-installation-1.webp` through `-9.webp`, EXIF-orientation-corrected
-  per the process established after the sideways family-photo bug) and
-  used as the page's hero image + gallery. Flagging in case the owner
-  wants the excluded one cropped instead of dropped — as-is, no watermark
-  ever reaches the live site.
-- **The photos appear to be Bay Area/California properties, not Texas**
-  (yard styles, plants, and the watermark on the excluded photo all point
-  the same direction). Since California cleaning service was explicitly
-  discontinued earlier in this project and the business's active
-  install/repair market is DFW, the page copy does not claim these are
-  local DFW job sites — they're introduced as "real installation work
-  completed by our business partner" and "the same crew, materials, and
-  installation standards we bring to every DFW project," which is
-  accurate without implying a specific (wrong) location. Flagging this
-  framing choice in case the owner would rather source or shoot DFW-local
-  install photos instead once available.
+(same direct-to-GitHub workflow as the family photo earlier in this doc)
+— real installation work done by the team. Converted to WebP
+(`assets/images/turf-installation-1.webp` through `-9.webp`,
+EXIF-orientation-corrected per the process established after the sideways
+family-photo bug). Per owner direction, the copy makes no mention of
+where any given photo was shot — installation photos, no location
+commentary needed.
+
+Three of the ten source photos needed handling before use:
+- **`BAT-Photo1.jpeg` excluded entirely** — visible competing company
+  logo/watermark ("Bay Area Turf") in the corner, can't be published as
+  Clean Green Turf's own work.
+- **`BAT-Photo.jpeg` (→ `turf-installation-1.webp`) and `BAT-Photo6.jpeg`
+  (→ `turf-installation-4.webp`) dropped from the gallery** — one had a
+  Halloween tombstone lawn decoration and tall background conifers, the
+  other a distinctive mountain-peak skyline; neither reads as a generic,
+  timeless installation photo. Deleted both files rather than leave them
+  as unused assets.
+- **`BAT-Photo8.jpeg` (`turf-installation-6.webp`) cropped** — the
+  original framing included tall palm trees; cropped to the bottom ~65%
+  of the frame (turf, patio, and fence only) to keep a genuinely nice
+  curved-patio shot without the distinctive palms. New dimensions
+  1000×490 (was 1000×750).
+
+Final gallery: `turf-installation-3` (pressure-washing close-up),
+`-5` (close-up curved patch), `-6` (cropped patio shot), `-7` and `-8`
+(side yards), `-9` (front yard) — six photos, all close-in or without
+strongly identifying background elements, plus `-2` as the page hero.
 
 Not done as part of this change, flagged rather than assumed: no nav or
 footer link was added for `/turf-installation` — it's reachable via the
@@ -876,4 +881,4 @@ but unlike the city pages it isn't yet backed by a "Services" nav entry
 since none currently exists. Regenerated `sitemap.xml` (39 URLs, up from
 38) and verified all 39 routes return 200 with exactly one `<h1>` each,
 plus a mobile (390px) pass confirming no horizontal overflow and that all
-9 gallery images load correctly.
+gallery images load correctly.

@@ -2,12 +2,9 @@
 // the full writeup. Built per owner request: a dedicated educational/sales
 // page about turf installation, separate from the booking scheduler, so the
 // homepage doesn't link straight from a one-line service-card blurb to a
-// booking calendar with no context in between. Photos are real installation
-// work by the owner's business partner (uploaded to the repo directly); one
-// of the ten uploaded photos was excluded — see the audit-findings entry —
-// and the remaining nine are used here as general craftsmanship examples,
-// not framed as specific DFW job-site photos, since the properties shown
-// aren't in the DFW service area. ?>
+// booking calendar with no context in between. Gallery photos are real
+// installation work by the team; see the audit-findings entry for which of
+// the uploaded source photos were excluded or cropped and why. ?>
 <img src="/assets/images/turf-installation-2.webp" alt="Large front yard artificial turf installation with brick walkway" loading="eager" width="1200" height="900"><h1>Artificial Turf Installation</h1>
 <h4>Base Prep · Drainage · Seaming · Infill — Done Right the First Time</h4>
 <p>Full artificial turf installation for backyards, front yards, side yards, pet runs, and putting greens, from the same team that will be keeping it clean for years afterward.</p>
@@ -51,13 +48,11 @@
 </ul>
 
 <h3>Installation Work by Our Team</h3>
-<p>A look at real installation work completed by our business partner — from small pet-run patches to full front and backyard replacements. These photos aren't from Texas yards specifically, but they're the same crew, materials, and installation standards we bring to every DFW project.</p>
+<p>A look at real installation work our team has completed — from small pet-run patches to full front and backyard replacements.</p>
 <div class="gallery">
-<img src="/assets/images/turf-installation-1.webp" alt="Front yard artificial turf installation with tree and landscaping" loading="lazy" width="1000" height="750">
 <img src="/assets/images/turf-installation-3.webp" alt="Technician pressure-washing newly installed artificial turf" loading="lazy" width="1000" height="750">
-<img src="/assets/images/turf-installation-4.webp" alt="Backyard artificial turf installation with dog on the lawn" loading="lazy" width="1000" height="750">
 <img src="/assets/images/turf-installation-5.webp" alt="Curved backyard artificial turf installation along a fence line" loading="lazy" width="480" height="640">
-<img src="/assets/images/turf-installation-6.webp" alt="Backyard artificial turf installation with patio and palm tree" loading="lazy" width="1000" height="750">
+<img src="/assets/images/turf-installation-6.webp" alt="Backyard artificial turf installation with patio" loading="lazy" width="1000" height="490">
 <img src="/assets/images/turf-installation-7.webp" alt="Side yard artificial turf installation with dog running" loading="lazy" width="1000" height="750">
 <img src="/assets/images/turf-installation-8.webp" alt="Side yard artificial turf installation between fence and deck" loading="lazy" width="1000" height="750">
 <img src="/assets/images/turf-installation-9.webp" alt="Upscale front yard artificial turf installation with stone wall" loading="lazy" width="1000" height="750">

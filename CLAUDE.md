@@ -197,15 +197,15 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   scheduler with no education in between. Built `/turf-installation`
   (`content/pages/turf-installation.php`) — a long-form page covering the
   install process (base prep, drainage/grading, seaming/infill), a photo
-  gallery of real installation work by the owner's business partner
-  (9 of 10 newly uploaded photos used; one excluded for a visible
-  competing-company watermark — flagged, not silently dropped), and CTAs
-  onward to the scheduler. Homepage card and one `/about` mention now link
-  here instead of straight to the scheduler. Route added, sitemap
-  regenerated (39 URLs). See `docs/audit-findings.md` "Turf installation
-  sales page" for the full writeup, including the photo-provenance framing
-  (the photos are Bay Area/CA jobs, not DFW — copy avoids claiming
-  otherwise).
+  gallery of real installation work, and CTAs onward to the scheduler.
+  Homepage card and one `/about` mention now link here instead of straight
+  to the scheduler. Of the 10 newly uploaded photos: 1 excluded for a
+  visible competing-company watermark, 2 more dropped from the gallery for
+  distinctive background elements (Halloween decor, a mountain skyline),
+  and 1 cropped to remove visible palm trees — 6 photos used in the
+  gallery plus 1 as the page hero. Route added, sitemap regenerated
+  (39 URLs). See `docs/audit-findings.md` "Turf installation sales page"
+  for the full writeup.
 
 **Not done yet:**
 - **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
