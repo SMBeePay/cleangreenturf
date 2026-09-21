@@ -1090,8 +1090,27 @@ call the Accounts/Contacts upsert endpoints. `.env.example` now asks for
 `ZohoCRM.modules.deals.ALL,ZohoCRM.modules.accounts.ALL,
 ZohoCRM.modules.contacts.ALL` when generating the Self Client code — a
 new grant code and refresh token are needed if one was already generated
-with the narrower scope. **Not yet re-verified against the live org**
-end-to-end with the new scope in place.
+with the narrower scope.
+
+**One more real bug on the way to verifying this**: after generating a
+new refresh token with the wider scope, the very next test still failed
+with `OAUTH_SCOPE_MISMATCH`. Cause: `zoho_get_access_token()` caches an
+access token in `data/zoho-token-cache.json` for up to ~1 hour to avoid
+a refresh-token round-trip on every form submission — that cache doesn't
+know the underlying refresh token (and its scope) changed, so it kept
+serving the old narrow-scope access token even after `.env` was updated
+correctly. No code fix needed for this (it's correct behavior for the
+normal case, a refresh token's scope doesn't normally change mid-life) —
+just deleting the stale cache file was enough to force a fresh token.
+Worth remembering if OAuth scope is ever widened again: **delete
+`data/zoho-token-cache.json` after rotating `ZOHO_REFRESH_TOKEN`.**
+
+**Verified end-to-end, live**: with the cache cleared, a real quote-form
+submission created Deal `7612959000000758001` ("Andrew Neal — Turf
+Cleaning Quote") in the Turf Cleaning pipeline, Stage "New Cleaning
+Inquiry", with both Account Name and Contact correctly linked (confirmed
+by finding the record in Zoho's Deals list view, not just trusting the
+API's success response). The Zoho CRM integration is live and working.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's

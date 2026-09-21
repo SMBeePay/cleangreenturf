@@ -241,40 +241,41 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   (`includes/quote-form-ga.php`, hardcoded to Cleaning, no dropdown) per
   owner request, keeping the shared form's new 3-option dropdown
   (Cleaning / Repair / Both, defaulting Cleaning) off the paid-traffic
-  page. **Still needs real Zoho credentials** (see "Not done yet") and a
-  live end-to-end check once added — see `docs/audit-findings.md` "Zoho
-  CRM integration" for the full pipeline/stage/field reference and the
-  judgment calls flagged there (notably: no clean "Website"/"Google Ads"
-  value exists in Zoho's Lead_Channel field yet, so that's left unset
-  rather than mismapped; and "Both Cleaning & Repair" submissions are
+  page. **Live and verified**: real credentials configured, and two real
+  bugs found via actual production testing (not caught by local testing,
+  since both needed a live Zoho org to surface) — `Contact_Name` doesn't
+  support Zoho's inline auto-create-by-name shorthand on this org's Deals
+  layout (unlike `Account_Name`), so `includes/zoho-crm.php` now upserts
+  real Account/Contact records via `zoho_push_lead()` before creating the
+  Deal, which needed broader OAuth scope (`deals.ALL,accounts.ALL,
+  contacts.ALL`, not just `deals.CREATE`). Confirmed end-to-end: a real
+  quote-form submission created "Andrew Neal — Turf Cleaning Quote" in
+  the Turf Cleaning pipeline with both Account Name and Contact properly
+  linked (not blank). Also added `data/zoho-debug.log` since Hostinger's
+  hPanel didn't have an easy-to-find error log — every push logs success
+  or failure there. See `docs/audit-findings.md` "Zoho CRM integration"
+  for the full pipeline/stage/field reference, the two real bugs and
+  their fixes, and remaining judgment calls (no clean "Website"/"Google
+  Ads" value exists in Zoho's `Lead_Channel` field yet, so that's left
+  unset rather than mismapped; "Both Cleaning & Repair" submissions are
   filed under Turf Repair, not Cleaning).
 
 **Not done yet:**
-- **Zoho CRM credentials**: needs a Self Client Client ID/Secret and a
-  refresh token from https://api-console.zoho.com (andrew@cleangreenturf.com
-  login) — see `.env.example`'s new `ZOHO_*` section for the exact
-  5-minute steps. Without these, the site works exactly as before; the
-  CRM push in `forms/handle-quote.php` and `scheduler/book.php` just
-  silently skips. Once added, submit one real test of each (quote form
-  and scheduler) and check Zoho directly to confirm the Deal lands in the
-  right pipeline with a correctly linked Account/Contact — the
-  auto-create-by-name behavior this relies on could not be verified
-  end-to-end from this environment.
-- **SMTP credentials**: `andrew@cleangreenturf.com` is confirmed Google
+- **SMTP credentials**: confirmed still not done via a live test — the
+  quote form's owner-notification email silently failed to arrive once
+  during Zoho testing, and the emails that did arrive showed Gmail's
+  "via srv569.main-hosting.eu" tag, meaning they went out through PHP's
+  unreliable `mail()` fallback, not real SMTP (`SMTP_PASSWORD` was still
+  blank in `.env`). `andrew@cleangreenturf.com` is confirmed Google
   Workspace, so this is a Gmail app password, not a Hostinger mailbox — see
   `.env.example` for the exact steps (turn on 2-Step Verification, generate
-  an app password at https://myaccount.google.com/apppasswords). Create
-  `.env` from `.env.example` on the server with that password. Never
-  commit `.env`. If deploying via Hostinger's Git integration, this file
-  needs to be placed on the server directly (it isn't in the repo) —
-  confirm a redeploy doesn't wipe it.
-- Deployment to Hostinger: staging deploy is live and verified (see above).
-  The earlier hPanel-wide outage that blocked the first deploy attempt has
-  resolved. Still pending: confirm whether the real `.env` (Gmail app
-  password) has been placed on the server yet — it's gitignored by design,
-  so the Git-integration deploy alone won't have put it there — and then
-  test the quote form end-to-end on live infrastructure. Domain cutover
-  (pointing cleangreenturf.com at this hosting) has not happened yet.
+  an app password at https://myaccount.google.com/apppasswords). Add it to
+  the same `.env` file the Zoho credentials now live in on the server.
+- Deployment to Hostinger: staging deploy is live and verified, including
+  a real end-to-end test of the quote form and scheduler on live
+  infrastructure (see Zoho CRM integration, above) — the remaining gap is
+  just the SMTP password (previous bullet). Domain cutover (pointing
+  cleangreenturf.com at this hosting) has not happened yet.
 - **Scheduler follow-ups**: (1) Twilio credentials for the day-before SMS
   reminder — see `.env.example`'s `TWILIO_*` section for the ~5-minute
   signup; without it the scheduler still fully works (booking, email
