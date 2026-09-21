@@ -241,10 +241,10 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   (`includes/quote-form-ga.php`, hardcoded to Cleaning, no dropdown) per
   owner request, keeping the shared form's new 3-option dropdown
   (Cleaning / Repair / Both, defaulting Cleaning) off the paid-traffic
-  page. **Quote form live and verified; scheduler fix corrected after two
-  misdiagnoses, not yet re-tested.** Real credentials configured, and
-  several real bugs found via actual production testing (none caught by
-  local testing, since all needed a live Zoho org to surface):
+  page. **Both lead paths live and fully verified in the real Zoho org.**
+  Real credentials configured, and several real bugs found via actual
+  production testing (none caught by local testing, since all needed a
+  live Zoho org to surface):
   1. `Contact_Name` doesn't support Zoho's inline auto-create-by-name
      shorthand on this org's Deals layout (unlike `Account_Name`) — fixed
      by having `includes/zoho-crm.php` upsert real Account/Contact
@@ -271,7 +271,10 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   both Account Name and Contact properly linked (not blank). The
   **scheduler booking** took three real attempts to get right (bug #4
   above, in its two wrong forms then its correct one) — the corrected fix
-  is pushed but not yet re-verified with a live booking. Also added
+  was then verified with a real live booking: "Andrew Neal — Turf
+  Installation Estimate" landed in the Turf Installation pipeline at
+  Stage "New Lead" with Account Name and Contact both correctly linked.
+  Both pipelines confirmed working from real website traffic. Also added
   `data/zoho-debug.log` since Hostinger's hPanel didn't have an
   easy-to-find error log — every push logs success or failure there. See
   `docs/audit-findings.md` "Zoho CRM integration" for the full trail,

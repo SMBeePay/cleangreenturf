@@ -1187,11 +1187,16 @@ Zoho-side configuration change was needed — this was purely a
 code-side misreading of Zoho's metadata API. **Not yet re-verified**
 with a live scheduler booking using the corrected values.
 
-The Zoho CRM integration overall: quote form confirmed fully working
-live; scheduler booking hit three real issues across its first three
-live attempts (two of them a misdiagnosis of the same underlying
-mistake, corrected above) — the fix is now grounded in actual record
-data rather than metadata, pushed and awaiting one more real test.
+**Final result — both lead paths confirmed live**: the corrected fix
+was verified with a real scheduler booking, which created "Andrew Neal
+— Turf Installation Estimate" in the Turf Installation pipeline at
+Stage "New Lead," with Account Name and Contact both correctly linked
+— visible directly in Zoho's Deals list alongside the earlier confirmed
+"Andrew Neal — Turf Cleaning Quote." The Zoho CRM integration is
+complete: both the quote form (Cleaning/Repair pipelines) and the
+scheduler (Installation pipeline) are pushing real leads into the
+correct pipeline with linked Account/Contact records, from real website
+traffic, not just successful API responses trusted at face value.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's
