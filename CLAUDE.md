@@ -331,11 +331,14 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   "Google Ads", inferred from the Referer header), and `Landing_Page_URL`
   (also from Referer, via a new shared `zoho_landing_page_url()` helper)
   into both `forms/handle-quote.php` and `scheduler/book.php`.
-  `Service_Line` found a real data gap: the picklist only has "Turf
-  Installation" and "Turf Cleaning", no "Turf Repair" — set correctly for
-  cleaning submissions and scheduler bookings, left unset (not
+  `Service_Line` found a real data gap: the picklist only had "Turf
+  Installation" and "Turf Cleaning", no "Turf Repair" — left unset (not
   mismapped) for repair-only and cleaning+repair quote submissions,
-  flagged to the owner as a possible Zoho-side picklist addition. See
+  flagged to the owner as a possible Zoho-side picklist addition. Owner
+  added the "Turf Repair" option same-day; confirmed its actual_value
+  matches its display text (no renaming-artifact trap this time) and
+  wired `ZOHO_SERVICE_LINE_REPAIR` into the repair branch — all three
+  service lines now populate correctly, no more gap. See
   `docs/audit-findings.md` "Zoho CRM lead-attribution fields."
 
 **Not done yet:**

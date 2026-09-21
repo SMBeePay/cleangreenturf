@@ -71,13 +71,9 @@ const ZOHO_LEAD_CHANNEL_SCHEDULER = 'Scheduler';
 const ZOHO_LEAD_SOURCE_WEBSITE = 'Website';
 const ZOHO_LEAD_SOURCE_GOOGLE_ADS = 'Google Ads';
 
-// Service_Line only has "Turf Installation" and "Turf Cleaning" as real
-// options today — there is no "Turf Repair" value yet. Repair-only and
-// cleaning+repair quote submissions leave Service_Line unset rather than
-// mismap it to one of these two; see docs/audit-findings.md "Zoho CRM
-// lead-attribution fields" if a Turf Repair option gets added later.
 const ZOHO_SERVICE_LINE_INSTALLATION = 'Turf Installation';
 const ZOHO_SERVICE_LINE_CLEANING = 'Turf Cleaning';
+const ZOHO_SERVICE_LINE_REPAIR = 'Turf Repair';
 
 /**
  * Best-effort "landing page" for a lead: the page the form/booking widget

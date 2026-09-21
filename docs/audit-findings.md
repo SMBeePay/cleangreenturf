@@ -1406,25 +1406,33 @@ actually submitted from, not true first-touch multi-page attribution —
 this project has no click-tracking layer to do better than that.
 
 **Service_Line found a real gap, flagged rather than guessed around**:
-the picklist only has two options — "Turf Installation" and "Turf
-Cleaning" — no "Turf Repair". So:
-- Cleaning-only quote submissions → `Service_Line: "Turf Cleaning"`.
-- Scheduler bookings → `Service_Line: "Turf Installation"`.
-- Repair-only and "cleaning + repair" quote submissions → left **unset**.
-  Mapping either to "Turf Cleaning" would misrepresent a repair lead, and
-  there's no correct option to pick. If reporting on repair volume by
-  Service_Line matters, a "Turf Repair" option needs to be added to the
-  picklist in Zoho (Setup → Customization → Deals → Service_Line) — that's
-  a Zoho-side change this project can't make, flagging per owner's
-  standing "let me know if anything needs to change on the Zoho side."
+at the time this was first built, the picklist only had two options —
+"Turf Installation" and "Turf Cleaning" — no "Turf Repair". Repair-only
+and "cleaning + repair" quote submissions were left with Service_Line
+**unset** rather than mismapped to "Turf Cleaning", and the gap was
+flagged to the owner as a possible Zoho-side picklist addition.
+
+**Follow-up, same day**: owner added a "Turf Repair" option to the
+Service_Line picklist in Zoho (Setup → Customization → Deals →
+Service_Line). Confirmed via `getFields` that the new option's
+`actual_value` matches its display text exactly (`"Turf Repair"` →
+`"Turf Repair"`, no renaming-artifact mismatch this time — unlike
+Lead_Channel above). Verified live by writing `Service_Line: "Turf
+Repair"` to the same test Deal used earlier and reading it back
+identical, then added `ZOHO_SERVICE_LINE_REPAIR = 'Turf Repair'` to
+`includes/zoho-crm.php` and wired it into the repair/cleaning+repair
+branch of `forms/handle-quote.php`'s `zoho_push_lead()` call. All three
+service lines (cleaning, installation, repair) now populate
+Service_Line correctly — no more gap.
 
 New constants added to `includes/zoho-crm.php`
 (`ZOHO_LEAD_CHANNEL_QUOTE_FORM`, `ZOHO_LEAD_CHANNEL_SCHEDULER`,
 `ZOHO_LEAD_SOURCE_WEBSITE`, `ZOHO_LEAD_SOURCE_GOOGLE_ADS`,
-`ZOHO_SERVICE_LINE_INSTALLATION`, `ZOHO_SERVICE_LINE_CLEANING`) follow the
-same pattern as the existing Pipeline/Stage constants, each documented
-with the same actual_value-vs-display-text warning. Wired into
+`ZOHO_SERVICE_LINE_INSTALLATION`, `ZOHO_SERVICE_LINE_CLEANING`,
+`ZOHO_SERVICE_LINE_REPAIR`) follow the same pattern as the existing
+Pipeline/Stage constants, each documented with the same
+actual_value-vs-display-text warning where it applies. Wired into
 `forms/handle-quote.php` and `scheduler/book.php`'s existing
 `zoho_push_lead()` calls. Verified with the full 40-route regression
-check (no regressions) and the two live-record updates above (exact
-values round-tripped through the real API).
+check (no regressions) and live-record updates on real test Deals (exact
+values round-tripped through the real API each time).

@@ -154,9 +154,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         'Lead_Channel' => ZOHO_LEAD_CHANNEL_QUOTE_FORM,
         'Lead_Source' => $leadSource,
         'Landing_Page_URL' => $landingPageUrl,
-        // No Service_Line set: Zoho's picklist only has Turf Installation
-        // and Turf Cleaning today, no Turf Repair option — see
-        // includes/zoho-crm.php.
+        'Service_Line' => ZOHO_SERVICE_LINE_REPAIR,
     ]);
 } else {
     zoho_push_lead($zohoConfig, $name, $email, $phone, [
