@@ -549,11 +549,34 @@ blockquote img {
 /* ---- Scheduler ---- */
 .btn--small { padding: 0.5em 1em; font-size: var(--step--1); }
 
+/* Booking-page layout: heading+sub on the left, calendar on the right,
+   so the calendar is visible without scrolling — the calendar itself is
+   the page's whole point. On mobile (single column) the widget comes
+   right after the heading, ahead of the trust bullets, so what to do is
+   immediately obvious without scrolling past a bulleted list first. */
+.scheduler-hero {
+    display: grid; grid-template-columns: 1fr; row-gap: var(--space-4);
+    grid-template-areas: "intro" "widget" "trust";
+    align-items: start; margin-bottom: var(--space-6);
+}
+@media (min-width: 900px) {
+    .scheduler-hero {
+        grid-template-columns: 0.85fr 1.15fr; column-gap: var(--space-6);
+        grid-template-areas: "intro widget" "trust widget";
+    }
+}
+.scheduler-hero__intro { grid-area: intro; }
+.scheduler-hero__intro h1 { font-size: var(--step-2); margin-bottom: 0.4em; }
+.scheduler-hero__widget { grid-area: widget; }
+
+/* /reschedule still uses this simpler centered header — it's managing an
+   existing appointment, not the first-visit booking flow, so it doesn't
+   need the two-column layout above. */
 .scheduler-page-header { text-align: center; max-width: 720px; margin: 0 auto var(--space-6); }
 .scheduler-page-header__sub { color: var(--ink-soft); font-size: var(--step-1); font-family: var(--font-sans); }
 
 .scheduler-trust {
-    list-style: none; padding: 0; margin: 0 auto var(--space-6); max-width: 720px;
+    grid-area: trust; list-style: none; padding: 0; margin: 0;
     display: flex; flex-direction: column; gap: var(--space-2);
 }
 .scheduler-trust li { display: flex; align-items: center; gap: 0.6em; padding-left: 0; font-family: var(--font-sans); color: var(--ink-soft); }

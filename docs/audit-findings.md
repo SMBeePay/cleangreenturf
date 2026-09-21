@@ -1201,3 +1201,46 @@ customer's only acknowledgment is the redirect to the thank-you page.
 Flagging in case the owner wants a customer confirmation email added to
 the quote form too, matching the scheduler's pattern — not done as part
 of this fix since it wasn't what was reported broken.
+
+## Scheduler page layout: calendar moved above the fold (owner-directed)
+
+Owner feedback on `/schedule-turf-installation-estimate`: the centered
+heading + trust bullets pushed the calendar below the fold on both
+desktop and mobile — "someone should immediately see what they need to
+do." Asked for the calendar closer to the top, ideally a two-column
+layout with a smaller heading on the left and the calendar on the right.
+
+Restructured `content/pages/schedule-turf-installation-estimate.php`
+into three pieces inside a new `.scheduler-hero` grid container: the
+intro (H1 + one-line subtext), the calendar widget, and the trust
+bullets. New CSS (`assets/css/style.css`) uses `grid-template-areas` so
+the three pieces can reorder per breakpoint without touching the HTML:
+- **Mobile (default, single column)**: intro → widget → trust. The
+  calendar appears immediately after the heading, ahead of the trust
+  bullets, so there's no bulleted list to scroll past before reaching
+  the actionable part of the page.
+- **900px+ (two columns)**: intro and trust stack in a narrower left
+  column (0.85fr), the calendar fills a wider right column (1.15fr)
+  spanning both rows — heading, subtext, and calendar all visible
+  without scrolling on a normal desktop viewport.
+- The page's H1 is sized down for this layout (`--step-2` instead of
+  the sitewide `--step-4`) via `.scheduler-hero__intro h1` — it no
+  longer needs to dominate the page now that the calendar shares top
+  billing.
+
+`/reschedule` shares the same `includes/scheduler-widget.php` but wasn't
+part of this ask (it's managing an existing appointment, not the
+first-visit booking flow) — kept its original simpler centered
+`.scheduler-page-header` styling unchanged; that class had to be
+restored after an initial pass accidentally deleted it while adding the
+new `.scheduler-hero` rules, which would have left `/reschedule`
+unstyled. Also restored `.scheduler`'s own `max-width: 720px` (needed
+so `/reschedule`'s calendar, which isn't inside the new grid, doesn't
+stretch to the site's full 1240px content width) — harmless for the new
+two-column layout too, since that grid column already renders narrower
+than 720px at realistic viewport widths.
+
+Verified via headless-browser screenshots at 1400px, 900px, and 390px:
+no horizontal overflow at any width, and on a 390×844 mobile viewport
+the calendar's top edge sits at y≈407 — comfortably the first screen,
+no scrolling needed to see it.
