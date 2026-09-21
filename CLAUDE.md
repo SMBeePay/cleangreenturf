@@ -284,22 +284,30 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   mismapped; "Both Cleaning & Repair" submissions are filed under Turf
   Repair, not Cleaning).
 
+- **SMTP credentials added, real bug found and fixed**: owner added the
+  Gmail app password to `.env` — confirmed live, mail now routes through
+  Gmail's real SMTP relay (the "via srv569.main-hosting.eu" tag on
+  delivered mail, a symptom of the `mail()` fallback, is gone). This
+  surfaced a real, previously-latent bug: email subjects with an em dash
+  rendered as mojibake (`New Quote Request â€" Andrew Neal TEST`) because
+  neither `forms/handle-quote.php` nor `includes/mailer.php` ever set
+  PHPMailer's `CharSet` (defaulted to `iso-8859-1`, mismatching the
+  actual UTF-8 bytes). Invisible until now because the `mail()` fallback
+  already declared UTF-8 correctly — real SMTP creds were the first time
+  PHPMailer's own charset handling was ever exercised. Fixed with one
+  line (`$mailer->CharSet = PHPMailer::CHARSET_UTF8;`) in both files —
+  `includes/mailer.php` is shared by the scheduler's booking,
+  reschedule, and cancellation emails too, so one fix covers all of
+  them. Verified locally via `preSend()`/`getSentMIMEMessage()`
+  reproduction (exact same PHPMailer code path); not yet re-verified
+  with another live send. See `docs/audit-findings.md` "SMTP
+  credentials added; found and fixed a real mojibake bug."
+
 **Not done yet:**
-- **SMTP credentials**: confirmed still not done via a live test — the
-  quote form's owner-notification email silently failed to arrive once
-  during Zoho testing, and the emails that did arrive showed Gmail's
-  "via srv569.main-hosting.eu" tag, meaning they went out through PHP's
-  unreliable `mail()` fallback, not real SMTP (`SMTP_PASSWORD` was still
-  blank in `.env`). `andrew@cleangreenturf.com` is confirmed Google
-  Workspace, so this is a Gmail app password, not a Hostinger mailbox — see
-  `.env.example` for the exact steps (turn on 2-Step Verification, generate
-  an app password at https://myaccount.google.com/apppasswords). Add it to
-  the same `.env` file the Zoho credentials now live in on the server.
-- Deployment to Hostinger: staging deploy is live and verified, including
-  a real end-to-end test of the quote form and scheduler on live
-  infrastructure (see Zoho CRM integration, above) — the remaining gap is
-  just the SMTP password (previous bullet). Domain cutover (pointing
-  cleangreenturf.com at this hosting) has not happened yet.
+- Domain cutover (pointing cleangreenturf.com at this Hostinger
+  hosting) has not happened yet — staging deploy is otherwise fully
+  live and verified (quote form, scheduler, Zoho CRM, and now SMTP all
+  confirmed working end-to-end on real infrastructure).
 - **Scheduler follow-ups**: (1) Twilio credentials for the day-before SMS
   reminder — see `.env.example`'s `TWILIO_*` section for the ~5-minute
   signup; without it the scheduler still fully works (booking, email

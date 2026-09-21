@@ -1249,3 +1249,42 @@ Verified via headless-browser screenshots at 1400px, 900px, and 390px:
 no horizontal overflow at any width, and on a 390×844 mobile viewport
 the calendar's top edge sits at y≈407 — comfortably the first screen,
 no scrolling needed to see it.
+
+## SMTP credentials added; found and fixed a real mojibake bug
+
+Owner added the Gmail app password to `.env`. First live test after
+that confirmed SMTP is genuinely active now: the "via
+srv569.main-hosting.eu" tag that previously appeared on delivered mail
+(a symptom of the `mail()` fallback) is gone — mail now routes through
+Gmail's real SMTP relay. This closes out the last item that had been
+sitting in "Not done yet" since the initial rebuild.
+
+That same test surfaced a real, previously-latent bug: the email
+subject rendered as `New Quote Request â€" Andrew Neal TEST` in Gmail —
+mojibake where the em dash should be. Cause: neither
+`forms/handle-quote.php` nor `includes/mailer.php` ever set
+PHPMailer's `CharSet` property, so it defaulted to `iso-8859-1`.
+Confirmed by reproducing locally with `preSend()` +
+`getSentMIMEMessage()` (no live send needed): PHPMailer declared the
+Subject header as `=?iso-8859-1?Q?...=E2=80=94...?=` while the actual
+bytes (`E2 80 94`) are UTF-8 for an em dash — a genuine mismatch, not
+just a display quirk. Gmail decoded those bytes per the (wrong)
+declared charset and produced exactly the garbled text seen live.
+
+This bug was latent from the start but invisible until now — every
+email had been going out via the `mail()` fallback (which already sets
+`Content-Type: text/plain; charset=UTF-8` explicitly), so PHPMailer's
+default charset was never actually exercised until real SMTP creds
+went in. It would have affected **every** transactional email with an
+em dash in the subject or body — which is most of them (quote-form
+notification, scheduler confirmation, owner notification, reschedule
+and cancellation notices all use "—" for visual separation).
+
+Fix: `$mailer->CharSet = PHPMailer::CHARSET_UTF8;` added right after
+`new PHPMailer(true)` in both `forms/handle-quote.php` and
+`includes/mailer.php` (the shared helper `scheduler/book.php` and
+`scheduler/reschedule.php` both call, so one fix covers all scheduler
+emails too). Re-verified locally: the same reproduction now produces
+`=?utf-8?Q?...=E2=80=94...?=` — charset and bytes match. Not yet
+re-verified with another live send, but the local proof is exact
+(same PHPMailer code path, same input, correct output).

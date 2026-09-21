@@ -26,6 +26,7 @@ function send_transactional_email(
     if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($mailConfig['password'])) {
         $mailer = new PHPMailer(true);
         try {
+            $mailer->CharSet = PHPMailer::CHARSET_UTF8;
             $mailer->isSMTP();
             $mailer->Host = $mailConfig['host'];
             $mailer->Port = $mailConfig['port'];

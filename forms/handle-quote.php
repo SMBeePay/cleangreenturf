@@ -96,6 +96,7 @@ if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($ma
     // SMTP path — reliable delivery, won't land in spam as easily as mail().
     $mailer = new PHPMailer(true);
     try {
+        $mailer->CharSet = PHPMailer::CHARSET_UTF8;
         $mailer->isSMTP();
         $mailer->Host = $mailConfig['host'];
         $mailer->Port = $mailConfig['port'];
