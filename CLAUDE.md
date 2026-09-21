@@ -388,6 +388,30 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   see `.env.example`'s new Google Calendar section for the full
   walkthrough, and `docs/audit-findings.md` "Google Calendar sync" for
   the complete writeup.
+- **Dynamic availability against Google Calendar**: owner immediately
+  followed up asking that availability also reflect anything already on
+  their calendar(s) — not just other website bookings. Added
+  `gcal_get_busy_periods()` (uses Google's `freeBusy` API, one call
+  checks multiple calendars at once) and a `GOOGLE_BUSY_CALENDAR_IDS` env
+  var (defaults to just the booking calendar if unset; owner can add a
+  personal or second business calendar, shared at "see only free/busy"
+  permission — no full event-detail access needed for those). Wired
+  through `scheduler_slots_for_date()` (now excludes any slot overlapping
+  a busy period), `scheduler_days_with_availability()` (fetches busy
+  periods once per month, not once per day), and
+  `scheduler_slot_is_valid_and_open()` (the actual server-side booking
+  validation, so this isn't just a display-layer filter — a conflicting
+  slot is rejected even if someone bypasses the widget). Fails open like
+  every other integration here: a Google outage degrades to today's
+  DB-only availability rather than blocking bookings entirely, logged to
+  `data/gcal-debug.log`. Verified with a direct query test (a fake
+  11am-1pm busy period correctly excluded exactly the overlapping slots,
+  including the back-to-back boundary case), the `freeBusy` request
+  structure confirmed against Google's real API with a throwaway keypair,
+  both `scheduler/availability.php` modes smoke-tested with Google
+  Calendar unconfigured, and the full route regression. See
+  `docs/audit-findings.md` "Dynamic availability against Google
+  Calendar."
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger
@@ -406,12 +430,15 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   URL; still no primary-nav entry. Owner mentioned having ad copy for a
   turf-installation landing page, which would naturally link to this
   scheduler once shared. (4) `ADMIN_PASSWORD` needs to be set in `.env`
-  before `/admin/appointments.php` is usable. (5) Google Calendar sync is
-  built (see above) but needs the owner to complete the one-time Cloud
-  Console / service-account setup and add `GOOGLE_SERVICE_ACCOUNT_EMAIL`,
-  `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`, and `GOOGLE_CALENDAR_ID` to
-  `.env` — see `.env.example` for the full walkthrough. Until then,
-  bookings work exactly as before, just without the calendar push.
+  before `/admin/appointments.php` is usable. (5) Google Calendar sync
+  and dynamic availability are both built (see above) but need the owner
+  to complete the one-time Cloud Console / service-account setup and add
+  `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`,
+  and `GOOGLE_CALENDAR_ID` to `.env` — see `.env.example` for the full
+  walkthrough. Optionally also `GOOGLE_BUSY_CALENDAR_IDS` if other
+  calendars (personal, a second business) should block availability too.
+  Until then, bookings work exactly as before: no calendar event
+  created, and availability only reflects other website bookings.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the

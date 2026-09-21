@@ -13,6 +13,8 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/google-calendar.php';
+
 function scheduler_db(): PDO {
     static $pdo = null;
     if ($pdo !== null) {
@@ -71,15 +73,33 @@ function scheduler_booked_slot_starts(string $fromYmdHis, string $toYmdHis, ?str
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
+/** @param array<int, array{start: DateTime, end: DateTime}> $busyPeriods */
+function scheduler_overlaps_busy_period(DateTime $slotStart, DateTime $slotEnd, array $busyPeriods): bool {
+    foreach ($busyPeriods as $busy) {
+        if ($slotStart < $busy['end'] && $slotEnd > $busy['start']) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * Open, bookable slots for one calendar date. Re-derives everything from
  * config + the DB every time (business hours, lead time, booking window,
  * blackout dates, already-booked slots) — this is also what validates a
  * submitted booking server-side, so it must never trust client input.
  *
+ * $busyPeriods (see gcal_get_busy_periods()) additionally excludes any
+ * slot that overlaps existing time already blocked on a synced Google
+ * Calendar — pre-fetched by the caller (once per date or once per whole
+ * month, see scheduler_slot_is_valid_and_open()/
+ * scheduler_days_with_availability() below) rather than fetched in here,
+ * so this function doesn't make its own network call every time it runs.
+ *
+ * @param array<int, array{start: DateTime, end: DateTime}> $busyPeriods
  * @return array<int, array{value:string,label:string}>
  */
-function scheduler_slots_for_date(string $dateYmd, array $config, ?string $excludeToken = null): array {
+function scheduler_slots_for_date(string $dateYmd, array $config, ?string $excludeToken = null, array $busyPeriods = []): array {
     $tz = new DateTimeZone($config['timezone']);
     $date = DateTime::createFromFormat('Y-m-d', $dateYmd, $tz);
     if (!$date) {
@@ -118,7 +138,8 @@ function scheduler_slots_for_date(string $dateYmd, array $config, ?string $exclu
     while (($cursor->getTimestamp() + $slotMinutes * 60) <= $close->getTimestamp()) {
         if ($cursor >= $earliestBookable) {
             $value = $cursor->format('Y-m-d H:i:s');
-            if (!isset($booked[$value])) {
+            $slotEnd = (clone $cursor)->modify('+' . $slotMinutes . ' minutes');
+            if (!isset($booked[$value]) && !scheduler_overlaps_busy_period($cursor, $slotEnd, $busyPeriods)) {
                 $slots[] = ['value' => $value, 'label' => $cursor->format('g:i A')];
             }
         }
@@ -128,17 +149,23 @@ function scheduler_slots_for_date(string $dateYmd, array $config, ?string $exclu
 }
 
 /** @return array<string,int> date (Y-m-d) => number of open slots, for calendar rendering. */
-function scheduler_days_with_availability(string $monthYm, array $config): array {
+function scheduler_days_with_availability(string $monthYm, array $config, array $gcalConfig): array {
     $tz = new DateTimeZone($config['timezone']);
     $first = DateTime::createFromFormat('Y-m-d', $monthYm . '-01', $tz);
     if (!$first) {
         return [];
     }
     $daysInMonth = (int)$first->format('t');
+    // One freeBusy call for the whole month, not one per day — reused
+    // across every scheduler_slots_for_date() call in the loop below.
+    $rangeStart = (clone $first)->setTime(0, 0, 0);
+    $rangeEnd = (clone $rangeStart)->modify('+' . $daysInMonth . ' days');
+    $busyPeriods = gcal_get_busy_periods($gcalConfig, $rangeStart, $rangeEnd);
+
     $result = [];
     for ($d = 1; $d <= $daysInMonth; $d++) {
         $dateYmd = $first->format('Y-m') . '-' . str_pad((string)$d, 2, '0', STR_PAD_LEFT);
-        $count = count(scheduler_slots_for_date($dateYmd, $config));
+        $count = count(scheduler_slots_for_date($dateYmd, $config, null, $busyPeriods));
         if ($count > 0) {
             $result[$dateYmd] = $count;
         }
@@ -146,13 +173,20 @@ function scheduler_days_with_availability(string $monthYm, array $config): array
     return $result;
 }
 
-/** Server-side re-validation that a submitted slot is real and still open. */
-function scheduler_slot_is_valid_and_open(string $slotStartYmdHis, array $config, ?string $excludeToken = null): bool {
+/** Server-side re-validation that a submitted slot is real and still open — including against synced Google Calendar conflicts. */
+function scheduler_slot_is_valid_and_open(string $slotStartYmdHis, array $config, array $gcalConfig, ?string $excludeToken = null): bool {
     $parts = explode(' ', $slotStartYmdHis);
     if (count($parts) !== 2) {
         return false;
     }
-    foreach (scheduler_slots_for_date($parts[0], $config, $excludeToken) as $slot) {
+    $tz = new DateTimeZone($config['timezone']);
+    $dayStart = DateTime::createFromFormat('Y-m-d H:i:s', $parts[0] . ' 00:00:00', $tz);
+    if (!$dayStart) {
+        return false;
+    }
+    $dayEnd = (clone $dayStart)->modify('+1 day');
+    $busyPeriods = gcal_get_busy_periods($gcalConfig, $dayStart, $dayEnd);
+    foreach (scheduler_slots_for_date($parts[0], $config, $excludeToken, $busyPeriods) as $slot) {
         if ($slot['value'] === $slotStartYmdHis) {
             return true;
         }

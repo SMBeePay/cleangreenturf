@@ -13,6 +13,7 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../includes/scheduler.php';
 $schedulerConfig = require __DIR__ . '/../config/scheduler.php';
+$gcalConfig = require __DIR__ . '/../config/google-calendar.php';
 
 $date = isset($_GET['date']) ? trim((string)$_GET['date']) : null;
 $month = isset($_GET['month']) ? trim((string)$_GET['month']) : null;
@@ -24,7 +25,10 @@ if ($date !== null) {
         echo json_encode(['error' => 'invalid_date']);
         exit;
     }
-    echo json_encode(['date' => $date, 'slots' => scheduler_slots_for_date($date, $schedulerConfig, $token)]);
+    $tz = new DateTimeZone($schedulerConfig['timezone']);
+    $dayStart = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' 00:00:00', $tz);
+    $busyPeriods = $dayStart ? gcal_get_busy_periods($gcalConfig, $dayStart, (clone $dayStart)->modify('+1 day')) : [];
+    echo json_encode(['date' => $date, 'slots' => scheduler_slots_for_date($date, $schedulerConfig, $token, $busyPeriods)]);
     exit;
 }
 
@@ -34,7 +38,7 @@ if ($month !== null) {
         echo json_encode(['error' => 'invalid_month']);
         exit;
     }
-    echo json_encode(['month' => $month, 'days' => scheduler_days_with_availability($month, $schedulerConfig)]);
+    echo json_encode(['month' => $month, 'days' => scheduler_days_with_availability($month, $schedulerConfig, $gcalConfig)]);
     exit;
 }
 

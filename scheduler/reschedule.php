@@ -85,7 +85,7 @@ if ($action === 'cancel') {
 if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $slotStart)) {
     scheduler_json_fail('invalid_slot');
 }
-if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $token)) {
+if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $gcalConfig, $token)) {
     scheduler_json_fail('slot_unavailable', 409);
 }
 

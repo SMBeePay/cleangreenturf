@@ -104,6 +104,77 @@ function gcal_get_access_token(array $config): ?string {
     return $data['access_token'];
 }
 
+/**
+ * Busy (blocked) time periods across every calendar in
+ * $config['busy_calendar_ids'], within [$rangeStart, $rangeEnd) — one
+ * freeBusy API request covers all of them, not just the calendar new
+ * bookings get created on, so anything already on any shared calendar (a
+ * personal appointment, a manually added block, another commitment)
+ * blocks that time from being offered to someone booking an estimate.
+ *
+ * Fails OPEN, not closed, same as every other external integration in
+ * this project: if Google Calendar isn't configured, or the API call
+ * fails for any reason, this returns an empty array (no extra
+ * restriction) rather than blocking every slot on a Google outage —
+ * every failure is still logged to data/gcal-debug.log so an ongoing
+ * outage doesn't go unnoticed.
+ *
+ * @return array<int, array{start: DateTime, end: DateTime}>
+ */
+function gcal_get_busy_periods(array $config, DateTime $rangeStart, DateTime $rangeEnd): array {
+    if (empty($config['busy_calendar_ids'])) {
+        return [];
+    }
+
+    try {
+        $accessToken = gcal_get_access_token($config);
+        if ($accessToken === null) {
+            return [];
+        }
+
+        $ch = curl_init('https://www.googleapis.com/calendar/v3/freeBusy');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $accessToken,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'timeMin' => $rangeStart->format('c'),
+                'timeMax' => $rangeEnd->format('c'),
+                'items' => array_map(static fn(string $id): array => ['id' => $id], $config['busy_calendar_ids']),
+            ], JSON_UNESCAPED_SLASHES),
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false || $httpCode >= 300) {
+            gcal_log("Google Calendar: freeBusy query failed (HTTP $httpCode, curl error: \"$curlError\"): $response — availability will NOT reflect calendar conflicts until this is resolved");
+            return [];
+        }
+
+        $data = json_decode($response, true);
+        $periods = [];
+        foreach ($data['calendars'] ?? [] as $calendarId => $calendarData) {
+            if (!empty($calendarData['errors'])) {
+                gcal_log("Google Calendar: freeBusy error for calendar $calendarId: " . json_encode($calendarData['errors']));
+                continue;
+            }
+            foreach ($calendarData['busy'] ?? [] as $busy) {
+                $periods[] = ['start' => new DateTime($busy['start']), 'end' => new DateTime($busy['end'])];
+            }
+        }
+        return $periods;
+    } catch (\Throwable $e) {
+        gcal_log('Google Calendar: freeBusy exception: ' . $e->getMessage());
+        return [];
+    }
+}
+
 /** Creates a calendar event. Returns its Google event id, or null on failure/not-configured. */
 function gcal_create_event(array $config, array $eventFields): ?string {
     try {

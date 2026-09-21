@@ -73,7 +73,7 @@ $name = scheduler_clean_line($name);
 $phone = scheduler_clean_line($phone);
 $address = scheduler_clean_line($address);
 
-if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig)) {
+if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $gcalConfig)) {
     scheduler_json_fail('slot_unavailable', 409);
 }
 

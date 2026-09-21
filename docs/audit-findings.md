@@ -1581,3 +1581,87 @@ Calendar ID) and add the three `GOOGLE_*` values to `.env` on the live
 server. Once that's done, a real test booking will confirm the live
 send end-to-end, the same way SMTP/Zoho were verified earlier in this
 project.
+
+## Dynamic availability against Google Calendar
+
+Immediately after Google Calendar sync shipped, owner asked for the
+booking widget's availability to also be dynamic: if there's an existing
+event during a slot on any of their Clean Green Turf calendars — or
+anything else already blocking that time — it shouldn't show as
+available to someone booking a new estimate. Previously, availability
+only checked this scheduler's own SQLite database (other website
+bookings) — anything added directly to Google Calendar (a manually
+blocked morning, a personal appointment, another commitment) had no
+effect on what the public booking page offered.
+
+**Approach**: Google's Calendar `freeBusy` API (a single request can
+check busy/free status across multiple calendars at once, purpose-built
+for exactly this) rather than fetching and parsing full event lists —
+simpler, and it only needs "free/busy" visibility into calendars that
+aren't the booking calendar itself, not full event detail access.
+
+Added `gcal_get_busy_periods(config, rangeStart, rangeEnd)` to
+`includes/google-calendar.php`. `config/google-calendar.php` gained
+`busy_calendar_ids`, driven by a new `GOOGLE_BUSY_CALENDAR_IDS` env var
+(comma-separated Calendar IDs) — defaults to just `GOOGLE_CALENDAR_ID`
+(the booking calendar) if not set, so at minimum, anything already on
+that calendar still blocks. Owner can add other calendars (a personal
+one, a second business calendar) shared with the service account at
+"see only free/busy" permission — no need to grant full event-detail
+access to calendars unrelated to the business.
+
+Wired into `includes/scheduler.php`'s availability logic:
+- `scheduler_slots_for_date()` gained an optional `$busyPeriods` param —
+  a candidate slot is now excluded if it overlaps any busy period, in
+  addition to the existing "already booked in our own DB" check. This
+  function itself makes no network calls — busy periods are always
+  pre-fetched by the caller and passed in, so this stays fast and pure.
+- `scheduler_days_with_availability()` (month view, used for the
+  calendar's per-day dot indicators) fetches busy periods **once for the
+  whole month** and reuses that same result across all ~30 per-day calls
+  in its loop — not one `freeBusy` request per day.
+- `scheduler_slot_is_valid_and_open()` (the server-side re-validation
+  used at actual booking/reschedule time, so a slot can't be trusted from
+  client input) fetches busy periods for just that one day.
+- `scheduler/availability.php` (the public endpoint the front-end
+  calendar widget calls) updated to load `config/google-calendar.php` and
+  pass it through to both of the above.
+
+**Fails open, not closed** — the same convention as every other external
+integration in this project (Zoho, Twilio, SMTP): if Google Calendar
+isn't configured yet, or the `freeBusy` call fails for any reason
+(outage, bad credentials, network issue), `gcal_get_busy_periods()`
+returns an empty array rather than blocking every slot. This means
+availability degrades to exactly today's behavior (DB-only checking) on
+a Google problem, rather than taking the entire booking page down —
+consistent with how a Zoho outage never blocks a lead email. Every
+failure is still logged to `data/gcal-debug.log` so a real, ongoing
+outage doesn't go unnoticed and silently stay degraded.
+
+**Verified**:
+- Direct query test: built a fake busy period (11am-1pm on a real
+  bookable weekday) and confirmed `scheduler_slots_for_date()` correctly
+  excluded the 11am and 12pm slots while keeping 9am, 10am, 1pm, 2pm, and
+  3pm — including the boundary case (a slot ending exactly when a busy
+  period starts is correctly NOT excluded — no false-blocking of
+  back-to-back availability).
+- `freeBusy` request structure verified against Google's real API using
+  the same throwaway-RSA-keypair technique as the initial Google
+  Calendar sync check (see "Google Calendar sync" above) — reached
+  Google's real token endpoint cleanly; failed only because the fake
+  service account doesn't exist, confirming the request itself is
+  correctly formed.
+- Both `scheduler/availability.php` modes (`?date=` and `?month=`) smoke
+  tested locally with Google Calendar left unconfigured (today's real
+  state) — both returned normal results with no errors, confirming the
+  fail-open path works end-to-end through the actual public endpoint,
+  not just the underlying function.
+- Full 40-route regression check re-run — no regressions.
+
+Once the owner finishes the Google Calendar setup from `.env.example`
+(same one-time setup as the initial sync, plus optionally sharing
+additional calendars for `GOOGLE_BUSY_CALENDAR_IDS`), this starts working
+immediately with no further code changes — a real live test booking
+against a calendar with an existing conflicting event will be the final
+verification, the same way SMTP/Zoho were confirmed working end-to-end
+earlier in this project.
