@@ -241,10 +241,10 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   (`includes/quote-form-ga.php`, hardcoded to Cleaning, no dropdown) per
   owner request, keeping the shared form's new 3-option dropdown
   (Cleaning / Repair / Both, defaulting Cleaning) off the paid-traffic
-  page. **Quote form live and verified; scheduler fix pushed twice, not
-  yet re-tested.** Real credentials configured, and five real bugs found
-  via actual production testing (none caught by local testing, since all
-  five needed a live Zoho org to surface):
+  page. **Quote form live and verified; scheduler fix corrected after two
+  misdiagnoses, not yet re-tested.** Real credentials configured, and
+  several real bugs found via actual production testing (none caught by
+  local testing, since all needed a live Zoho org to surface):
   1. `Contact_Name` doesn't support Zoho's inline auto-create-by-name
      shorthand on this org's Deals layout (unlike `Account_Name`) — fixed
      by having `includes/zoho-crm.php` upsert real Account/Contact
@@ -254,26 +254,29 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   3. A stale cached access token from before the scope upgrade masked
      that the new scope had taken effect — fixed by clearing
      `data/zoho-token-cache.json`.
-  4. The Turf Installation pipeline is secretly still Zoho's original
-     default "Standard" pipeline (renamed for display only) — its real
-     `Pipeline` field value is `"Standard (Standard)"`, not `"Turf
-     Installation"`. Fixed with named `ZOHO_PIPELINE_*` constants instead
-     of hardcoded display strings.
-  5. Even with the right Pipeline value, Zoho couldn't confidently
-     resolve which Deals layout to validate it against (there's only
-     one, but omitting `Layout` still got rejected) — fixed by having
-     `zoho_create_deal()` default `Layout` to the org's one Deals layout
-     (`ZOHO_DEALS_LAYOUT_ID`) on every call.
+  4. **The real one, found on the third scheduler attempt after two wrong
+     fixes**: the Turf Installation pipeline's `Pipeline`/`Stage` fields
+     were being sent using the field-metadata endpoint's legacy
+     `actual_value` strings (`"Standard (Standard)"`, `"Qualification"`)
+     — an artifact from when this pipeline was renamed from Zoho's
+     original default "Standard" pipeline, not what create/read calls
+     actually use. Confirmed by reading real existing Deal records
+     directly: they store plain display text (`"Turf Installation"`,
+     `"Won – Installed"`, etc.). Fixed `ZOHO_PIPELINE_INSTALLATION` →
+     `'Turf Installation'` and `ZOHO_STAGE_INSTALLATION_NEW` →
+     `'New Lead'`. No Zoho-side change needed — this was a code-side
+     misreading of Zoho's own metadata API, not a data problem.
   Confirmed end-to-end for the **quote form**: a real submission created
   "Andrew Neal — Turf Cleaning Quote" in the Turf Cleaning pipeline with
   both Account Name and Contact properly linked (not blank). The
-  **scheduler booking** hit bugs #4 and #5 above across its first two
-  real tests — both fixes are pushed but not yet re-verified with a
-  third live booking. Also added `data/zoho-debug.log` since Hostinger's
-  hPanel didn't have an easy-to-find error log — every push logs success
-  or failure there. See `docs/audit-findings.md` "Zoho CRM integration"
-  for the full pipeline/stage/field reference, all five bugs and their
-  fixes, and remaining judgment calls (no clean "Website"/"Google Ads" value exists
+  **scheduler booking** took three real attempts to get right (bug #4
+  above, in its two wrong forms then its correct one) — the corrected fix
+  is pushed but not yet re-verified with a live booking. Also added
+  `data/zoho-debug.log` since Hostinger's hPanel didn't have an
+  easy-to-find error log — every push logs success or failure there. See
+  `docs/audit-findings.md` "Zoho CRM integration" for the full trail,
+  including the two wrong fixes and why they seemed plausible, and
+  remaining judgment calls (no clean "Website"/"Google Ads" value exists
   in Zoho's `Lead_Channel` field yet, so that's left unset rather than
   mismapped; "Both Cleaning & Repair" submissions are filed under Turf
   Repair, not Cleaning).

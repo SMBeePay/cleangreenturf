@@ -34,30 +34,28 @@ function zoho_log(string $message): void {
     @file_put_contents(ZOHO_DEBUG_LOG_FILE, '[' . date('c') . '] ' . $message . "\n", FILE_APPEND | LOCK_EX);
 }
 
-// Deals.Pipeline "actual_value" for each pipeline. Turf Installation is
-// secretly still Zoho's original default "Standard" pipeline under the
-// hood (renamed for display only), so its real stored value is
-// "Standard (Standard)", NOT "Turf Installation" — confirmed via a live
-// MAPPING_MISMATCH rejection when "Turf Installation" was sent literally.
-// Turf Cleaning and Turf Repair were created fresh, so their actual_value
-// matches their display text exactly. See docs/audit-findings.md "Zoho
-// CRM integration."
-const ZOHO_PIPELINE_INSTALLATION = 'Standard (Standard)'; // displays as "Turf Installation"
+// Deals.Pipeline value for each pipeline. IMPORTANT: use the plain
+// display text for both Pipeline and Stage on every pipeline, including
+// Turf Installation — verified by reading real existing Deal records
+// directly (getRecords), which store Pipeline as "Turf Installation" and
+// Stage as e.g. "Won – Installed", the same text shown in the CRM UI.
+// The field-metadata endpoint's `pick_list_values[].actual_value` (e.g.
+// "Standard (Standard)" for Pipeline, "Qualification" for the New Lead
+// stage) is a legacy/reporting artifact left over from when this
+// pipeline was renamed from Zoho's original default "Standard" pipeline
+// — NOT what create/read record calls actually use. Two earlier attempts
+// at this file used those legacy `actual_value` strings and were
+// rejected by the API both times; see docs/audit-findings.md "Zoho CRM
+// integration" for the full trail.
+const ZOHO_PIPELINE_INSTALLATION = 'Turf Installation';
 const ZOHO_PIPELINE_CLEANING = 'Turf Cleaning';
 const ZOHO_PIPELINE_REPAIR = 'Turf Repair';
 
-// The Deals module's only layout. Without this explicitly set on every
-// create request, Zoho rejected ZOHO_PIPELINE_INSTALLATION's unusual
-// "Standard (Standard)" value with MAPPING_MISMATCH ("Layout doesn't
-// contain the Pipeline") even though it's a genuinely valid pick_list
-// value on this exact layout — being explicit removes the ambiguity.
+// The Deals module's only layout — set explicitly on every create
+// request rather than left to auto-resolve.
 const ZOHO_DEALS_LAYOUT_ID = '7612959000000091023';
 
-// Deals.Stage "actual_value" for each pipeline's first/new stage. Same
-// quirk as above — Turf Installation reused Zoho's original default
-// Stage system field, so its underlying value ("Qualification") doesn't
-// match what the CRM UI displays ("New Lead").
-const ZOHO_STAGE_INSTALLATION_NEW = 'Qualification'; // displays as "New Lead"
+const ZOHO_STAGE_INSTALLATION_NEW = 'New Lead';
 const ZOHO_STAGE_CLEANING_NEW = 'New Cleaning Inquiry';
 const ZOHO_STAGE_REPAIR_NEW = 'New Repair Inquiry';
 

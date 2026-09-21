@@ -1162,10 +1162,36 @@ exists, especially for an unusual-looking value like `"Standard
 each caller to remember to set it. **Not yet re-verified** with a third
 live scheduler booking attempt.
 
+**Correction — the real root cause, found by reading actual records
+instead of field metadata**: the Layout fix (bug #5) did not resolve
+it — the third live attempt failed with the exact same
+`MAPPING_MISMATCH` on `Pipeline`. Rather than guess a fourth time,
+pulled several of the org's 97 real pre-existing Deal records directly
+(`getRecords`) instead of trusting the field-configuration endpoint's
+picklist metadata. Every real record stores `Pipeline` and `Stage` as
+**plain display text** — `"Pipeline":"Turf Installation"`,
+`"Stage":"Won – Installed"` — not the `pick_list_values[].actual_value`
+strings (`"Standard (Standard)"`, `"Qualification"`) that bugs #4 and
+#5 were built around. That `actual_value` field is a legacy/reporting
+artifact left over from when the pipeline was renamed from Zoho's
+original default "Standard" pipeline; it is not what create/read record
+calls actually use. **Both prior "fixes" were chasing the wrong value
+entirely.**
+
+Real fix: `ZOHO_PIPELINE_INSTALLATION` is now `'Turf Installation'`
+(plain text, matching `ZOHO_PIPELINE_CLEANING`/`ZOHO_PIPELINE_REPAIR`'s
+existing pattern) and `ZOHO_STAGE_INSTALLATION_NEW` is now `'New Lead'`.
+The `ZOHO_DEALS_LAYOUT_ID` default added in bug #5 was kept (harmless,
+and good practice regardless) but was never the actual problem. No
+Zoho-side configuration change was needed — this was purely a
+code-side misreading of Zoho's metadata API. **Not yet re-verified**
+with a live scheduler booking using the corrected values.
+
 The Zoho CRM integration overall: quote form confirmed fully working
-live; scheduler booking hit two separate real bugs on its first two
-live attempts (Pipeline value, then missing Layout reference) — both
-fixed and pushed, awaiting one more real test to confirm.
+live; scheduler booking hit three real issues across its first three
+live attempts (two of them a misdiagnosis of the same underlying
+mistake, corrected above) — the fix is now grounded in actual record
+data rather than metadata, pushed and awaiting one more real test.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's
