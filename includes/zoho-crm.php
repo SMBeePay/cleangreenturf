@@ -46,6 +46,13 @@ const ZOHO_PIPELINE_INSTALLATION = 'Standard (Standard)'; // displays as "Turf I
 const ZOHO_PIPELINE_CLEANING = 'Turf Cleaning';
 const ZOHO_PIPELINE_REPAIR = 'Turf Repair';
 
+// The Deals module's only layout. Without this explicitly set on every
+// create request, Zoho rejected ZOHO_PIPELINE_INSTALLATION's unusual
+// "Standard (Standard)" value with MAPPING_MISMATCH ("Layout doesn't
+// contain the Pipeline") even though it's a genuinely valid pick_list
+// value on this exact layout — being explicit removes the ambiguity.
+const ZOHO_DEALS_LAYOUT_ID = '7612959000000091023';
+
 // Deals.Stage "actual_value" for each pipeline's first/new stage. Same
 // quirk as above — Turf Installation reused Zoho's original default
 // Stage system field, so its underlying value ("Qualification") doesn't
@@ -206,6 +213,7 @@ function zoho_push_lead(array $zohoConfig, string $name, string $email, string $
  * Account/Contact linking Zoho's Deals API doesn't do inline.
  */
 function zoho_create_deal(array $zohoConfig, array $fields): bool {
+    $fields['Layout'] ??= ['id' => ZOHO_DEALS_LAYOUT_ID];
     try {
         $accessToken = zoho_get_access_token($zohoConfig);
         if ($accessToken === null) {

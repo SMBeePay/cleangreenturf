@@ -1139,8 +1139,33 @@ assignments in `forms/handle-quote.php` and `scheduler/book.php` to use
 them instead of hardcoded display strings. **Not yet re-verified with a
 second live scheduler booking** after this fix.
 
+**A fifth real bug, on the very next scheduler retest**: the Pipeline
+value fix above (bug #4) still failed, this time with:
+
+```
+{"code":"MAPPING_MISMATCH","details":{"mapped_field":"Layout",
+"api_name":"Pipeline","json_path":"$.data[0].Pipeline"},"message":
+"Layout doesn't contain the Pipeline","status":"error"}
+```
+
+Re-pulled the live layout data a second time to rule out a stale
+assumption: still exactly one Deals layout (`Standard`, id
+`7612959000000091023`), and its `Pipeline` field's pick_list_values
+still include `Turf Installation` → `actual_value: "Standard
+(Standard)"` character-for-character, matching the constant exactly.
+So the value was correct; the problem was that `zoho_create_deal()`
+never told Zoho which `Layout` to validate `Pipeline` against — the
+Deals API doesn't reliably auto-resolve this even when only one layout
+exists, especially for an unusual-looking value like `"Standard
+(Standard)"`. Fix: added `ZOHO_DEALS_LAYOUT_ID` and had
+`zoho_create_deal()` default `Layout` to it on every call (`$fields['Layout'] ??= ['id' => ZOHO_DEALS_LAYOUT_ID]`) rather than requiring
+each caller to remember to set it. **Not yet re-verified** with a third
+live scheduler booking attempt.
+
 The Zoho CRM integration overall: quote form confirmed fully working
-live; scheduler booking fix pushed but awaiting one more real test.
+live; scheduler booking hit two separate real bugs on its first two
+live attempts (Pipeline value, then missing Layout reference) — both
+fixed and pushed, awaiting one more real test to confirm.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's
