@@ -139,7 +139,6 @@ if (!$sent) {
 
 // CRM push happens after the email is confirmed sent, and never blocks the
 // redirect — see the file doc and includes/zoho-crm.php.
-[$firstName, $lastName] = zoho_split_name($name);
 $dealDetails = "Phone: $phone\nEmail: $email\nAddress: $address\n"
     . 'Approx Size of Turf Area: ' . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n"
     . 'Cleaning Frequency: ' . ($frequency !== '' ? $frequency : 'Not specified') . "\n"
@@ -161,7 +160,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         'Pipeline' => 'Turf Repair',
         'Stage' => ZOHO_STAGE_REPAIR_NEW,
         'Account_Name' => ['name' => $name],
-        'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+        'Contact_Name' => ['name' => $name],
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => ($service === 'cleaning_repair' ? "Also wants routine cleaning.\n\n" : '') . $dealDetails,
     ]);
@@ -172,7 +171,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         'Stage' => ZOHO_STAGE_CLEANING_NEW,
         'Cleaning_Status' => 'New Inquiry',
         'Account_Name' => ['name' => $name],
-        'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+        'Contact_Name' => ['name' => $name],
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => $dealDetails,
     ]);

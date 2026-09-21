@@ -117,14 +117,13 @@ send_transactional_email(
     $name
 );
 
-[$firstName, $lastName] = zoho_split_name($name);
 $slotDateTime = new DateTime($slotStart, new DateTimeZone($schedulerConfig['timezone']));
 zoho_create_deal($zohoConfig, [
     'Deal_Name' => "$name — Turf Installation Estimate ($prettyWhen)",
     'Pipeline' => 'Turf Installation',
     'Stage' => ZOHO_STAGE_INSTALLATION_NEW,
     'Account_Name' => ['name' => $name],
-    'Contact_Name' => ['First_Name' => $firstName, 'Last_Name' => $lastName !== '' ? $lastName : $firstName],
+    'Contact_Name' => ['name' => $name],
     'Closing_Date' => $slotDateTime->format('Y-m-d'),
     'Estimate_Scheduled' => $slotDateTime->format('Y-m-d\TH:i:sP'),
     'Description' => "Phone: $phone\nEmail: $email\nAddress: $address\nScheduled: $prettyWhen\n"

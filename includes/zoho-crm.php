@@ -92,15 +92,6 @@ function zoho_get_access_token(array $zohoConfig): ?string {
 }
 
 /**
- * Splits a full name into [first, last] for Contact_Name — best-effort,
- * everything after the first space becomes the last name.
- */
-function zoho_split_name(string $fullName): array {
-    $parts = preg_split('/\s+/', trim($fullName), 2);
-    return [$parts[0] ?? $fullName, $parts[1] ?? ''];
-}
-
-/**
  * Creates a Deal record. $fields should already contain Deal_Name, Stage,
  * Pipeline, Account_Name, Closing_Date, etc. Returns true on success,
  * false on any failure — never throws (see file doc).

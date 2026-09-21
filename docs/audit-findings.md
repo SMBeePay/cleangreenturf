@@ -1033,3 +1033,47 @@ Not attempted: creating the pipelines/stages/custom fields themselves via
 API — the Zoho CRM API (and the tools available here) don't expose
 pipeline/layout creation; that's a Setup-UI-only operation, moot anyway
 since the owner had already built all three out.
+
+### Update: real end-to-end test found and fixed a genuine bug
+
+Once the owner had real Zoho credentials in place, the first live test
+(one scheduler booking, one quote-form submission) surfaced exactly the
+kind of issue flagged above as unverified — a real one, not a config
+problem. Diagnosing it needed a second fix first: **Hostinger's error
+log wasn't easy to find** (no log tab under hPanel's PHP Configuration,
+no plain `error_log` file at the site root), so `includes/zoho-crm.php`
+now also writes every failure (and success) to `data/zoho-debug.log` —
+same directory as the scheduler's SQLite db, already blocked from web
+access and gitignored — with `curl_error()` captured alongside the HTTP
+code for better diagnostics. That surfaced the real error immediately:
+
+```
+{"code":"MANDATORY_NOT_FOUND","details":{"api_name":"id",
+"json_path":"$.data[0].Contact_Name.id"},"message":"required field
+not found","status":"error"}
+```
+
+`Account_Name`'s `{"name": "..."}` shorthand was accepted fine, but
+`Contact_Name` rejected the `{"First_Name", "Last_Name"}` shape I'd
+used and demanded a real Contact record `id` instead. Fix: send
+`Contact_Name` as `{"name": "..."}` too, matching `Account_Name`'s
+working shape exactly (Zoho splits the full name into First/Last
+internally, the same as its own "+ Add New Contact" UI flow) —
+`forms/handle-quote.php` and `scheduler/book.php` both updated, and the
+now-unused `zoho_split_name()` helper removed. **Not yet re-verified
+against the live org** (this fix was made and pushed in response to the
+error log, but a second real test after deploy is still needed) — if
+`Contact_Name`'s `{"name": ...}` shorthand also gets rejected on the
+next test, the fallback is enabling "allow adding new records" on the
+Contact Name lookup field's settings in Zoho Setup (Setup → Customization
+→ Modules and Fields → Deals → Contact Name field), which is likely
+already why `Account_Name` alone worked without any code changes needed.
+
+Separately (not a bug): the owner initially expected a customer-facing
+confirmation email from the quote form, matching the scheduler's
+behavior — the quote form was only ever built to notify the owner, per
+its original design (see "Real form fields confirmed," above); the
+customer's only acknowledgment is the redirect to the thank-you page.
+Flagging in case the owner wants a customer confirmation email added to
+the quote form too, matching the scheduler's pattern — not done as part
+of this fix since it wasn't what was reported broken.
