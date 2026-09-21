@@ -19,6 +19,20 @@
 declare(strict_types=1);
 
 const ZOHO_TOKEN_CACHE_FILE = __DIR__ . '/../data/zoho-token-cache.json';
+const ZOHO_DEBUG_LOG_FILE = __DIR__ . '/../data/zoho-debug.log';
+
+/**
+ * Writes to both PHP's normal error_log() (in case the host's log viewer
+ * does surface it) and a dedicated file under data/ — same directory as
+ * the scheduler's SQLite database, already blocked from direct web access
+ * by data/.htaccess and gitignored. Added because Hostinger's error log
+ * location isn't always easy to find from hPanel; this guarantees a place
+ * to look regardless of hosting panel layout.
+ */
+function zoho_log(string $message): void {
+    error_log($message);
+    @file_put_contents(ZOHO_DEBUG_LOG_FILE, '[' . date('c') . '] ' . $message . "\n", FILE_APPEND | LOCK_EX);
+}
 
 // Deals.Stage "actual_value" for each pipeline's first/new stage. The Turf
 // Installation pipeline reused Zoho's original default stage system field,
@@ -55,16 +69,17 @@ function zoho_get_access_token(array $zohoConfig): ?string {
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
 
     if ($response === false || $httpCode !== 200) {
-        error_log('Zoho CRM: token refresh failed (HTTP ' . $httpCode . '): ' . $response);
+        zoho_log('Zoho CRM: token refresh failed (HTTP ' . $httpCode . ', curl error: "' . $curlError . '"): ' . $response);
         return null;
     }
 
     $data = json_decode($response, true);
     if (empty($data['access_token'])) {
-        error_log('Zoho CRM: token refresh response missing access_token: ' . $response);
+        zoho_log('Zoho CRM: token refresh response missing access_token: ' . $response);
         return null;
     }
 
@@ -110,22 +125,24 @@ function zoho_create_deal(array $zohoConfig, array $fields): bool {
         ]);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
 
         if ($response === false || $httpCode >= 300) {
-            error_log('Zoho CRM: create Deal failed (HTTP ' . $httpCode . '): ' . $response);
+            zoho_log('Zoho CRM: create Deal failed (HTTP ' . $httpCode . ', curl error: "' . $curlError . '"): ' . $response);
             return false;
         }
 
         $status = json_decode($response, true)['data'][0]['status'] ?? null;
         if ($status !== 'success') {
-            error_log('Zoho CRM: create Deal rejected: ' . $response);
+            zoho_log('Zoho CRM: create Deal rejected: ' . $response);
             return false;
         }
 
+        zoho_log('Zoho CRM: create Deal succeeded: ' . $response);
         return true;
     } catch (\Throwable $e) {
-        error_log('Zoho CRM: create Deal exception: ' . $e->getMessage());
+        zoho_log('Zoho CRM: create Deal exception: ' . $e->getMessage());
         return false;
     }
 }
