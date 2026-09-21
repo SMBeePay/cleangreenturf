@@ -4,6 +4,14 @@
  * reschedule_token (sent in the confirmation email and reminder text —
  * never guessable, 32 hex chars from random_bytes(16)). Same server-side
  * re-validation and notification pattern as scheduler/book.php.
+ *
+ * Also keeps the owner's Google Calendar event in sync (see
+ * includes/google-calendar.php): a reschedule moves the existing event to
+ * its new time instead of leaving a stale one, and a cancellation deletes
+ * it outright. Best-effort, same as scheduler/book.php's initial push — a
+ * Google failure here never blocks the reschedule/cancel itself. Only
+ * appointments with a stored gcal_event_id are touched (bookings made
+ * before Google Calendar sync was configured won't have one).
  */
 declare(strict_types=1);
 
@@ -11,10 +19,12 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/scheduler.php';
+require_once __DIR__ . '/../includes/google-calendar.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
 $schedulerConfig = require __DIR__ . '/../config/scheduler.php';
+$gcalConfig = require __DIR__ . '/../config/google-calendar.php';
 
 function scheduler_json_fail(string $error, int $code = 400): never {
     http_response_code($code);
@@ -45,6 +55,10 @@ if ($appt['status'] === 'cancelled') {
 
 if ($action === 'cancel') {
     scheduler_cancel($token);
+
+    if (!empty($appt['gcal_event_id'])) {
+        gcal_delete_event($gcalConfig, $appt['gcal_event_id']);
+    }
 
     send_transactional_email(
         $mailConfig,
@@ -77,6 +91,16 @@ if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $token)) {
 
 scheduler_reschedule($token, $slotStart, $smsOptIn);
 $prettyWhen = scheduler_format_display($slotStart, $schedulerConfig);
+
+if (!empty($appt['gcal_event_id'])) {
+    $tz = new DateTimeZone($schedulerConfig['timezone']);
+    $newStart = new DateTime($slotStart, $tz);
+    $newEnd = (clone $newStart)->modify('+' . (int)$schedulerConfig['slot_minutes'] . ' minutes');
+    gcal_update_event($gcalConfig, $appt['gcal_event_id'], [
+        'start' => ['dateTime' => $newStart->format('c'), 'timeZone' => $schedulerConfig['timezone']],
+        'end' => ['dateTime' => $newEnd->format('c'), 'timeZone' => $schedulerConfig['timezone']],
+    ]);
+}
 
 send_transactional_email(
     $mailConfig,

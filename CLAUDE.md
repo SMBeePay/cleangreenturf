@@ -358,10 +358,36 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   both boundary cases all resolved correctly) and the full 40-route
   regression check. See `docs/audit-findings.md` "Scheduler reminder
   timing fixed."
-  **Flagged, not changed**: `config/scheduler.php`'s hours are
-  Mon-Fri 9am-5pm + Sat 9am-1pm, but owner described actual hours as
-  Mon-Fri 8am-4pm only (no Saturday) — needs owner confirmation before
-  changing, since it affects real booking availability.
+- **Business hours corrected**: owner confirmed Mon-Fri 9am-4pm, no
+  Saturday. `config/scheduler.php`'s `hours` array updated (Saturday's
+  key removed entirely rather than emptied, matching how an absent
+  weekday already makes Sunday unbookable). Verified locally: Saturday
+  now returns 0 slots, weekdays return 7 hourly slots 9am through a
+  3pm-start/4pm-end last slot. Full route regression re-run — no
+  regressions. See `docs/audit-findings.md` "Business hours corrected."
+- **Google Calendar sync (new capability, owner-directed)**: owner
+  created a dedicated Google Calendar and wants every booked turf
+  installation estimate synced to it. Built
+  `includes/google-calendar.php` (plain-curl Calendar v3 REST client,
+  same no-SDK philosophy as Zoho/Twilio/PHPMailer) + `config/
+  google-calendar.php`, using a Google service-account JWT-Bearer flow
+  (PHP's built-in `openssl_sign()` for RS256 — no JWT library) so the
+  service account only ever sees the one calendar the owner explicitly
+  shares with it. Wired into `scheduler/book.php` (creates the event,
+  stores the returned event id in a new `gcal_event_id` column) and
+  `scheduler/reschedule.php` (moves the event on reschedule, deletes it
+  on cancel — both no-op harmlessly if no event id was ever stored).
+  Best-effort throughout, logged to `data/gcal-debug.log` like Zoho's
+  own debug log. Verified without real credentials yet: a throwaway
+  RSA keypair's JWT was accepted and correctly parsed by Google's real
+  token endpoint (failed only on "account not found" for the fake
+  email — confirms the signing/encoding is correct), and a full local
+  book → reschedule → cancel cycle ran clean with Google Calendar left
+  unconfigured (today's real state). Owner still needs to complete the
+  Cloud Console / service-account setup and add credentials to `.env` —
+  see `.env.example`'s new Google Calendar section for the full
+  walkthrough, and `docs/audit-findings.md` "Google Calendar sync" for
+  the complete writeup.
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger
@@ -380,7 +406,12 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   URL; still no primary-nav entry. Owner mentioned having ad copy for a
   turf-installation landing page, which would naturally link to this
   scheduler once shared. (4) `ADMIN_PASSWORD` needs to be set in `.env`
-  before `/admin/appointments.php` is usable.
+  before `/admin/appointments.php` is usable. (5) Google Calendar sync is
+  built (see above) but needs the owner to complete the one-time Cloud
+  Console / service-account setup and add `GOOGLE_SERVICE_ACCOUNT_EMAIL`,
+  `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`, and `GOOGLE_CALENDAR_ID` to
+  `.env` — see `.env.example` for the full walkthrough. Until then,
+  bookings work exactly as before, just without the calendar push.
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the

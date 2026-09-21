@@ -49,6 +49,10 @@ function scheduler_db(): PDO {
     if (!in_array('sms_opt_in', $columns, true)) {
         $pdo->exec('ALTER TABLE appointments ADD COLUMN sms_opt_in INTEGER NOT NULL DEFAULT 0');
     }
+    // Same pattern: gcal_event_id (Google Calendar sync) added later too.
+    if (!in_array('gcal_event_id', $columns, true)) {
+        $pdo->exec('ALTER TABLE appointments ADD COLUMN gcal_event_id TEXT');
+    }
 
     return $pdo;
 }
@@ -181,6 +185,13 @@ function scheduler_create_appointment(array $data): array {
         ':now' => $now,
     ]);
     return ['id' => (int)$pdo->lastInsertId(), 'reschedule_token' => $token];
+}
+
+/** Records the Google Calendar event id created for a booking, for later update/delete on reschedule/cancel. */
+function scheduler_set_gcal_event_id(int $id, string $eventId): void {
+    $pdo = scheduler_db();
+    $stmt = $pdo->prepare('UPDATE appointments SET gcal_event_id = ? WHERE id = ?');
+    $stmt->execute([$eventId, $id]);
 }
 
 function scheduler_get_by_token(string $token): ?array {

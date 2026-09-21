@@ -1496,3 +1496,88 @@ this fix, noticed its configured hours are Mon-Fri 9am-5pm plus Sat
 — hours affect real booking availability and should be an explicit,
 confirmed decision, not a side effect of a reminder-timing fix. Owner
 should confirm which is correct.
+
+## Business hours corrected: Mon-Fri 9am-4pm, no Saturday
+
+Owner confirmed the scheduler's actual hours should be Mon-Fri 9am-4pm
+with no Saturday appointments — `config/scheduler.php` previously had
+Mon-Fri 9am-5pm plus Sat 9am-1pm (flagged in the prior entry above,
+"Scheduler reminder timing fixed"). Updated the `hours` array: Saturday
+(weekday key 6) removed entirely rather than set to empty hours, which
+matches how `scheduler_slots_for_date()` already treats an absent day —
+"no key for this weekday" makes it fully unbookable, same mechanism
+already used for Sunday. Verified locally: the next Saturday returns 0
+available slots, and a normal weekday returns 7 hourly slots from 9:00 AM
+through a 3:00 PM start (i.e. ending at 4:00 PM). Full 40-route
+regression check also re-run — no regressions. Grepped the rest of the
+codebase for other hard-coded hours (schema, footer, trust bar) — none
+found, so this was an isolated fix.
+
+## Google Calendar sync (new capability, owner-directed)
+
+Owner created a dedicated Google Calendar (inside their existing
+cleangreenturf Google account) and asked for every booked turf
+installation estimate to sync onto it, so bookings show up there
+directly without checking `/admin`.
+
+Built `includes/google-calendar.php` — a plain-curl Google Calendar v3
+REST client, same "no SDK/Composer" philosophy as the existing Zoho/
+Twilio/PHPMailer integrations — plus `config/google-calendar.php` for
+reading credentials from `.env`. Auth uses a Google **service account**
+authorized via a self-signed JWT exchanged for a short-lived OAuth access
+token (the standard server-to-server "JWT Bearer" flow): no interactive
+login, no refresh token to manage, and critically, the service account
+only ever has access to whatever specific calendar the owner explicitly
+shares with it — not the owner's whole Google account. The JWT itself is
+built and RS256-signed with PHP's built-in `openssl_sign()` — no JWT
+library needed, matching this project's zero-dependency pattern.
+
+Wired into:
+- `scheduler/book.php`: creates a calendar event right after the Zoho
+  push, covering the appointment's actual start/end time
+  (`slot_minutes` from `config/scheduler.php`), with the customer's name,
+  phone, email, notes, and reschedule/cancel link in the description and
+  the address as the event location. The returned Google event id is
+  saved on the appointment row (new `gcal_event_id` column, added via the
+  same lightweight-migration pattern already used for `sms_opt_in`) so it
+  can be found again later.
+- `scheduler/reschedule.php`: a reschedule now **moves the existing
+  calendar event** to the new time (via a `PATCH` to the stored event id)
+  instead of leaving a stale one on the calendar; a cancellation
+  **deletes** the event outright. Both are skipped harmlessly for any
+  appointment with no stored `gcal_event_id` (bookings made before this
+  was configured, or ones where the original calendar push failed).
+
+Every call is best-effort, same convention as Zoho: a Google outage, a
+bad/missing credential, or an API error is logged (to both
+`error_log()` and a dedicated `data/gcal-debug.log`, same reasoning as
+Zoho's own debug log — Hostinger's hPanel doesn't have an easy-to-find
+log viewer) and never blocks the booking/reschedule/cancellation itself.
+
+**Verified without needing real Google credentials yet** (owner hasn't
+completed the Cloud Console / service account setup at the time of this
+change — see `.env.example`'s new Google Calendar section for the full
+walkthrough):
+- Generated a throwaway RSA keypair locally and called
+  `gcal_get_access_token()` with it directly. Google's real token
+  endpoint accepted the request's structure and RS256 signature, getting
+  as far as `invalid_grant: account not found` — i.e. it correctly parsed
+  and verified the JWT and only failed because the fake service-account
+  email doesn't exist. This is about as strong a confirmation as
+  possible short of real credentials: the encoding, signing, and request
+  format are all correct.
+- Ran a full local booking → reschedule → cancel cycle with Google
+  Calendar left unconfigured (today's real state, everywhere except this
+  test): booking succeeded and stored `gcal_event_id` as empty/null
+  rather than erroring, and both reschedule and cancel correctly skipped
+  the (empty) calendar update/delete. Confirmation/notification emails
+  still sent correctly throughout.
+- Full 40-route regression check re-run — no regressions.
+
+**Next step for the owner**: complete the setup in `.env.example`
+(enable the Calendar API, create a service account, download its key,
+share the target calendar with the service account's email, copy the
+Calendar ID) and add the three `GOOGLE_*` values to `.env` on the live
+server. Once that's done, a real test booking will confirm the live
+send end-to-end, the same way SMTP/Zoho were verified earlier in this
+project.

@@ -12,6 +12,11 @@
  * is the one lead source where we actually know the appointment time up
  * front, unlike the quote form's placeholder Closing_Date. Best-effort,
  * same as the quote form: a CRM failure never blocks the booking itself.
+ *
+ * Also creates an event on the owner's dedicated Google Calendar (see
+ * includes/google-calendar.php and docs/audit-findings.md "Google
+ * Calendar sync") so bookings show up there directly. Same best-effort
+ * pattern as Zoho: a Google outage never blocks the booking.
  */
 declare(strict_types=1);
 
@@ -20,11 +25,13 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/scheduler.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
+require_once __DIR__ . '/../includes/google-calendar.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
 $schedulerConfig = require __DIR__ . '/../config/scheduler.php';
 $zohoConfig = require __DIR__ . '/../config/zoho.php';
+$gcalConfig = require __DIR__ . '/../config/google-calendar.php';
 
 function scheduler_json_fail(string $error, int $code = 400): never {
     http_response_code($code);
@@ -134,5 +141,19 @@ zoho_push_lead($zohoConfig, $name, $email, $phone, [
     'Landing_Page_URL' => $landingPageUrl,
     'Service_Line' => ZOHO_SERVICE_LINE_INSTALLATION,
 ]);
+
+$slotEndDateTime = (clone $slotDateTime)->modify('+' . (int)$schedulerConfig['slot_minutes'] . ' minutes');
+$gcalEventId = gcal_create_event($gcalConfig, [
+    'summary' => "Turf Installation Estimate — $name",
+    'location' => $address,
+    'description' => "Phone: $phone\nEmail: $email\n"
+        . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
+        . 'Reschedule/cancel link: ' . $rescheduleUrl,
+    'start' => ['dateTime' => $slotDateTime->format('c'), 'timeZone' => $schedulerConfig['timezone']],
+    'end' => ['dateTime' => $slotEndDateTime->format('c'), 'timeZone' => $schedulerConfig['timezone']],
+]);
+if ($gcalEventId !== null) {
+    scheduler_set_gcal_event_id($result['id'], $gcalEventId);
+}
 
 echo json_encode(['success' => true, 'when' => $prettyWhen, 'reschedule_url' => $rescheduleUrl, 'sms_opt_in' => $smsOptIn]);

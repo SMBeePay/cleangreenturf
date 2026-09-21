@@ -12,12 +12,13 @@ return [
     // ['open H:i', 'close H:i'] in 24-hour time. Omit a day entirely to
     // make it unavailable for booking.
     'hours' => [
-        1 => ['9:00', '17:00'], // Monday
-        2 => ['9:00', '17:00'], // Tuesday
-        3 => ['9:00', '17:00'], // Wednesday
-        4 => ['9:00', '17:00'], // Thursday
-        5 => ['9:00', '17:00'], // Friday
-        6 => ['9:00', '13:00'], // Saturday (shorter day)
+        1 => ['9:00', '16:00'], // Monday
+        2 => ['9:00', '16:00'], // Tuesday
+        3 => ['9:00', '16:00'], // Wednesday
+        4 => ['9:00', '16:00'], // Thursday
+        5 => ['9:00', '16:00'], // Friday
+        // No Saturday appointments for now — omitting day 6 makes it
+        // entirely unbookable (see scheduler_slots_for_date()).
     ],
 
     // Minimum hours of advance notice required before the next open slot.
