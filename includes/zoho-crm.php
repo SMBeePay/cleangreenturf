@@ -92,9 +92,107 @@ function zoho_get_access_token(array $zohoConfig): ?string {
 }
 
 /**
+ * Upserts a record into $module (dedup on $duplicateCheckFields) and
+ * returns its real Zoho id, or null on failure. Used instead of the
+ * Deals API's inline "give me a name and I'll create the record" lookup
+ * shorthand — that shorthand isn't supported for Contact_Name on this
+ * org's Deals layout (confirmed via a live MANDATORY_NOT_FOUND rejection
+ * on Contact_Name.id — see docs/audit-findings.md "Zoho CRM integration"),
+ * so every Deal now links to a real Account/Contact id instead of relying
+ * on it. Requires OAuth scope for the target module (Accounts/Contacts),
+ * not just Deals — see .env.example.
+ */
+function zoho_upsert_record(array $zohoConfig, string $module, array $fields, array $duplicateCheckFields): ?string {
+    try {
+        $accessToken = zoho_get_access_token($zohoConfig);
+        if ($accessToken === null) {
+            return null;
+        }
+
+        $ch = curl_init(rtrim($zohoConfig['api_domain'], '/') . '/crm/v8/' . $module . '/upsert');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Zoho-oauthtoken ' . $accessToken,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'data' => [$fields],
+                'duplicate_check_fields' => $duplicateCheckFields,
+            ], JSON_UNESCAPED_SLASHES),
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false || $httpCode >= 300) {
+            zoho_log("Zoho CRM: upsert $module failed (HTTP $httpCode, curl error: \"$curlError\"): $response");
+            return null;
+        }
+
+        $record = json_decode($response, true)['data'][0] ?? null;
+        $id = $record['details']['id'] ?? null;
+        if (($record['status'] ?? null) !== 'success' || empty($id)) {
+            zoho_log("Zoho CRM: upsert $module rejected: $response");
+            return null;
+        }
+
+        return (string)$id;
+    } catch (\Throwable $e) {
+        zoho_log("Zoho CRM: upsert $module exception: " . $e->getMessage());
+        return null;
+    }
+}
+
+function zoho_upsert_account(array $zohoConfig, string $accountName): ?string {
+    return zoho_upsert_record($zohoConfig, 'Accounts', ['Account_Name' => $accountName], ['Account_Name']);
+}
+
+function zoho_upsert_contact(array $zohoConfig, string $fullName, string $email, string $phone): ?string {
+    $parts = preg_split('/\s+/', trim($fullName), 2);
+    return zoho_upsert_record($zohoConfig, 'Contacts', [
+        'First_Name' => $parts[0] ?? $fullName,
+        'Last_Name' => $parts[1] ?? ($parts[0] ?? $fullName),
+        'Email' => $email,
+        'Phone' => $phone,
+    ], ['Email']);
+}
+
+/**
+ * Full lead-to-Deal push: upserts the Account and Contact first, then
+ * creates the Deal linked to their real ids. $dealFields should contain
+ * everything EXCEPT Account_Name/Contact_Name (Deal_Name, Pipeline,
+ * Stage, Closing_Date, Description, etc.) — this adds those two.
+ * Account_Name is required on this org's Deals layout, so a failed
+ * Account upsert aborts the whole push (returns false); Contact_Name is
+ * optional, so a failed Contact upsert just omits it rather than
+ * blocking the Deal.
+ */
+function zoho_push_lead(array $zohoConfig, string $name, string $email, string $phone, array $dealFields): bool {
+    $accountId = zoho_upsert_account($zohoConfig, $name);
+    if ($accountId === null) {
+        zoho_log('Zoho CRM: aborting Deal creation, Account upsert failed for ' . $name);
+        return false;
+    }
+    $dealFields['Account_Name'] = ['id' => $accountId];
+
+    $contactId = zoho_upsert_contact($zohoConfig, $name, $email, $phone);
+    if ($contactId !== null) {
+        $dealFields['Contact_Name'] = ['id' => $contactId];
+    }
+
+    return zoho_create_deal($zohoConfig, $dealFields);
+}
+
+/**
  * Creates a Deal record. $fields should already contain Deal_Name, Stage,
  * Pipeline, Account_Name, Closing_Date, etc. Returns true on success,
- * false on any failure — never throws (see file doc).
+ * false on any failure — never throws (see file doc). Prefer
+ * zoho_push_lead() over calling this directly — it handles the
+ * Account/Contact linking Zoho's Deals API doesn't do inline.
  */
 function zoho_create_deal(array $zohoConfig, array $fields): bool {
     try {

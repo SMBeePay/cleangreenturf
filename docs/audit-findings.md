@@ -1055,19 +1055,43 @@ not found","status":"error"}
 
 `Account_Name`'s `{"name": "..."}` shorthand was accepted fine, but
 `Contact_Name` rejected the `{"First_Name", "Last_Name"}` shape I'd
-used and demanded a real Contact record `id` instead. Fix: send
-`Contact_Name` as `{"name": "..."}` too, matching `Account_Name`'s
-working shape exactly (Zoho splits the full name into First/Last
-internally, the same as its own "+ Add New Contact" UI flow) —
-`forms/handle-quote.php` and `scheduler/book.php` both updated, and the
-now-unused `zoho_split_name()` helper removed. **Not yet re-verified
-against the live org** (this fix was made and pushed in response to the
-error log, but a second real test after deploy is still needed) — if
-`Contact_Name`'s `{"name": ...}` shorthand also gets rejected on the
-next test, the fallback is enabling "allow adding new records" on the
-Contact Name lookup field's settings in Zoho Setup (Setup → Customization
-→ Modules and Fields → Deals → Contact Name field), which is likely
-already why `Account_Name` alone worked without any code changes needed.
+used and demanded a real Contact record `id` instead.
+
+**First attempted fix (didn't work)**: sent `Contact_Name` as
+`{"name": "..."}` too, matching `Account_Name`'s shape. A second live
+test with this in place hit the *exact same* `MANDATORY_NOT_FOUND` on
+`Contact_Name.id` — so `Contact_Name` on this org's Deals layout doesn't
+support the inline auto-create-by-name shorthand at all, regardless of
+the object shape sent. (Possible explanation: the "allow adding new
+records" setting for a lookup field, found under Setup → Customization →
+Modules and Fields → Deals → Contact Name field, likely isn't enabled
+for `Contact_Name` — only `Account_Name` — though this wasn't confirmed
+by inspecting that setting directly, since fixing it in code was more
+reliable than guessing at a UI toggle a second time.)
+
+**Actual fix**: stopped relying on the inline shorthand for either
+field. `includes/zoho-crm.php` now has `zoho_upsert_record()` (a generic
+upsert-by-dedup-field helper hitting Zoho's `/crm/v8/{module}/upsert`
+endpoint), `zoho_upsert_account()`/`zoho_upsert_contact()` (Account
+deduped on `Account_Name`, Contact deduped on `Email`), and
+`zoho_push_lead()` — the new single entry point both callers use, which
+upserts the Account and Contact first and only then creates the Deal,
+linked to their real `id`s. `Account_Name` is required on this Deals
+layout, so a failed Account upsert aborts the whole push;
+`Contact_Name` is optional, so a failed Contact upsert just omits it.
+`forms/handle-quote.php` and `scheduler/book.php` both call
+`zoho_push_lead()` now instead of `zoho_create_deal()` directly, and the
+now-unused `zoho_split_name()` helper was removed (name-splitting moved
+into `zoho_upsert_contact()`).
+
+**Requires broader OAuth scope than originally documented**: the
+refresh token generated for `ZohoCRM.modules.deals.CREATE` alone can't
+call the Accounts/Contacts upsert endpoints. `.env.example` now asks for
+`ZohoCRM.modules.deals.ALL,ZohoCRM.modules.accounts.ALL,
+ZohoCRM.modules.contacts.ALL` when generating the Self Client code — a
+new grant code and refresh token are needed if one was already generated
+with the narrower scope. **Not yet re-verified against the live org**
+end-to-end with the new scope in place.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's

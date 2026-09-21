@@ -155,23 +155,19 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
     $dealName = $service === 'cleaning_repair'
         ? "$name — Turf Repair + Cleaning Quote"
         : "$name — Turf Repair Quote";
-    zoho_create_deal($zohoConfig, [
+    zoho_push_lead($zohoConfig, $name, $email, $phone, [
         'Deal_Name' => $dealName,
         'Pipeline' => 'Turf Repair',
         'Stage' => ZOHO_STAGE_REPAIR_NEW,
-        'Account_Name' => ['name' => $name],
-        'Contact_Name' => ['name' => $name],
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => ($service === 'cleaning_repair' ? "Also wants routine cleaning.\n\n" : '') . $dealDetails,
     ]);
 } else {
-    zoho_create_deal($zohoConfig, [
+    zoho_push_lead($zohoConfig, $name, $email, $phone, [
         'Deal_Name' => "$name — Turf Cleaning Quote",
         'Pipeline' => 'Turf Cleaning',
         'Stage' => ZOHO_STAGE_CLEANING_NEW,
         'Cleaning_Status' => 'New Inquiry',
-        'Account_Name' => ['name' => $name],
-        'Contact_Name' => ['name' => $name],
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => $dealDetails,
     ]);
