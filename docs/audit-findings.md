@@ -1105,12 +1105,42 @@ just deleting the stale cache file was enough to force a fresh token.
 Worth remembering if OAuth scope is ever widened again: **delete
 `data/zoho-token-cache.json` after rotating `ZOHO_REFRESH_TOKEN`.**
 
-**Verified end-to-end, live**: with the cache cleared, a real quote-form
-submission created Deal `7612959000000758001` ("Andrew Neal — Turf
-Cleaning Quote") in the Turf Cleaning pipeline, Stage "New Cleaning
-Inquiry", with both Account Name and Contact correctly linked (confirmed
-by finding the record in Zoho's Deals list view, not just trusting the
-API's success response). The Zoho CRM integration is live and working.
+**Verified end-to-end, live — quote form**: with the cache cleared, a
+real quote-form submission created Deal `7612959000000758001` ("Andrew
+Neal — Turf Cleaning Quote") in the Turf Cleaning pipeline, Stage "New
+Cleaning Inquiry", with both Account Name and Contact correctly linked
+(confirmed by finding the record in Zoho's Deals list view, not just
+trusting the API's success response).
+
+**A fourth real bug, found testing the scheduler side**: a real
+turf-installation-estimate booking failed with a new error:
+
+```
+{"code":"MAPPING_MISMATCH","details":{"mapped_field":"Pipeline",
+"api_name":"Stage","json_path":"$.data[0].Stage"},"message":
+"Pipeline doesn't contain the Stage","status":"error"}
+```
+
+Re-pulled the live Deals layout directly from Zoho (rather than trusting
+the copy recorded earlier in this doc) and found the actual cause: the
+**Turf Installation pipeline is secretly still Zoho's original default
+"Standard" pipeline** — renamed for display only. Its Pipeline field's
+real stored value is `"Standard (Standard)"`, not `"Turf Installation"`.
+Turf Cleaning and Turf Repair were created as brand-new pipelines, so
+their stored value happens to equal their display text exactly — which
+is exactly why the quote form's Deal (Turf Cleaning) worked on the first
+real try while the scheduler's (Turf Installation) didn't: pure
+coincidence that Cleaning's display and internal values matched.
+
+Fix: added `ZOHO_PIPELINE_INSTALLATION` (`'Standard (Standard)'`),
+`ZOHO_PIPELINE_CLEANING`, and `ZOHO_PIPELINE_REPAIR` constants to
+`includes/zoho-crm.php`, and switched all three `Pipeline` field
+assignments in `forms/handle-quote.php` and `scheduler/book.php` to use
+them instead of hardcoded display strings. **Not yet re-verified with a
+second live scheduler booking** after this fix.
+
+The Zoho CRM integration overall: quote form confirmed fully working
+live; scheduler booking fix pushed but awaiting one more real test.
 
 Separately (not a bug): the owner initially expected a customer-facing
 confirmation email from the quote form, matching the scheduler's

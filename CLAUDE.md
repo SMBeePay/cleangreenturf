@@ -241,24 +241,37 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   (`includes/quote-form-ga.php`, hardcoded to Cleaning, no dropdown) per
   owner request, keeping the shared form's new 3-option dropdown
   (Cleaning / Repair / Both, defaulting Cleaning) off the paid-traffic
-  page. **Live and verified**: real credentials configured, and two real
-  bugs found via actual production testing (not caught by local testing,
-  since both needed a live Zoho org to surface) — `Contact_Name` doesn't
-  support Zoho's inline auto-create-by-name shorthand on this org's Deals
-  layout (unlike `Account_Name`), so `includes/zoho-crm.php` now upserts
-  real Account/Contact records via `zoho_push_lead()` before creating the
-  Deal, which needed broader OAuth scope (`deals.ALL,accounts.ALL,
-  contacts.ALL`, not just `deals.CREATE`). Confirmed end-to-end: a real
-  quote-form submission created "Andrew Neal — Turf Cleaning Quote" in
-  the Turf Cleaning pipeline with both Account Name and Contact properly
-  linked (not blank). Also added `data/zoho-debug.log` since Hostinger's
-  hPanel didn't have an easy-to-find error log — every push logs success
-  or failure there. See `docs/audit-findings.md` "Zoho CRM integration"
-  for the full pipeline/stage/field reference, the two real bugs and
-  their fixes, and remaining judgment calls (no clean "Website"/"Google
-  Ads" value exists in Zoho's `Lead_Channel` field yet, so that's left
-  unset rather than mismapped; "Both Cleaning & Repair" submissions are
-  filed under Turf Repair, not Cleaning).
+  page. **Quote form live and verified; scheduler fix pushed, not yet
+  re-tested.** Real credentials configured, and four real bugs found via
+  actual production testing (none caught by local testing, since all
+  four needed a live Zoho org to surface):
+  1. `Contact_Name` doesn't support Zoho's inline auto-create-by-name
+     shorthand on this org's Deals layout (unlike `Account_Name`) — fixed
+     by having `includes/zoho-crm.php` upsert real Account/Contact
+     records via `zoho_push_lead()` before creating the Deal.
+  2. That fix needed broader OAuth scope (`deals.ALL,accounts.ALL,
+     contacts.ALL`, not just `deals.CREATE`) — a second Self Client grant.
+  3. A stale cached access token from before the scope upgrade masked
+     that the new scope had taken effect — fixed by clearing
+     `data/zoho-token-cache.json`.
+  4. The Turf Installation pipeline is secretly still Zoho's original
+     default "Standard" pipeline (renamed for display only) — its real
+     `Pipeline` field value is `"Standard (Standard)"`, not `"Turf
+     Installation"`. Fixed with named `ZOHO_PIPELINE_*` constants instead
+     of hardcoded display strings.
+  Confirmed end-to-end for the **quote form**: a real submission created
+  "Andrew Neal — Turf Cleaning Quote" in the Turf Cleaning pipeline with
+  both Account Name and Contact properly linked (not blank). The
+  **scheduler booking** hit bug #4 above on its first real test — the fix
+  is pushed but not yet re-verified with a second live booking. Also
+  added `data/zoho-debug.log` since Hostinger's hPanel didn't have an
+  easy-to-find error log — every push logs success or failure there. See
+  `docs/audit-findings.md` "Zoho CRM integration" for the full
+  pipeline/stage/field reference, all four bugs and their fixes, and
+  remaining judgment calls (no clean "Website"/"Google Ads" value exists
+  in Zoho's `Lead_Channel` field yet, so that's left unset rather than
+  mismapped; "Both Cleaning & Repair" submissions are filed under Turf
+  Repair, not Cleaning).
 
 **Not done yet:**
 - **SMTP credentials**: confirmed still not done via a live test — the

@@ -157,7 +157,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         : "$name — Turf Repair Quote";
     zoho_push_lead($zohoConfig, $name, $email, $phone, [
         'Deal_Name' => $dealName,
-        'Pipeline' => 'Turf Repair',
+        'Pipeline' => ZOHO_PIPELINE_REPAIR,
         'Stage' => ZOHO_STAGE_REPAIR_NEW,
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => ($service === 'cleaning_repair' ? "Also wants routine cleaning.\n\n" : '') . $dealDetails,
@@ -165,7 +165,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
 } else {
     zoho_push_lead($zohoConfig, $name, $email, $phone, [
         'Deal_Name' => "$name — Turf Cleaning Quote",
-        'Pipeline' => 'Turf Cleaning',
+        'Pipeline' => ZOHO_PIPELINE_CLEANING,
         'Stage' => ZOHO_STAGE_CLEANING_NEW,
         'Cleaning_Status' => 'New Inquiry',
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),

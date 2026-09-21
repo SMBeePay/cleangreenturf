@@ -34,11 +34,22 @@ function zoho_log(string $message): void {
     @file_put_contents(ZOHO_DEBUG_LOG_FILE, '[' . date('c') . '] ' . $message . "\n", FILE_APPEND | LOCK_EX);
 }
 
-// Deals.Stage "actual_value" for each pipeline's first/new stage. The Turf
-// Installation pipeline reused Zoho's original default stage system field,
-// so its underlying value ("Qualification") doesn't match what the CRM UI
-// displays ("New Lead") — Turf Cleaning and Turf Repair use plain custom
-// stage values that match their display text exactly.
+// Deals.Pipeline "actual_value" for each pipeline. Turf Installation is
+// secretly still Zoho's original default "Standard" pipeline under the
+// hood (renamed for display only), so its real stored value is
+// "Standard (Standard)", NOT "Turf Installation" — confirmed via a live
+// MAPPING_MISMATCH rejection when "Turf Installation" was sent literally.
+// Turf Cleaning and Turf Repair were created fresh, so their actual_value
+// matches their display text exactly. See docs/audit-findings.md "Zoho
+// CRM integration."
+const ZOHO_PIPELINE_INSTALLATION = 'Standard (Standard)'; // displays as "Turf Installation"
+const ZOHO_PIPELINE_CLEANING = 'Turf Cleaning';
+const ZOHO_PIPELINE_REPAIR = 'Turf Repair';
+
+// Deals.Stage "actual_value" for each pipeline's first/new stage. Same
+// quirk as above — Turf Installation reused Zoho's original default
+// Stage system field, so its underlying value ("Qualification") doesn't
+// match what the CRM UI displays ("New Lead").
 const ZOHO_STAGE_INSTALLATION_NEW = 'Qualification'; // displays as "New Lead"
 const ZOHO_STAGE_CLEANING_NEW = 'New Cleaning Inquiry';
 const ZOHO_STAGE_REPAIR_NEW = 'New Repair Inquiry';

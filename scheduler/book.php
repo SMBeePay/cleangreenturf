@@ -120,7 +120,7 @@ send_transactional_email(
 $slotDateTime = new DateTime($slotStart, new DateTimeZone($schedulerConfig['timezone']));
 zoho_push_lead($zohoConfig, $name, $email, $phone, [
     'Deal_Name' => "$name — Turf Installation Estimate ($prettyWhen)",
-    'Pipeline' => 'Turf Installation',
+    'Pipeline' => ZOHO_PIPELINE_INSTALLATION,
     'Stage' => ZOHO_STAGE_INSTALLATION_NEW,
     'Closing_Date' => $slotDateTime->format('Y-m-d'),
     'Estimate_Scheduled' => $slotDateTime->format('Y-m-d\TH:i:sP'),
