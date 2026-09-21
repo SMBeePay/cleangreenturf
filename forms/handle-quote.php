@@ -16,17 +16,18 @@
  * best-effort: if Zoho isn't configured yet or the API call fails, the
  * email still sends and the customer still sees the success page — CRM
  * sync failures are logged, never surfaced to the visitor.
+ *
+ * Sends two emails: the owner notification (blocking — if this fails the
+ * visitor sees an error and can retry, since a lost lead notification is
+ * the one failure mode that actually matters) and a customer-facing
+ * "thanks for reaching out" confirmation (best-effort, like the Zoho
+ * push — a failure here is logged but never blocks the success redirect).
  */
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/phpmailer/Exception.php';
-require_once __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
-require_once __DIR__ . '/../vendor/phpmailer/SMTP.php';
+require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
@@ -78,7 +79,6 @@ $name = clean_line($name);
 $phone = clean_line($phone);
 $address = clean_line($address);
 
-$to = $businessInfo['email'];
 $subject = 'New Quote Request — ' . $name;
 
 $body = "New turf cleaning quote request from cleangreenturf.com\n\n";
@@ -90,52 +90,33 @@ $body .= "Approx Size of Turf Area: " . ($turfSize !== '' ? $turfSize : 'Not pro
 $body .= "How Frequently Would You Like Your Turf Cleaned?: " . ($frequency !== '' ? $frequency : 'Not specified') . "\n";
 $body .= "Any additional notes we should know about?: " . ($notes !== '' ? $notes : 'None') . "\n";
 
-$sent = false;
-
-if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($mailConfig['password'])) {
-    // SMTP path — reliable delivery, won't land in spam as easily as mail().
-    $mailer = new PHPMailer(true);
-    try {
-        $mailer->CharSet = PHPMailer::CHARSET_UTF8;
-        $mailer->isSMTP();
-        $mailer->Host = $mailConfig['host'];
-        $mailer->Port = $mailConfig['port'];
-        $mailer->SMTPAuth = true;
-        $mailer->Username = $mailConfig['username'];
-        $mailer->Password = $mailConfig['password'];
-        if ($mailConfig['encryption'] === 'ssl') {
-            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        } elseif ($mailConfig['encryption'] === 'tls') {
-            $mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        } else {
-            $mailer->SMTPAutoTLS = false;
-        }
-
-        $mailer->setFrom($mailConfig['from_email'], $mailConfig['from_name']);
-        $mailer->addAddress($to);
-        $mailer->addReplyTo($email, $name);
-        $mailer->Subject = $subject;
-        $mailer->Body = $body;
-        $mailer->isHTML(false);
-
-        $sent = $mailer->send();
-    } catch (PHPMailerException $e) {
-        error_log('Quote form SMTP send failed: ' . $mailer->ErrorInfo);
-        $sent = false;
-    }
-} else {
-    // No SMTP configured yet — fall back to mail().
-    $headers = [
-        'From: ' . $mailConfig['from_name'] . ' <' . $mailConfig['from_email'] . '>',
-        'Reply-To: ' . $name . ' <' . $email . '>',
-        'Content-Type: text/plain; charset=UTF-8',
-    ];
-    $sent = mail($to, $subject, $body, implode("\r\n", $headers));
-}
+$sent = send_transactional_email($mailConfig, $businessInfo['email'], $businessInfo['name'], $subject, $body, $email, $name);
 
 if (!$sent) {
     error_log('Quote form submission failed to send for ' . $email);
     redirect_with_error('send_failed');
+}
+
+// Customer-facing "thanks for reaching out" confirmation — best-effort,
+// same as the Zoho push below: never blocks the redirect, just logged
+// on failure. The owner notification above is the one that must succeed.
+$serviceLabel = match ($service) {
+    'repair' => 'turf repair',
+    'cleaning_repair' => 'turf cleaning and repair',
+    default => 'turf cleaning',
+};
+$phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
+$customerBody = "Hi $name,\n\n"
+    . "Thank you for reaching out to Clean Green Turf for a free $serviceLabel quote! Here's what you submitted:\n\n"
+    . "Address: $address\n"
+    . ($turfSize !== '' ? "Approx Size: $turfSize\n" : '')
+    . ($service !== 'repair' && $frequency !== '' ? "Cleaning Frequency: $frequency\n" : '')
+    . ($notes !== '' ? "Notes: $notes\n" : '')
+    . "\nWe usually reply same-day with your quote. If anything above needs correcting, just reply to this email or give us a call.\n\n"
+    . "Talk soon,\n{$businessInfo['name']}\n$phoneDisplay\n";
+
+if (!send_transactional_email($mailConfig, $email, $name, 'Thanks for Reaching Out to Clean Green Turf!', $customerBody)) {
+    error_log('Quote form customer confirmation failed to send for ' . $email);
 }
 
 // CRM push happens after the email is confirmed sent, and never blocks the

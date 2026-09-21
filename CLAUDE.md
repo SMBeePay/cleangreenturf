@@ -302,6 +302,23 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   reproduction (exact same PHPMailer code path); not yet re-verified
   with another live send. See `docs/audit-findings.md` "SMTP
   credentials added; found and fixed a real mojibake bug."
+- **Customer confirmation email added to the quote form**: owner asked
+  for an auto-reply "thanks for reaching out" email to the customer,
+  plus a check that the old Hostinger-era address-truncation bug isn't
+  present here. `forms/handle-quote.php` was refactored to use the
+  shared `includes/mailer.php` helper (dropping its own duplicated
+  PHPMailer/`mail()` code, so it now inherits the charset fix above
+  automatically) and sends a second, best-effort email to the customer
+  echoing back what they submitted (address, size, frequency, notes,
+  service type) with a "we usually reply same-day" line. Owner
+  notification stays the one send that blocks the response; the
+  customer email is logged-on-failure, never blocks the success
+  redirect. Address-truncation concern investigated and ruled out: no
+  `maxlength` on the address input, no fixed-width CSS, no backend
+  `substr()` anywhere in the request path — verified with a real test
+  submission arriving complete in both email bodies. See
+  `docs/audit-findings.md` "Customer confirmation email added;
+  address-truncation concern investigated (no bug found)."
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger

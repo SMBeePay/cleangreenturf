@@ -1288,3 +1288,75 @@ emails too). Re-verified locally: the same reproduction now produces
 `=?utf-8?Q?...=E2=80=94...?=` — charset and bytes match. Not yet
 re-verified with another live send, but the local proof is exact
 (same PHPMailer code path, same input, correct output).
+
+## Customer confirmation email added; address-truncation concern investigated (no bug found)
+
+Owner asked for two things: (1) an auto-reply "thank you for reaching out"
+email to the customer after they submit the quote form, and (2) a check
+that the old Hostinger-era issue of the address field getting cut off
+(suspected browser autofill mishandling) isn't present in the new
+implementation.
+
+**Customer confirmation email.** `forms/handle-quote.php` was refactored
+first: it had its own inline PHPMailer/`mail()` block, duplicating (and
+now drifting from) the shared `includes/mailer.php` helper already used
+by the scheduler — including missing the `CharSet` fix from the mojibake
+bug above until this refactor. Replaced it with a call to the same
+`send_transactional_email()` helper, so the quote form now inherits any
+future fix to that one place automatically.
+
+Added a second `send_transactional_email()` call right after the owner
+notification succeeds: a "Thanks for Reaching Out to Clean Green Turf!"
+email to the customer's own submitted address, echoing back what they
+entered (address, approx size, cleaning frequency, notes as applicable)
+and the service type in plain language ("turf cleaning" / "turf repair" /
+"turf cleaning and repair"), plus a one-line "we usually reply same-day"
+expectation-setter and the business phone number. Sent with `replyToEmail`
+left null (unlike the owner notification, which sets the customer as
+reply-to) — a reply to this one should reach Clean Green Turf, not the
+customer, since PHPMailer's `addReplyTo()` isn't called at all here so it
+defaults to the `From` address already set in `mailConfig`.
+
+This follows the same best-effort convention as the Zoho CRM push
+directly below it in the same file: the owner notification is the one
+send that blocks the response (a lost lead is the failure that actually
+matters), the customer confirmation is logged-on-failure but never blocks
+the success redirect — a customer not getting a courtesy email shouldn't
+strand them on an error page after they already successfully submitted.
+
+Verified locally with a fake `sendmail_path` capturing outgoing mail to a
+log file (no real SMTP needed): submitted a full test POST to
+`forms/handle-quote.php` and confirmed both emails were sent with correct
+recipients and subjects —
+`To: andrew@cleangreenturf.com` / `Subject: New Quote Request — Jane
+Smith` and `To: jane@example.com` / `Subject: Thanks for Reaching Out to
+Clean Green Turf!` — and both bodies rendered complete and correctly
+formatted.
+
+**Address-truncation investigation.** Traced the address field end to
+end looking for anything that could cut it off:
+- The `<input>` for address in `includes/quote-form.php` and
+  `includes/quote-form-ga.php` has no `maxlength` attribute, so the
+  browser imposes no character cap.
+- `assets/css/style.css`'s `.quote-form__row input` rule is `width:
+  100%` with no fixed narrow width — nothing visually truncates a long
+  value.
+- `forms/handle-quote.php` only trims and strips CR/LF from the address
+  (`clean_line()`, to prevent header injection) — no `substr()` or any
+  other length-limiting call anywhere in the request path. A grep of the
+  whole project (excluding `vendor/`) for `substr(` turns up only unrelated
+  uses in `config/mail.php`/`config/zoho.php` (stripping quote characters
+  around `.env` values) and `templates/*.php` (hero-extraction regex,
+  unrelated to form data).
+- `autocomplete="street-address"` is used correctly on the single-line
+  address field, which is the right autocomplete token for a composite
+  address input — not a likely autofill-truncation cause on its own.
+- Confirmed in the same local test above: the test address ("123 Main
+  St, McKinney TX") arrived complete and untruncated in both the owner
+  notification and the new customer-confirmation email bodies.
+
+No truncation risk found anywhere in the current implementation. The
+original issue the owner recalled was very likely specific to
+Hostinger's proprietary form builder (replaced entirely by this
+project — see the file's own docblock) rather than something carried
+forward here.
