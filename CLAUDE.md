@@ -340,19 +340,41 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   wired `ZOHO_SERVICE_LINE_REPAIR` into the repair branch — all three
   service lines now populate correctly, no more gap. See
   `docs/audit-findings.md` "Zoho CRM lead-attribution fields."
+- **Scheduler reminder timing fixed**: owner had Twilio credentials added
+  and then flagged two real problems with the original design: a fixed
+  daily cron run gives wildly inconsistent notice (~15h for an 8am
+  appointment vs ~23h for a 4pm one), and — the real bug — since this
+  scheduler's minimum booking lead time is exactly 24 hours, anyone who
+  booked shortly after that day's run for what it called "tomorrow" was
+  never picked up again and got no reminder at all. Replaced the
+  once-daily "find tomorrow's date" check with an hourly rolling window
+  (`scheduler_appointments_needing_reminder()` now matches appointments
+  23-25 hours out, not a calendar date) — every appointment passes
+  through that window exactly once regardless of when it was booked, and
+  reminders land at a consistent ~24 hours before the actual appointment
+  time. `bin/send-reminders.php` and `.env.example` updated to say the
+  Hostinger cron job should run hourly, not daily. Verified locally with
+  a direct query test (in-window, out-of-window, already-reminded, and
+  both boundary cases all resolved correctly) and the full 40-route
+  regression check. See `docs/audit-findings.md` "Scheduler reminder
+  timing fixed."
+  **Flagged, not changed**: `config/scheduler.php`'s hours are
+  Mon-Fri 9am-5pm + Sat 9am-1pm, but owner described actual hours as
+  Mon-Fri 8am-4pm only (no Saturday) — needs owner confirmation before
+  changing, since it affects real booking availability.
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger
   hosting) has not happened yet — staging deploy is otherwise fully
   live and verified (quote form, scheduler, Zoho CRM, and now SMTP all
   confirmed working end-to-end on real infrastructure).
-- **Scheduler follow-ups**: (1) Twilio credentials for the day-before SMS
-  reminder — see `.env.example`'s `TWILIO_*` section for the ~5-minute
-  signup; without it the scheduler still fully works (booking, email
-  confirmation, reschedule, cancel), it just skips the text. (2) A daily
-  Hostinger cron job needs to be set up in hPanel to actually run
-  `bin/send-reminders.php` — see that file's header comment for the exact
-  command. (3) Now linked from the homepage's Turf Installation card and
+- **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
+  owner — not yet verified with a real live send (see "Scheduler reminder
+  timing fixed" above for the query-level local test; the actual Twilio
+  API call still needs a real test booking on live infrastructure). (2) An
+  **hourly** Hostinger cron job needs to be set up in hPanel to actually
+  run `bin/send-reminders.php` — see that file's header comment for the
+  exact command and why hourly, not daily. (3) Now linked from the homepage's Turf Installation card and
   the `/about` installation paragraph via the new `/turf-installation`
   page (see below) rather than directly, plus still reachable by direct
   URL; still no primary-nav entry. Owner mentioned having ad copy for a

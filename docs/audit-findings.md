@@ -1436,3 +1436,63 @@ actual_value-vs-display-text warning where it applies. Wired into
 `zoho_push_lead()` calls. Verified with the full 40-route regression
 check (no regressions) and live-record updates on real test Deals (exact
 values round-tripped through the real API each time).
+
+## Scheduler reminder timing fixed: rolling window instead of fixed-time daily cron
+
+Owner correctly identified two problems with the original day-before SMS
+reminder design (`bin/send-reminders.php` running once daily, finding
+appointments where `date(slot_start) = tomorrow`):
+
+1. **Inconsistent, sometimes-too-short notice.** A cron fixed at, say,
+   5pm gives an 8am appointment only ~15 hours' notice but a 4pm
+   appointment ~23 hours — the same "day before" job lands very
+   differently depending on the appointment's own time of day.
+2. **A real gap for late bookings**: this scheduler's minimum booking
+   lead time is exactly 24 hours (`config/scheduler.php`'s
+   `lead_time_hours`). Someone booking shortly after that day's cron run,
+   for a slot the run had already classified as "tomorrow," would never
+   be picked up again — by the next day's run, `date(slot_start)` for
+   that appointment was "today," not "tomorrow," so the calendar-date
+   match silently and permanently missed it. Given the minimum lead time
+   is exactly 24 hours, this isn't a rare edge case — it's close to the
+   default case for anyone booking with the least lead time the site
+   allows.
+
+**Fix**: replaced the calendar-date match with a rolling
+hours-until-appointment window. `scheduler_appointments_needing_reminder()`
+(`includes/scheduler.php`) now takes the scheduler config instead of a
+date string and selects confirmed, SMS-opted-in appointments where
+`slot_start` is 23-25 hours from right now and no reminder has been sent
+yet (`SCHEDULER_REMINDER_WINDOW_MIN_HOURS` / `_MAX_HOURS` constants).
+`bin/send-reminders.php` is meant to run **hourly** now, not once a day —
+the 2-hour window is wider than that interval so one delayed or missed
+cron run can't skip anyone. `reminder_sent_at` is still set immediately
+after a successful send, so repeat hourly runs within the window never
+double-text the same appointment.
+
+This fixes both complaints: every appointment passes through the 23-25hr
+window exactly once regardless of when it was booked (closing the gap),
+and the reminder always lands at a consistent ~24 hours before the
+actual appointment time — not a fixed clock time that's a poor fit for
+both an 8am and a 4pm slot.
+
+Verified locally with a direct query test against the real
+`scheduler_appointments_needing_reminder()` function (not just reading
+the code): inserted test appointments at exactly 24h and 23.5h out
+(matched), 30h and 10h out (correctly excluded), one already-reminded
+appointment at 24h out (correctly excluded despite being in-window), and
+boundary cases at 22h59m and 25h01m out (both correctly excluded, just
+outside the window). Test rows were removed and the local scheduler
+database restored to its prior state afterward. Also re-ran the full
+40-route regression check — no regressions.
+
+`.env.example`'s Twilio setup section updated to say "hourly," not
+"daily," cron job.
+
+**Flagged, not changed**: while looking at `config/scheduler.php` for
+this fix, noticed its configured hours are Mon-Fri 9am-5pm plus Sat
+9am-1pm, but the owner described actual appointment hours as Mon-Fri
+8am-4pm only (no Saturday) in the same conversation. Did not change this
+— hours affect real booking availability and should be an explicit,
+confirmed decision, not a side effect of a reminder-timing fix. Owner
+should confirm which is correct.

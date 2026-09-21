@@ -1,15 +1,28 @@
 <?php
 /**
- * Sends the day-before SMS reminder (with a reschedule link) for tomorrow's
- * turf-installation estimate appointments. Meant to run once a day via a
- * Hostinger cron job (hPanel > Advanced > Cron Jobs), e.g.:
+ * Sends the day-before SMS reminder (with a reschedule link) for
+ * turf-installation estimate appointments that are 23-25 hours out. Meant
+ * to run roughly HOURLY via a Hostinger cron job (hPanel > Advanced > Cron
+ * Jobs), e.g.:
  *
  *   php /home/USERNAME/domains/cleangreenturf.com/public_html/bin/send-reminders.php
  *
- * Run it in the early evening so "tomorrow" reminders land at a reasonable
- * hour. Requires TWILIO_* credentials in .env — see .env.example. Safe to
- * run with no Twilio credentials configured yet: it logs and skips instead
- * of failing, same graceful-degradation approach as the SMTP fallback.
+ * Deliberately not a once-a-day job at a fixed clock time — this
+ * scheduler's minimum booking lead time is exactly 24 hours
+ * (config/scheduler.php's lead_time_hours), so a booking made shortly
+ * after that day's run, for what the run considered "tomorrow," would
+ * never be picked up again (see scheduler_appointments_needing_reminder()
+ * in includes/scheduler.php for the full explanation). Running hourly and
+ * matching on a rolling 23-25-hours-out window instead means every
+ * appointment passes through the window exactly once no matter when it
+ * was booked, and reminders land at a consistent ~24 hours before the
+ * actual appointment time — not, say, 15 hours before an 8am slot because
+ * the cron happened to run at 5pm the day before. Safe to run this often:
+ * reminder_sent_at is set immediately after a successful send, so repeat
+ * runs within the window never double-text anyone. Requires TWILIO_*
+ * credentials in .env — see .env.example. Also safe to run with no Twilio
+ * credentials configured yet: it logs and skips instead of failing, same
+ * graceful-degradation approach as the SMTP fallback.
  */
 declare(strict_types=1);
 
@@ -20,10 +33,7 @@ $businessInfo = require __DIR__ . '/../config/business-info.php';
 $schedulerConfig = require __DIR__ . '/../config/scheduler.php';
 $smsConfig = require __DIR__ . '/../config/sms.php';
 
-$tz = new DateTimeZone($schedulerConfig['timezone']);
-$tomorrow = (new DateTime('now', $tz))->modify('+1 day')->format('Y-m-d');
-
-$appointments = scheduler_appointments_needing_reminder($tomorrow);
+$appointments = scheduler_appointments_needing_reminder($schedulerConfig);
 
 $sent = 0;
 $skipped = 0;

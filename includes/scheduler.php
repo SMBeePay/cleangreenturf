@@ -203,11 +203,37 @@ function scheduler_cancel(string $token): bool {
     return $stmt->execute([gmdate('Y-m-d\TH:i:s\Z'), $token]);
 }
 
-/** @return array[] confirmed, SMS-opted-in appointments for $dateYmd that haven't had a reminder sent yet. */
-function scheduler_appointments_needing_reminder(string $dateYmd): array {
+// Reminder window, in hours-before-appointment: wider than the
+// recommended hourly cron interval so one delayed/missed run can't skip
+// anyone. See scheduler_appointments_needing_reminder() below for why this
+// replaced a fixed "run once daily, find tomorrow's appointments" check.
+const SCHEDULER_REMINDER_WINDOW_MIN_HOURS = 23;
+const SCHEDULER_REMINDER_WINDOW_MAX_HOURS = 25;
+
+/**
+ * Confirmed, SMS-opted-in appointments that are 23-25 hours out and
+ * haven't had a reminder sent yet — call this roughly hourly (see
+ * bin/send-reminders.php), not once a day at a fixed time.
+ *
+ * A fixed daily run had a real gap: this scheduler's minimum booking lead
+ * time is exactly 24 hours (config/scheduler.php's lead_time_hours), so
+ * any booking made after that day's run, for a slot the run would have
+ * called "tomorrow," was never picked up again — by the next day's run,
+ * date(slot_start) was "today," not "tomorrow," and it fell through
+ * permanently. A rolling hours-until-appointment window instead of a
+ * calendar-date match means every appointment passes through the window
+ * exactly once regardless of when it was booked, and reminders land at a
+ * consistent ~24 hours before the actual appointment time rather than a
+ * fixed clock time that's a poor fit for both an 8am and a 4pm slot.
+ */
+function scheduler_appointments_needing_reminder(array $config): array {
     $pdo = scheduler_db();
-    $stmt = $pdo->prepare("SELECT * FROM appointments WHERE status = 'confirmed' AND sms_opt_in = 1 AND date(slot_start) = ? AND reminder_sent_at IS NULL");
-    $stmt->execute([$dateYmd]);
+    $tz = new DateTimeZone($config['timezone']);
+    $now = new DateTime('now', $tz);
+    $windowStart = (clone $now)->modify('+' . SCHEDULER_REMINDER_WINDOW_MIN_HOURS . ' hours')->format('Y-m-d H:i:s');
+    $windowEnd = (clone $now)->modify('+' . SCHEDULER_REMINDER_WINDOW_MAX_HOURS . ' hours')->format('Y-m-d H:i:s');
+    $stmt = $pdo->prepare("SELECT * FROM appointments WHERE status = 'confirmed' AND sms_opt_in = 1 AND slot_start >= ? AND slot_start <= ? AND reminder_sent_at IS NULL");
+    $stmt->execute([$windowStart, $windowEnd]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
