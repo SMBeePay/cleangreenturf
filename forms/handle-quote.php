@@ -121,6 +121,14 @@ if (!send_transactional_email($mailConfig, $email, $name, 'Thanks for Reaching O
 
 // CRM push happens after the email is confirmed sent, and never blocks the
 // redirect — see the file doc and includes/zoho-crm.php.
+$landingPageUrl = zoho_landing_page_url($businessInfo, '/contact');
+// The Google Ads landing page and the regular quote form both post here —
+// distinguish them by which page the submission came from, since there's
+// no separate hidden field marking the GA form.
+$leadSource = str_contains($landingPageUrl, '/dfw-turf-cleaning-request-ga')
+    ? ZOHO_LEAD_SOURCE_GOOGLE_ADS
+    : ZOHO_LEAD_SOURCE_WEBSITE;
+
 $dealDetails = "Phone: $phone\nEmail: $email\nAddress: $address\n"
     . 'Approx Size of Turf Area: ' . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n"
     . 'Cleaning Frequency: ' . ($frequency !== '' ? $frequency : 'Not specified') . "\n"
@@ -143,6 +151,12 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         'Stage' => ZOHO_STAGE_REPAIR_NEW,
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => ($service === 'cleaning_repair' ? "Also wants routine cleaning.\n\n" : '') . $dealDetails,
+        'Lead_Channel' => ZOHO_LEAD_CHANNEL_QUOTE_FORM,
+        'Lead_Source' => $leadSource,
+        'Landing_Page_URL' => $landingPageUrl,
+        // No Service_Line set: Zoho's picklist only has Turf Installation
+        // and Turf Cleaning today, no Turf Repair option — see
+        // includes/zoho-crm.php.
     ]);
 } else {
     zoho_push_lead($zohoConfig, $name, $email, $phone, [
@@ -152,6 +166,10 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
         'Cleaning_Status' => 'New Inquiry',
         'Closing_Date' => date('Y-m-d', strtotime('+14 days')),
         'Description' => $dealDetails,
+        'Lead_Channel' => ZOHO_LEAD_CHANNEL_QUOTE_FORM,
+        'Lead_Source' => $leadSource,
+        'Landing_Page_URL' => $landingPageUrl,
+        'Service_Line' => ZOHO_SERVICE_LINE_CLEANING,
     ]);
 }
 

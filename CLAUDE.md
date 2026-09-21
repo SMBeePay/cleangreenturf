@@ -319,6 +319,24 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   submission arriving complete in both email bodies. See
   `docs/audit-findings.md` "Customer confirmation email added;
   address-truncation concern investigated (no bug found)."
+- **Zoho lead-attribution fields populated**: owner noticed `Lead_Source`,
+  `Lead_Channel`, `Landing_Page_URL`, and `Service_Line` were coming
+  through null on both test Deals. Checked real field metadata first
+  (same discipline as the earlier Pipeline/Stage bug) and found the exact
+  same renamed-picklist trap: `Lead_Channel`'s "Quote Form"/"Scheduler"
+  display options have unrelated legacy `actual_value`s ("Thumbtack"/
+  "Referral"). Confirmed live against the two real test Deals that the
+  API wants the current display text, then wired
+  `Lead_Channel` ("Quote Form" / "Scheduler"), `Lead_Source` ("Website" or
+  "Google Ads", inferred from the Referer header), and `Landing_Page_URL`
+  (also from Referer, via a new shared `zoho_landing_page_url()` helper)
+  into both `forms/handle-quote.php` and `scheduler/book.php`.
+  `Service_Line` found a real data gap: the picklist only has "Turf
+  Installation" and "Turf Cleaning", no "Turf Repair" — set correctly for
+  cleaning submissions and scheduler bookings, left unset (not
+  mismapped) for repair-only and cleaning+repair quote submissions,
+  flagged to the owner as a possible Zoho-side picklist addition. See
+  `docs/audit-findings.md` "Zoho CRM lead-attribution fields."
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger

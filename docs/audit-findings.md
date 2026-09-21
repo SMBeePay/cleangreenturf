@@ -1360,3 +1360,71 @@ original issue the owner recalled was very likely specific to
 Hostinger's proprietary form builder (replaced entirely by this
 project — see the file's own docblock) rather than something carried
 forward here.
+
+## Zoho CRM lead-attribution fields (Lead_Source, Lead_Channel, Landing_Page_URL, Service_Line)
+
+Owner reported that after the two test Deals landed in the right
+pipelines/stages, four fields were still coming through null:
+`Lead_Source`, `Lead_Channel`, `Landing_Page_URL`, `Service_Line`. Owner
+gave the exact target values: Lead Channel = "Quote Form" for quote-form
+submissions, "Scheduler" for scheduler bookings.
+
+Checked the real Deals-module field metadata (`getFields`) before writing
+any code, since the Pipeline/Stage bug earlier in this project was caused
+by exactly this: a renamed picklist where the API's `actual_value` no
+longer matches what's shown in the CRM UI. Same pattern here —
+`Lead_Channel`'s "Quote Form" option has `actual_value` "Thumbtack" and
+"Scheduler" has `actual_value` "Referral" (both leftover from before the
+picklist was relabeled). Confirmed directly against two real Deal records
+(`updateRecord` + read-back) that the API accepts and stores the current
+**display text**, not the legacy `actual_value` — consistent with the
+Pipeline/Stage finding, so no repeat of that earlier mistake:
+
+- `Andrew Neal TEST — Turf Cleaning Quote` (id `...768008`): set
+  `Lead_Channel: "Quote Form"`, `Lead_Source: "Website"`,
+  `Landing_Page_URL: "https://cleangreenturf.com/contact"`,
+  `Service_Line: "Turf Cleaning"` — read back identical.
+- `Andrew Neal — Turf Installation Estimate` (id `...768002`): set
+  `Lead_Channel: "Scheduler"`, `Lead_Source: "Website"`,
+  `Landing_Page_URL: "https://cleangreenturf.com/schedule-turf-installation-estimate"`,
+  `Service_Line: "Turf Installation"` — read back identical.
+
+**Lead_Source** picklist also turned out to have real "Website" and
+"Google Ads" display options now (this is new since the last audit —
+previously noted as not existing). `forms/handle-quote.php` sets
+`Lead_Source` based on which page the submission came from: if the
+Referer header points at `/dfw-turf-cleaning-request-ga` it's "Google
+Ads", otherwise "Website" (the quote form and the GA landing page share
+the same handler with no other distinguishing field). The scheduler only
+has one entry point today, so its bookings are always "Website".
+
+**Landing_Page_URL** is populated from the request's `Referer` header
+(new `zoho_landing_page_url()` helper in `includes/zoho-crm.php`, shared
+by both callers), falling back to the relevant page's own URL on the site
+domain if no Referer is present. This is the page the form/widget was
+actually submitted from, not true first-touch multi-page attribution —
+this project has no click-tracking layer to do better than that.
+
+**Service_Line found a real gap, flagged rather than guessed around**:
+the picklist only has two options — "Turf Installation" and "Turf
+Cleaning" — no "Turf Repair". So:
+- Cleaning-only quote submissions → `Service_Line: "Turf Cleaning"`.
+- Scheduler bookings → `Service_Line: "Turf Installation"`.
+- Repair-only and "cleaning + repair" quote submissions → left **unset**.
+  Mapping either to "Turf Cleaning" would misrepresent a repair lead, and
+  there's no correct option to pick. If reporting on repair volume by
+  Service_Line matters, a "Turf Repair" option needs to be added to the
+  picklist in Zoho (Setup → Customization → Deals → Service_Line) — that's
+  a Zoho-side change this project can't make, flagging per owner's
+  standing "let me know if anything needs to change on the Zoho side."
+
+New constants added to `includes/zoho-crm.php`
+(`ZOHO_LEAD_CHANNEL_QUOTE_FORM`, `ZOHO_LEAD_CHANNEL_SCHEDULER`,
+`ZOHO_LEAD_SOURCE_WEBSITE`, `ZOHO_LEAD_SOURCE_GOOGLE_ADS`,
+`ZOHO_SERVICE_LINE_INSTALLATION`, `ZOHO_SERVICE_LINE_CLEANING`) follow the
+same pattern as the existing Pipeline/Stage constants, each documented
+with the same actual_value-vs-display-text warning. Wired into
+`forms/handle-quote.php` and `scheduler/book.php`'s existing
+`zoho_push_lead()` calls. Verified with the full 40-route regression
+check (no regressions) and the two live-record updates above (exact
+values round-tripped through the real API).

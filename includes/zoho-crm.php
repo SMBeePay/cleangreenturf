@@ -59,6 +59,38 @@ const ZOHO_STAGE_INSTALLATION_NEW = 'New Lead';
 const ZOHO_STAGE_CLEANING_NEW = 'New Cleaning Inquiry';
 const ZOHO_STAGE_REPAIR_NEW = 'New Repair Inquiry';
 
+// Lead_Channel, Lead_Source, and Service_Line (Deals module) — same
+// renamed-picklist situation as Pipeline/Stage above: getFields' picklist
+// metadata shows these options' `actual_value` no longer matches what's
+// displayed in the CRM UI (e.g. Lead_Channel's "Quote Form" option has
+// actual_value "Thumbtack" left over from before it was renamed). Use the
+// current display text below, confirmed directly against getFields —
+// NOT the legacy actual_value, per the Pipeline/Stage lesson.
+const ZOHO_LEAD_CHANNEL_QUOTE_FORM = 'Quote Form';
+const ZOHO_LEAD_CHANNEL_SCHEDULER = 'Scheduler';
+const ZOHO_LEAD_SOURCE_WEBSITE = 'Website';
+const ZOHO_LEAD_SOURCE_GOOGLE_ADS = 'Google Ads';
+
+// Service_Line only has "Turf Installation" and "Turf Cleaning" as real
+// options today — there is no "Turf Repair" value yet. Repair-only and
+// cleaning+repair quote submissions leave Service_Line unset rather than
+// mismap it to one of these two; see docs/audit-findings.md "Zoho CRM
+// lead-attribution fields" if a Turf Repair option gets added later.
+const ZOHO_SERVICE_LINE_INSTALLATION = 'Turf Installation';
+const ZOHO_SERVICE_LINE_CLEANING = 'Turf Cleaning';
+
+/**
+ * Best-effort "landing page" for a lead: the page the form/booking widget
+ * was actually submitted from (the HTTP Referer header on the request),
+ * not true first-touch attribution — this project has no click-tracking
+ * infrastructure beyond that. Falls back to the given path on the site's
+ * own domain if no Referer is present (e.g. a stripped Referrer-Policy).
+ */
+function zoho_landing_page_url(array $businessInfo, string $fallbackPath): string {
+    $referer = trim((string)($_SERVER['HTTP_REFERER'] ?? ''));
+    return $referer !== '' ? $referer : rtrim($businessInfo['domain'], '/') . $fallbackPath;
+}
+
 function zoho_get_access_token(array $zohoConfig): ?string {
     if (empty($zohoConfig['client_id']) || empty($zohoConfig['client_secret']) || empty($zohoConfig['refresh_token'])) {
         return null; // Not configured yet — caller treats this as "skip CRM push."

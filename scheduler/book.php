@@ -118,6 +118,7 @@ send_transactional_email(
 );
 
 $slotDateTime = new DateTime($slotStart, new DateTimeZone($schedulerConfig['timezone']));
+$landingPageUrl = zoho_landing_page_url($businessInfo, '/schedule-turf-installation-estimate');
 zoho_push_lead($zohoConfig, $name, $email, $phone, [
     'Deal_Name' => "$name — Turf Installation Estimate ($prettyWhen)",
     'Pipeline' => ZOHO_PIPELINE_INSTALLATION,
@@ -128,6 +129,10 @@ zoho_push_lead($zohoConfig, $name, $email, $phone, [
         . 'SMS reminder opt-in: ' . ($smsOptIn ? 'Yes' : 'No') . "\n"
         . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
         . 'Reschedule/cancel link: ' . $rescheduleUrl,
+    'Lead_Channel' => ZOHO_LEAD_CHANNEL_SCHEDULER,
+    'Lead_Source' => ZOHO_LEAD_SOURCE_WEBSITE,
+    'Landing_Page_URL' => $landingPageUrl,
+    'Service_Line' => ZOHO_SERVICE_LINE_INSTALLATION,
 ]);
 
 echo json_encode(['success' => true, 'when' => $prettyWhen, 'reschedule_url' => $rescheduleUrl, 'sms_opt_in' => $smsOptIn]);
