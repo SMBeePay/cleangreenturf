@@ -471,10 +471,12 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder
   timing fixed" above for the query-level local test; the actual Twilio
-  API call still needs a real test booking on live infrastructure). (2) An
-  **hourly** Hostinger cron job needs to be set up in hPanel to actually
-  run `bin/send-reminders.php` — see that file's header comment for the
-  exact command and why hourly, not daily. (3) Now linked from the homepage's Turf Installation card and
+  API call still needs a real test booking on live infrastructure). (2)
+  ~~An **hourly** Hostinger cron job needs to be set up~~ **Done** — owner
+  created it in hPanel (Advanced > Cron Jobs): `php
+  public_html/bin/send-reminders.php`, "Once an hour (0 * * * *)". Not
+  yet confirmed actually firing/sending a real text — that's the next
+  step, alongside (1) above. (3) Now linked from the homepage's Turf Installation card and
   the `/about` installation paragraph via the new `/turf-installation`
   page (see below) rather than directly, plus still reachable by direct
   URL; still no primary-nav entry. Owner mentioned having ad copy for a
