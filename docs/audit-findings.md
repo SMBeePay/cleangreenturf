@@ -1893,3 +1893,35 @@ dead space before picking a date, correct two-column split (calendar +
 time list) immediately after picking one, and mobile (390px) unaffected
 (already single-column throughout, stacks calendar then times as
 before). Full 40-route regression re-run — no regressions.
+
+## Homepage's second photo was oversized, pushing the stats strip too far down
+
+Owner flagged a large image on the homepage pushing "trust icons" (the
+300+ Sq Ft / 194K Customers / 5.0★ / 2 Regions stats strip) too far down
+the page. This wasn't the hero image — it's the second photo, in the
+"DFW Artificial Turf Experts" section right after the hero
+(`content/pages/__home__.php`, `bat-photo5-...webp`, natively 1600×1200).
+That image had no height cap, so the sitewide `img { max-width: 100%;
+height: auto; }` reset scaled it to the full content width
+(~1192px) while preserving its near-square native ratio — rendering it
+at ~894px tall, far larger than a mid-page supporting photo should be.
+
+Fix scoped to just this one photo, not all `.prose img`: several other
+pages use portrait photos (found dimensions like 768×1047, 375×500,
+1600×2133 across content pages) that need their full height uncropped,
+so a blanket height cap would have clipped those. Added a new
+`.prose__photo--capped` class (`width: 100%; height: 480px; object-fit:
+cover`, same capped-height + cover-crop technique already used sitewide
+for `.page-hero` images) and applied it to just this image's `<img>`
+tag. Added a mobile-narrower height (`260px` under 700px) after
+checking the default 480px looked disproportionately tall relative to
+its ~342px mobile width.
+
+Verified with headless-browser screenshots: desktop image height
+confirmed at exactly 480px (down from ~894px) with the stats strip now
+following immediately after with no dead scroll space, and a sensible,
+uncut crop (fence/turf/technician still all clearly visible, nothing
+awkwardly cropped). Mobile checked and adjusted separately — the
+default 480px looked too tall against a ~342px width, tightened to
+260px for a better-proportioned crop. Full 40-route regression re-run —
+no regressions.

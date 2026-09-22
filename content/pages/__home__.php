@@ -16,7 +16,7 @@
 
 <h3>DFW Artificial Turf Experts</h3>
 <p>DFW summers are brutal on pet turf. We built our cleaning process specifically for Texas heat and Texas dogs — a pet-safe formula that fully extracts urine instead of masking it, so your backyard actually smells clean and stays that way. No gimmicks, no perfume cover-ups. Just clean turf.</p>
-<img src="/assets/images/bat-photo5-m7v3qvwpl1hjk71q.webp" alt="Artificial turf cleaning technician at work" loading="lazy" width="1600" height="1200">
+<img src="/assets/images/bat-photo5-m7v3qvwpl1hjk71q.webp" alt="Artificial turf cleaning technician at work" loading="lazy" width="1600" height="1200" class="prose__photo--capped">
 
 <div class="stats-strip">
     <div class="stats-strip__item"><span class="stats-strip__number">300+</span><span class="stats-strip__label">Sq Ft Cleaned</span></div>
