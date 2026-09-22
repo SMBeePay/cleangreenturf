@@ -1722,3 +1722,30 @@ ran the full 40-route regression check. Live end-to-end verification
 (create/update/delete against the real Turf Install Estimates calendar)
 is still pending the owner completing the domain-wide delegation
 authorization step.
+
+## Google Calendar: domain-wide delegation verified live end-to-end
+
+Owner completed the domain-wide delegation authorization (Workspace
+Admin console > Security > API controls > Domain-wide Delegation,
+service account Client ID + `https://www.googleapis.com/auth/calendar`
+scope) and set `GOOGLE_IMPERSONATE_EMAIL=andrew@cleangreenturf.com`.
+
+Verified against the real, live Turf Install Estimates calendar (no
+throwaway keys this time — real credentials, real calendar):
+1. Token exchange with the `sub` (impersonation) claim succeeded.
+2. `gcal_create_event()` created a real test event on the actual
+   calendar.
+3. `gcal_get_busy_periods()` correctly reported that exact hour as busy
+   (verified the returned UTC times matched the booked Central-time hour
+   precisely — 15:00-16:00 UTC = 10-11am CDT).
+4. `gcal_update_event()` successfully moved the event to a new time.
+5. `gcal_delete_event()` removed it (HTTP 204) — confirmed no leftover
+   test data on the real calendar afterward.
+
+This closes out both "Google Calendar sync" and "Dynamic availability
+against Google Calendar" above — no per-calendar sharing was ultimately
+needed; domain-wide delegation gives the service account the owner's own
+access to every calendar he owns, exactly matching the original ask
+("any of my Clean Green Turf calendars"). Remaining step is adding the
+same four `GOOGLE_*` values to `.env` on the live Hostinger server (this
+was verified from a local `.env`, gitignored as always, never committed).

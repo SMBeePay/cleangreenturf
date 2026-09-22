@@ -412,6 +412,30 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   Calendar unconfigured, and the full route regression. See
   `docs/audit-findings.md` "Dynamic availability against Google
   Calendar."
+- **Google Calendar: switched to domain-wide delegation, then verified
+  live end-to-end.** Directly sharing the calendar with the service
+  account's own email hit a real wall: Google Workspace treats that as
+  *external* sharing (different domain than cleangreenturf.com), and the
+  org's external-sharing policy capped it at read-only no matter what
+  permission was picked — even after the owner (also the Workspace
+  admin) raised that policy to its most permissive setting and waited
+  well past Google's own "a few minutes" estimate. Switched to **domain-
+  wide delegation** instead (Google's own recommended pattern for a
+  service account acting on behalf of a Workspace user): a new
+  `GOOGLE_IMPERSONATE_EMAIL` config makes the service account act AS the
+  owner via a JWT `sub` claim, which sidesteps the external-sharing
+  policy entirely and automatically grants access to every calendar he
+  owns — no per-calendar sharing needed at all. Owner authorized the
+  service account's Client ID in the Workspace Admin console (Security >
+  API controls > Domain-wide Delegation) with the `calendar` scope.
+  **Verified live end-to-end against the real Turf Install Estimates
+  calendar**: created a real test event, confirmed `freeBusy` correctly
+  reported it as busy (UTC times matched the booked Central-time hour
+  exactly), updated it to a new time, and deleted it — no leftover test
+  data. Both Google Calendar sync and dynamic availability are now fully
+  working, closing out the two items above. See `docs/audit-findings.md`
+  "Google Calendar: switched to domain-wide delegation" and "...verified
+  live end-to-end."
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger
@@ -431,14 +455,19 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   turf-installation landing page, which would naturally link to this
   scheduler once shared. (4) `ADMIN_PASSWORD` needs to be set in `.env`
   before `/admin/appointments.php` is usable. (5) Google Calendar sync
-  and dynamic availability are both built (see above) but need the owner
-  to complete the one-time Cloud Console / service-account setup and add
+  and dynamic availability are both built AND verified live (see above,
+  "Google Calendar: switched to domain-wide delegation... verified live
+  end-to-end") but only against a local `.env` for testing — the live
+  Hostinger server's `.env` still needs the same four values added:
   `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`,
-  and `GOOGLE_CALENDAR_ID` to `.env` — see `.env.example` for the full
-  walkthrough. Optionally also `GOOGLE_BUSY_CALENDAR_IDS` if other
-  calendars (personal, a second business) should block availability too.
-  Until then, bookings work exactly as before: no calendar event
-  created, and availability only reflects other website bookings.
+  `GOOGLE_CALENDAR_ID`, and `GOOGLE_IMPERSONATE_EMAIL`
+  (`andrew@cleangreenturf.com`) — see `.env.example` for the full
+  values/walkthrough. Until then, the live site's bookings work exactly
+  as before: no calendar event created, and availability only reflects
+  other website bookings. Optionally also `GOOGLE_BUSY_CALENDAR_IDS` if
+  other calendars beyond the booking one should block availability too —
+  not needed for the two calendars the owner already owns (impersonation
+  already covers those).
 - Phase 2 (new Repair/Installation pages, deeper location-page strategy,
   breadcrumb schema) — intentionally deferred per requirement #34.
 - Old-vs-new comparison (#29) against the
