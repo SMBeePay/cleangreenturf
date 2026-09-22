@@ -731,6 +731,11 @@ footer line, or a mention in the relevant TX city pages' copy) — flagging
 rather than deciding unilaterally whether that tradeoff is acceptable long
 term.
 
+**Resolved, pre-cutover**: owner explicitly confirmed being okay with
+Austin and California losing some ranking as a result of this tradeoff.
+No further action — the pages stay live, indexed, and sitemapped exactly
+as they are; this is a closed decision, not an open flag anymore.
+
 ## Pre-launch crawl (requirement #28) and SMTP hardening
 
 With the design approved, moved to launch-readiness per the requirements
