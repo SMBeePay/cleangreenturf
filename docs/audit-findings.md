@@ -1980,3 +1980,29 @@ stored as free text in the lead email/Zoho Description field, not
 validated against a fixed set server-side, so no other code needed to
 change. Verified both forms render the new options correctly and the
 full 40-route regression passes.
+
+## Domain cutover complete and verified live
+
+`cleangreenturf.com` now points at the new site (Hostinger's in-account
+domain reassignment, not a registrar/DNS-record change, since both the
+old and new sites lived in the same Hostinger account — see the earlier
+back-and-forth on this in the conversation for the full troubleshooting
+trail: an initial "still showing the old site" turned out to be DNS/
+browser-cache propagation lag, not a misconfiguration, and resolved on
+its own within the same session). The old Horizons site was correctly
+bumped to its own new temporary address by Hostinger as expected, and is
+no longer live at the real domain.
+
+**Owner confirmed full end-to-end verification on the real live domain**:
+- Quote form (`/contact`) submitted for real — owner notification and
+  customer confirmation emails both delivered, and a Deal showed up
+  correctly in Zoho.
+- Scheduler booking submitted for real — confirmation delivered, and a
+  Deal showed up correctly in Zoho's Turf Installation pipeline.
+
+This is the first time the full lead-capture pipeline (form/scheduler →
+email → Zoho) has been confirmed working on the actual production domain
+rather than the Hostinger staging subdomain used throughout the rest of
+this project. Also caught and fixed one real mobile bug in the same
+session, found only once real production DNS/traffic was in play (see
+"Hero CTA button clipped on mobile" above).

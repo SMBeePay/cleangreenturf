@@ -463,11 +463,32 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   passed. See `docs/audit-findings.md` "Lead-notification failsafe:
   automatic mail() fallback + last-resort log."
 
+- **Domain cutover complete and verified live**: `cleangreenturf.com` now
+  points at the new site (Hostinger's in-account domain reassignment,
+  since both old and new sites lived in the same Hostinger account — an
+  initial "still showing the old site" report turned out to be DNS/
+  browser-cache propagation lag, not a misconfiguration, and resolved on
+  its own). The old Horizons site was correctly bumped to its own
+  temporary address and is no longer live at the real domain. Owner
+  confirmed full end-to-end verification on the real production domain:
+  a real quote-form submission (owner + customer confirmation emails
+  delivered, Deal created in Zoho) and a real scheduler booking
+  (confirmation delivered, Deal created in Zoho's Turf Installation
+  pipeline) both worked. First confirmation of the full lead pipeline
+  (form/scheduler → email → Zoho) on production rather than the
+  Hostinger staging subdomain. One real mobile bug found immediately
+  after cutover and fixed same-day: the hero section's fixed
+  `height: 62vh` + `overflow: hidden` clipped the phone-number CTA
+  button on mobile viewports (found on a real phone at the live domain);
+  fixed with a `max-width: 640px` breakpoint switching `.page-hero` to
+  `height: auto`. Also shipped the same day: the quote-form turf-size
+  dropdown ranges changed to Less than 500 / 500–1,000 / 1,000–2,000 /
+  2,000+ sq ft (both `includes/quote-form.php` and
+  `includes/quote-form-ga.php`) per owner request. See
+  `docs/audit-findings.md` "Domain cutover complete and verified live"
+  and "Hero CTA button clipped on mobile" for the full writeups.
+
 **Not done yet:**
-- Domain cutover (pointing cleangreenturf.com at this Hostinger
-  hosting) has not happened yet — staging deploy is otherwise fully
-  live and verified (quote form, scheduler, Zoho CRM, and now SMTP all
-  confirmed working end-to-end on real infrastructure).
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder
   timing fixed" above for the query-level local test). Owner made a live
