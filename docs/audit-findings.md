@@ -1665,3 +1665,60 @@ immediately with no further code changes — a real live test booking
 against a calendar with an existing conflicting event will be the final
 verification, the same way SMTP/Zoho were confirmed working end-to-end
 earlier in this project.
+
+## Google Calendar: switched to domain-wide delegation (external-sharing org policy blocked direct sharing)
+
+Right after Google Calendar sync was verified against real credentials
+(token exchange succeeded), the actual calendar-sharing step hit a wall:
+sharing the Turf Install Estimates calendar with the service account's
+own email greyed out every write-level permission ("Make changes to
+events" etc.), leaving only read-only "See event details" selectable.
+The calendar's own UI named the cause: "Your organization might limit
+how you can share your calendar outside your organization" — since the
+service account's address is on a different domain
+(`...iam.gserviceaccount.com`, not `cleangreenturf.com`), Workspace
+treats sharing with it as *external* sharing, which is capped by an
+admin-controlled policy.
+
+Owner (who is also the Workspace admin) updated that policy — Admin
+console > Apps > Google Workspace > Calendar > Sharing settings >
+External sharing options — to the most permissive option ("Share all
+information, and allow managing of calendars") and saved. Even after
+waiting well past Google's own "a few minutes" estimate, the permission
+dropdown was still capped and a real API call still came back
+`403 requiredAccessLevel` (then once, oddly, a transient `404` — the
+calendar was still listed under "Shared with" throughout, so this wasn't
+a lost share, just continued propagation/policy weirdness).
+
+Rather than keep waiting on an opaque, possibly-still-blocked policy
+change, switched to **domain-wide delegation** — Google's own documented
+pattern for exactly this scenario (a service account acting on behalf of
+a Workspace user), and one that sidesteps the external-sharing policy
+entirely: the service account is authorized in the Workspace Admin
+console (Security > API controls > Domain-wide Delegation, keyed by the
+service account's numeric Client ID + the `calendar` OAuth scope) to
+*impersonate* a specific Workspace user rather than act as itself. Once
+authorized, it automatically has that user's own access to every
+calendar they own or have been shared — no per-calendar sharing at all,
+which also means it naturally covers "any of my Clean Green Turf
+calendars" without having to share each one individually.
+
+Code change: added `GOOGLE_IMPERSONATE_EMAIL` to
+`config/google-calendar.php`. `gcal_get_access_token()`
+(`includes/google-calendar.php`) now adds a `sub` claim (the standard
+JWT field for "act as this subject") to the signed JWT when that's set —
+one `if` block, fully backward compatible: leaving it unset keeps the
+original "service account acts as itself" behavior (Option 2 in
+`.env.example`, still documented for anyone who'd rather not touch
+Workspace admin settings, e.g. a Workspace where the external-sharing
+policy is already permissive or the user isn't the admin). `.env.example`
+rewritten to present both options, with Option 1 (delegation)
+recommended first given what Option 2 just ran into. Verified with the
+existing throwaway-keypair technique isn't meaningful here (delegation
+requires a real, admin-authorized service account) — instead re-verified
+the real credentials' token exchange still succeeds unchanged with no
+`sub` claim added (confirming the change is additive/non-breaking), and
+ran the full 40-route regression check. Live end-to-end verification
+(create/update/delete against the real Turf Install Estimates calendar)
+is still pending the owner completing the domain-wide delegation
+authorization step.

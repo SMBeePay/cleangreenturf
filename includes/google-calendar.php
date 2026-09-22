@@ -48,14 +48,20 @@ function gcal_get_access_token(array $config): ?string {
     }
 
     $now = time();
-    $header = gcal_base64url_encode((string)json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
-    $claim = gcal_base64url_encode((string)json_encode([
+    $claimFields = [
         'iss' => $config['client_email'],
         'scope' => 'https://www.googleapis.com/auth/calendar',
         'aud' => 'https://oauth2.googleapis.com/token',
         'iat' => $now,
         'exp' => $now + 3600,
-    ]));
+    ];
+    // Domain-wide delegation: act as this Workspace user instead of as the
+    // service account itself — see config/google-calendar.php.
+    if (!empty($config['impersonate_email'])) {
+        $claimFields['sub'] = $config['impersonate_email'];
+    }
+    $header = gcal_base64url_encode((string)json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
+    $claim = gcal_base64url_encode((string)json_encode($claimFields));
     $signingInput = "$header.$claim";
 
     $privateKey = openssl_pkey_get_private($config['private_key']);

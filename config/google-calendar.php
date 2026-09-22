@@ -19,6 +19,7 @@ require_once __DIR__ . '/mail.php';
 $rawPrivateKey = env('GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY');
 $calendarId = env('GOOGLE_CALENDAR_ID');
 $busyIdsRaw = env('GOOGLE_BUSY_CALENDAR_IDS');
+$impersonateEmail = env('GOOGLE_IMPERSONATE_EMAIL');
 
 // Which calendars to check for existing conflicts before offering a slot.
 // Defaults to just the booking calendar itself (GOOGLE_CALENDAR_ID) if
@@ -41,4 +42,12 @@ return [
     'private_key' => $rawPrivateKey !== null ? str_replace('\\n', "\n", $rawPrivateKey) : null,
     'calendar_id' => $calendarId,
     'busy_calendar_ids' => $busyCalendarIds,
+    // If set (via Google Workspace domain-wide delegation — see
+    // .env.example), the service account acts AS this Workspace user
+    // instead of as itself, so it gets that user's own access to every
+    // calendar they own or have been shared, with no per-calendar
+    // sharing needed. Preferred over calendar-by-calendar sharing, which
+    // some Workspace "external sharing" org policies block or restrict
+    // to read-only for a non-domain principal like a service account.
+    'impersonate_email' => $impersonateEmail,
 ];
