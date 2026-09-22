@@ -557,7 +557,7 @@ blockquote img {
 .scheduler-hero {
     display: grid; grid-template-columns: 1fr; row-gap: var(--space-4);
     grid-template-areas: "intro" "widget" "trust";
-    align-items: start; margin-bottom: var(--space-6);
+    align-items: start; margin-top: var(--space-6); margin-bottom: var(--space-6);
 }
 @media (min-width: 900px) {
     .scheduler-hero {

@@ -1763,3 +1763,30 @@ submit → PHP → Google Calendar API) working in production, not just the
 underlying function verified in isolation. Google Calendar sync and
 dynamic availability are both live and confirmed working on
 cleangreenturf.com's actual hosting.
+
+## Scheduler page missing top padding above headline (and its own confirmation state)
+
+Owner flagged the `/schedule-turf-installation-estimate` headline sitting
+flush against the trust bar with no breathing room, both before and
+after booking (the "You're booked!" confirmation swaps into the same
+layout client-side, in the same spot — not a separate page, so it had
+the identical problem).
+
+Root cause: this page's content doesn't match `templates/page.php`'s
+leading `<img>+<h1>` regex extraction (it opens with a wrapping
+`<div class="scheduler-hero">`, not a bare `<h1>`), so it never gets a
+`.page-hero` band — which is where other pages' top spacing comes from
+(`.page-hero--plain .page-hero__text` has `padding-top: var(--space-6)`).
+Content renders straight into `.prose`, which has `padding: 0 1.5rem
+var(--space-8)` — zero top padding — and `.scheduler-hero` itself had no
+`margin-top` of its own.
+
+Fix: added `margin-top: var(--space-6)` to `.scheduler-hero`
+(`assets/css/style.css`), matching the same spacing token other pages'
+plain hero variant already uses. Verified with headless-browser
+screenshots at 1400px and 390px (mobile) for the initial booking view,
+and reproduced the post-booking confirmation state by triggering the
+same DOM swap `assets/js/scheduler.js` does on a successful booking
+(hiding `[data-scheduler-booking]`, revealing `[data-scheduler-confirm]`)
+— both now have consistent breathing room below the trust bar. Full
+40-route regression re-run — no regressions.
