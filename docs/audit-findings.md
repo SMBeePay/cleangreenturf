@@ -1930,3 +1930,36 @@ awkwardly cropped). Mobile checked and adjusted separately — the
 default 480px looked too tall against a ~342px width, tightened to
 260px for a better-proportioned crop. Full 40-route regression re-run —
 no regressions.
+
+## Hero CTA button clipped on mobile (found on the live domain, real phone)
+
+First real bug caught on the actual live `cleangreenturf.com` right after
+the domain cutover: on a real phone, the homepage hero's phone-number
+button was visibly cut off at the bottom of the hero image.
+
+Root cause: `.page-hero` uses a fixed `height: 62vh` (capped between
+500-720px) with `overflow: hidden`, sized for a typical single-line-H1
+hero. The homepage's hero has more content than most pages using this
+same template — an eyebrow badge, a headline that wraps to 4 lines at
+mobile widths, a subtitle, a services line, and two CTA buttons — and at
+narrow viewport heights that stack was taller than the fixed box,
+silently clipping whatever didn't fit (the second button, in this case).
+Not homepage-specific in principle: any page with a long enough H1 to
+wrap several lines plus both CTA buttons could hit the same ceiling
+(confirmed the McKinney location page's 5-line H1 was close to it too).
+
+Fix: added a mobile breakpoint (`max-width: 640px`) that switches
+`.page-hero` to `height: auto; min-height: 420px; max-height: none` —
+the same "let it size to content" approach `.page-hero--plain` (the
+no-image variant) already used. `.page-hero__media` is absolutely
+positioned or `inset: 0` against `.page-hero`, so it stretches to match
+whatever height the text content ends up needing, same visual technique
+as before, just no longer clipped.
+
+Verified with headless-browser screenshots on both a short phone height
+(375×667, iPhone SE-class) and a taller one (390×844) on the homepage —
+both buttons now fully visible with room to spare on the shorter one
+too. Also checked an inner location page (`/mckinney-tx-turf-cleaning`,
+a 5-line wrapping H1) and the plain-gradient hero (`/about`) — both
+render correctly, confirming the fix generalizes rather than being a
+homepage-only patch. Full 40-route regression re-run — no regressions.

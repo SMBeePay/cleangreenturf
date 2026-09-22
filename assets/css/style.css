@@ -300,6 +300,18 @@ strong { color: var(--forest-950); font-weight: 700; }
 }
 .page-hero__ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 
+/* At narrow widths, a long wrapped headline plus a subtitle/services line
+   plus two CTA buttons (the homepage hero has all of these) can be taller
+   than the fixed 62vh/500-720px box above, and overflow:hidden clips
+   whatever doesn't fit (a real bug caught on a live phone: the phone-
+   number button got cut off). Let the hero grow to fit its content at
+   mobile widths instead of clipping it — .page-hero__media is absolutely
+   positioned so it stretches to match, same technique .page-hero--plain
+   already uses for its no-image variant. */
+@media (max-width: 640px) {
+    .page-hero { height: auto; min-height: 420px; max-height: none; }
+}
+
 /* Hero without an image (e.g. About) — solid brand gradient */
 .page-hero--plain {
     background: linear-gradient(135deg, var(--forest-950), var(--forest-800));
