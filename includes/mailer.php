@@ -1,9 +1,14 @@
 <?php
 /**
- * Shared plain-text email sender for the scheduler (confirmation/reschedule/
- * cancellation notices). Same SMTP-with-mail()-fallback pattern as
- * forms/handle-quote.php, pulled out here so scheduler/book.php,
- * scheduler/reschedule.php, and future callers don't each re-implement it.
+ * Shared plain-text email sender for every lead path (quote form,
+ * scheduler booking/reschedule/cancellation). Tries real SMTP first when
+ * configured, and — critically — always falls back to PHP's built-in
+ * mail() if SMTP fails for ANY reason (not just "no credentials set"):
+ * a transient SMTP hiccup (a Gmail throttle, a network blip) used to mean
+ * no email went out at all, since the old fallback only ever triggered
+ * when SMTP wasn't configured in the first place. Two independent
+ * delivery paths per email is cheap insurance against losing a real lead
+ * to one bad SMTP connection.
  */
 declare(strict_types=1);
 
@@ -50,11 +55,15 @@ function send_transactional_email(
             $mailer->Body = $body;
             $mailer->isHTML(false);
 
-            return $mailer->send();
+            if ($mailer->send()) {
+                return true;
+            }
+            error_log('Transactional email SMTP send failed, falling back to mail(): ' . $mailer->ErrorInfo);
         } catch (PHPMailerException $e) {
-            error_log('Scheduler email send failed: ' . $mailer->ErrorInfo);
-            return false;
+            error_log('Transactional email SMTP send threw, falling back to mail(): ' . $mailer->ErrorInfo);
         }
+        // Don't return false here — fall through to the mail() attempt
+        // below instead of giving up after one failed delivery path.
     }
 
     $headers = [
@@ -65,4 +74,21 @@ function send_transactional_email(
         $headers[] = 'Reply-To: ' . ($replyToName ?? '') . ' <' . $replyToEmail . '>';
     }
     return mail($toEmail, $subject, $body, implode("\r\n", $headers));
+}
+
+/**
+ * True last resort: called only when a CRITICAL notification (a new lead
+ * or booking) failed through BOTH delivery paths above. Writes the full
+ * message to a local log file so the raw lead details are never silently
+ * lost even in a total email outage — same "own debug log, since
+ * Hostinger's error log is hard to find" convention as
+ * data/zoho-debug.log and data/gcal-debug.log. This is a safety net to
+ * check manually if a lead ever seems to be missing, not a real-time
+ * alert — there's no SMS/push here, since the whole point is that email
+ * itself has already failed twice.
+ */
+function record_failed_lead_email(string $context, string $subject, string $body): void {
+    error_log("URGENT: transactional email failed via both SMTP and mail() for [$context]: $subject");
+    $entry = '[' . date('c') . "] FAILED TO EMAIL — $context\nSubject: $subject\n\n$body\n" . str_repeat('-', 60) . "\n\n";
+    @file_put_contents(__DIR__ . '/../data/failed-leads.log', $entry, FILE_APPEND | LOCK_EX);
 }

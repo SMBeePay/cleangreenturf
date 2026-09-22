@@ -1790,3 +1790,76 @@ same DOM swap `assets/js/scheduler.js` does on a successful booking
 (hiding `[data-scheduler-booking]`, revealing `[data-scheduler-confirm]`)
 — both now have consistent breathing room below the trust bar. Full
 40-route regression re-run — no regressions.
+
+## Lead-notification failsafe: automatic mail() fallback + last-resort log
+
+Owner asked whether there's a failsafe in place so a Zoho outage (or
+any other integration hiccup) can never cost him a lead — specifically,
+whether he's guaranteed to at least get an email for every quote-form
+submission and every scheduler booking.
+
+Auditing the three lead paths surfaced two real gaps, not just a
+"yes it's already handled":
+
+1. **`send_transactional_email()` (`includes/mailer.php`) only ever fell
+   back to PHP's plain `mail()` when SMTP wasn't configured at all** —
+   not when SMTP *was* configured but a send genuinely failed at
+   runtime (a Gmail throttle, a transient network error). A live SMTP
+   outage had zero automatic second attempt.
+2. **`scheduler/book.php` never checked the owner-notification email's
+   result at all** — unlike `forms/handle-quote.php`, which already
+   checks and shows the visitor an error on failure. A silently-failed
+   booking notification would leave the owner with no idea a booking
+   happened, discoverable only by manually checking `/admin`.
+
+**Fix, three layers**:
+1. `send_transactional_email()` now always attempts the `mail()`
+   fallback if the SMTP attempt fails for any reason — not just when
+   unconfigured. One shared function, so every caller (quote form,
+   scheduler booking/reschedule/cancellation) gets this automatically.
+2. `scheduler/book.php` now checks the owner notification's result and
+   logs loudly (`error_log`) if it fails, matching the quote form's
+   existing behavior — the booking itself is still never rejected over
+   this (the appointment's already safely in the database and visible
+   in `/admin` either way), but a failure is no longer silent.
+3. New `record_failed_lead_email()` in `includes/mailer.php`: a true
+   last resort, called only when BOTH SMTP and `mail()` fail for a
+   critical lead notification. Writes the full lead details to
+   `data/failed-leads.log` (same "own debug log" convention as
+   `zoho-debug.log`/`gcal-debug.log` — already covered by `data/`'s
+   existing deny-all `.htaccess` and `.gitignore` rule, no changes
+   needed there). Wired into both `forms/handle-quote.php` and
+   `scheduler/book.php`.
+
+**Important honest caveat, found while testing**: PHP's `mail()` almost
+always returns `true` even when the underlying delivery genuinely fails
+downstream — it only confirms the message was handed off locally (e.g.
+to `sendmail`), not that it was actually delivered. Verified this
+directly: with `sendmail_path` pointed at a command that always exits
+with an error, `mail()` still returned `true`. It only returns `false`
+in more catastrophic local failures — e.g. `sendmail_path` pointing at a
+binary that doesn't exist at all, so the pipe can't even be opened.
+Practically, this means layer 3 (the failed-leads log) mainly guards
+against total local mail-transport misconfiguration, not more common
+issues like a bounce or a spam-folder landing — those are inherently
+invisible to a `mail()`/SMTP return value and would need a real
+delivery-tracking service (SendGrid, Mailgun, etc. with webhooks) to
+catch, which is a bigger change than what was asked here. Layers 1 and
+2 (the actual SMTP-then-mail() redundancy, and no-longer-silent
+failures) are the real, meaningful improvement; layer 3 is inexpensive
+extra insurance on top, not a guarantee of catching every kind of
+"the email didn't really arrive."
+
+**Verified**:
+- Simulated a genuine SMTP failure (bogus, unreachable host) and
+  confirmed the `mail()` fallback caught it and delivered successfully
+  — proving layer 1 actually works, not just falls through silently.
+- Simulated a total failure (bogus SMTP host + a `sendmail_path` that
+  can't even be invoked) and confirmed `record_failed_lead_email()`
+  fires and writes the complete lead details to
+  `data/failed-leads.log`.
+- Re-ran the normal happy-path quote-form and scheduler-booking flows
+  end-to-end (fake-sendmail local test) — both still send both their
+  emails correctly with no regression, and (correctly) no
+  `failed-leads.log` entry was created since nothing actually failed.
+- Full 40-route regression check — no regressions.

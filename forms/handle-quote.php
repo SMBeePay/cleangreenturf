@@ -94,6 +94,10 @@ $sent = send_transactional_email($mailConfig, $businessInfo['email'], $businessI
 
 if (!$sent) {
     error_log('Quote form submission failed to send for ' . $email);
+    // Both SMTP and the mail() fallback failed inside send_transactional_email()
+    // — record the raw lead so it isn't lost even though the visitor sees
+    // an error (they might not retry).
+    record_failed_lead_email('Quote form (' . $service . ')', $subject, $body);
     redirect_with_error('send_failed');
 }
 

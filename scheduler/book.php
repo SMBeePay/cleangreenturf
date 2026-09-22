@@ -109,20 +109,30 @@ send_transactional_email(
     $customerBody
 );
 
+$ownerSubject = 'New Estimate Booked — ' . $name . ' — ' . $prettyWhen;
 $ownerBody = "New turf installation estimate booked online.\n\n"
     . "Name: $name\nPhone: $phone\nEmail: $email\nAddress: $address\nWhen: $prettyWhen\n"
     . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n\n"
     . 'Manage: ' . $businessInfo['domain'] . "/admin/index.php\n";
 
-send_transactional_email(
+$ownerNotified = send_transactional_email(
     $mailConfig,
     $businessInfo['email'],
     $businessInfo['name'],
-    'New Estimate Booked — ' . $name . ' — ' . $prettyWhen,
+    $ownerSubject,
     $ownerBody,
     $email,
     $name
 );
+if (!$ownerNotified) {
+    // Unlike the quote form, a booking is never rejected over this — the
+    // appointment is already safely in the database and visible in
+    // /admin either way. But silently losing the notification email
+    // defeats the whole point of it, so at least log it as loudly as the
+    // quote form does, plus the same last-resort raw-details record.
+    error_log('Scheduler booking owner notification failed to send for appointment #' . $result['id']);
+    record_failed_lead_email('Scheduler booking #' . $result['id'], $ownerSubject, $ownerBody);
+}
 
 $slotDateTime = new DateTime($slotStart, new DateTimeZone($schedulerConfig['timezone']));
 $landingPageUrl = zoho_landing_page_url($businessInfo, '/schedule-turf-installation-estimate');

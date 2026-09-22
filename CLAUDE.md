@@ -436,6 +436,32 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   working, closing out the two items above. See `docs/audit-findings.md`
   "Google Calendar: switched to domain-wide delegation" and "...verified
   live end-to-end."
+- **Lead-notification failsafe added**: owner asked whether a Zoho (or
+  other) outage could ever cost him a lead — specifically whether he's
+  guaranteed at least an email for every quote-form submission and
+  scheduler booking. Audit found two real gaps: `send_transactional_email()`
+  only fell back to plain `mail()` when SMTP was unconfigured, not when
+  SMTP was configured but genuinely failed at runtime; and
+  `scheduler/book.php` never checked the owner-notification email's
+  result at all (unlike the quote form, which already does). Fixed with
+  three layers: (1) `mail()` fallback now fires on any SMTP failure, not
+  just "unconfigured" — one shared function, covers every caller; (2)
+  the scheduler now checks and logs a failed owner notification instead
+  of staying silent, without rejecting the booking itself (it's already
+  safely in the database); (3) a new `record_failed_lead_email()` writes
+  full lead details to `data/failed-leads.log` as a true last resort when
+  BOTH delivery paths fail. Honest caveat found while testing: PHP's
+  `mail()` almost always returns `true` even when real delivery fails
+  downstream, so layer 3 mainly catches total local mail-transport
+  misconfiguration, not bounces or spam-foldering — a real
+  delivery-tracking service would be needed to catch those, which is a
+  bigger change than asked for here. Verified: a simulated SMTP failure
+  was caught by the `mail()` fallback and actually delivered; a
+  simulated total failure (both paths broken) correctly triggered the
+  last-resort log; normal happy-path quote-form and booking flows still
+  send both their emails with no regression; full route regression
+  passed. See `docs/audit-findings.md` "Lead-notification failsafe:
+  automatic mail() fallback + last-resort log."
 
 **Not done yet:**
 - Domain cutover (pointing cleangreenturf.com at this Hostinger
