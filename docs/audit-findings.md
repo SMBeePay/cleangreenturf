@@ -1863,3 +1863,33 @@ extra insurance on top, not a guarantee of catching every kind of
   emails correctly with no regression, and (correctly) no
   `failed-leads.log` entry was created since nothing actually failed.
 - Full 40-route regression check — no regressions.
+
+## Scheduler calendar had dead whitespace to the right before a date was picked
+
+Owner flagged a large empty area to the right of the calendar on
+`/schedule-turf-installation-estimate` (and, by the same shared widget,
+`/reschedule`).
+
+Root cause: `.scheduler__layout` (wrapping the calendar and the
+time-slot list side by side) was a fixed two-column grid
+(`grid-template-columns: 1fr 1fr`) at 640px and up, regardless of
+whether the time-slot column actually had anything in it. Before a date
+is selected, `.scheduler-slots` is `hidden` — but the grid still
+reserved an equal-width second column for it, leaving the calendar
+looking squeezed into the left half with a blank column next to it.
+
+Fix: the two-column layout now only applies once a date is actually
+picked. `assets/js/scheduler.js` toggles a new `.scheduler__layout--split`
+class alongside the existing `slotsEl.hidden` toggle (in both
+`loadMonth()`, which hides the slots panel again when navigating
+months, and `selectDate()`, which reveals it) — `assets/css/style.css`'s
+two-column rule now targets that class instead of the bare layout
+element. Calendar day cells already used `aspect-ratio: 1` with
+`repeat(7, 1fr)` columns, so they scale up cleanly to fill the full
+width rather than distorting.
+
+Verified with headless-browser screenshots: full-width calendar with no
+dead space before picking a date, correct two-column split (calendar +
+time list) immediately after picking one, and mobile (390px) unaffected
+(already single-column throughout, stacks calendar then times as
+before). Full 40-route regression re-run — no regressions.

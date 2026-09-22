@@ -599,9 +599,14 @@ blockquote img {
 }
 .scheduler__current svg { width: 16px; height: 16px; vertical-align: -2px; color: var(--green-700); }
 
+/* Single column (calendar only, full width) until a date is picked and
+   the time-slot list actually has something to show — otherwise the
+   grid reserved an equal-width second column for nothing, leaving a
+   large empty gap to the right of the calendar. JS toggles
+   --split alongside showing/hiding the slots panel. */
 .scheduler__layout { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
 @media (min-width: 640px) {
-    .scheduler__layout { grid-template-columns: 1fr 1fr; }
+    .scheduler__layout--split { grid-template-columns: 1fr 1fr; }
 }
 
 .scheduler-cal__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }

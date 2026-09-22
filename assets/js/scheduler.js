@@ -18,6 +18,7 @@
 
     var calendarEl = root.querySelector('[data-scheduler-calendar]');
     var slotsEl = root.querySelector('[data-scheduler-slots]');
+    var layoutEl = root.querySelector('.scheduler__layout');
     var formEl = root.querySelector('[data-scheduler-form]');
     var confirmEl = root.querySelector('[data-scheduler-confirm]');
     var cancelledEl = root.querySelector('[data-scheduler-cancelled]');
@@ -128,6 +129,7 @@
     function loadMonth() {
         clearError();
         slotsEl.hidden = true;
+        layoutEl.classList.remove('scheduler__layout--split');
         formEl.hidden = true;
         fetch('/scheduler/availability.php?month=' + monthKey(viewYear, viewMonth))
             .then(function (r) { return r.json(); })
@@ -144,6 +146,7 @@
         btnEl.classList.add('scheduler-cal__day--selected');
 
         slotsEl.hidden = false;
+        layoutEl.classList.add('scheduler__layout--split');
         slotsEl.innerHTML = '<p class="scheduler-slots__loading">Loading times…</p>';
         formEl.hidden = true;
 
