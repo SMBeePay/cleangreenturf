@@ -1749,3 +1749,17 @@ access to every calendar he owns, exactly matching the original ask
 ("any of my Clean Green Turf calendars"). Remaining step is adding the
 same four `GOOGLE_*` values to `.env` on the live Hostinger server (this
 was verified from a local `.env`, gitignored as always, never committed).
+
+## Google Calendar sync confirmed live via a real website booking (not just a script test)
+
+Final confirmation: owner booked a real test appointment through the
+actual live site (`/schedule-turf-installation-estimate`), not a script
+against the API directly. It appeared correctly on the Turf Install
+Estimates Google Calendar as "Turf Installation Estimate — Andrew Neal,"
+with the correct date/time, address, phone, email, notes, and a working
+reschedule/cancel link in the description — exactly matching what
+`scheduler/book.php` constructs. This is the real end-to-end path (form
+submit → PHP → Google Calendar API) working in production, not just the
+underlying function verified in isolation. Google Calendar sync and
+dynamic availability are both live and confirmed working on
+cleangreenturf.com's actual hosting.
