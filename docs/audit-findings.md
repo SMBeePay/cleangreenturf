@@ -1963,3 +1963,20 @@ too. Also checked an inner location page (`/mckinney-tx-turf-cleaning`,
 a 5-line wrapping H1) and the plain-gradient hero (`/about`) — both
 render correctly, confirming the fix generalizes rather than being a
 homepage-only patch. Full 40-route regression re-run — no regressions.
+
+## Quote form turf-size ranges updated
+
+Owner asked for different turf-size brackets on the quote form's "Approx.
+Size of Your Turf Area" dropdown: under 500, 500-1,000, 1,000-2,000, and
+2,000+ sq ft — replacing the previous 500-1,500 / 1,500-3,000 / 3,000+
+brackets. Updated in both places this field appears:
+`includes/quote-form.php` (the shared quote form on `/contact` and the
+homepage) and `includes/quote-form-ga.php` (the Google Ads landing
+page's own copy of the form). The "Not sure" catch-all option and the
+"Less than 500 sq ft" bottom bracket were left as-is since they weren't
+part of the requested change. No other file referenced the old bracket
+values (confirmed via a full-codebase grep) — this dropdown's value is
+stored as free text in the lead email/Zoho Description field, not
+validated against a fixed set server-side, so no other code needed to
+change. Verified both forms render the new options correctly and the
+full 40-route regression passes.
