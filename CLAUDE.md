@@ -470,13 +470,15 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   confirmed working end-to-end on real infrastructure).
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder
-  timing fixed" above for the query-level local test). Owner tried a
-  live test booking but accidentally deleted its Google Calendar event
-  before the reminder window hit — doesn't block the text itself (the
-  reminder cron checks the scheduler's own appointment database, not
-  Google Calendar), but deferring full verification to the first real
-  customer booking rather than re-testing manually right now; revisit
-  once one comes in. (2)
+  timing fixed" above for the query-level local test). Owner made a live
+  test booking, then separately deleted its event directly from Google
+  Calendar (not via the site's cancel flow) — confirmed this has zero
+  effect on the reminder: `bin/send-reminders.php` only reads the
+  scheduler's own SQLite database, never Google Calendar, so the
+  underlying appointment is untouched and the text should still fire
+  normally on schedule. Deferring final confirmation to whenever that
+  fires (or the first real customer booking) rather than re-testing
+  manually right now. (2)
   ~~An **hourly** Hostinger cron job needs to be set up~~ **Done** — owner
   created it in hPanel (Advanced > Cron Jobs): `php
   public_html/bin/send-reminders.php`, "Once an hour (0 * * * *)". Not
