@@ -2006,3 +2006,59 @@ rather than the Hostinger staging subdomain used throughout the rest of
 this project. Also caught and fixed one real mobile bug in the same
 session, found only once real production DNS/traffic was in play (see
 "Hero CTA button clipped on mobile" above).
+
+## Address validation added to quote form and scheduler
+
+Owner reported a real spam-shaped lead on the live site: a cleaning quote
+submitted with "n/a" as the address. Every field on both the quote form
+and the scheduler's booking form was already marked `required` in HTML
+(name, service, phone, email, address, turf size, frequency — notes is
+the one intentionally optional field), but that's client-side only and
+easy to bypass (a bot posting directly, or a browser autofill quirk), and
+even a filled-in address field was never checked for being an actual
+address rather than junk text.
+
+Added `includes/validation.php`, shared by `forms/handle-quote.php` and
+`scheduler/book.php`:
+- `looks_like_real_address()` — rejects known junk phrases ("n/a", "na",
+  "none", "test", "asdf", "xxx", "tbd", "unknown", a bare "123", etc.,
+  matched after stripping punctuation/case), a single repeated character,
+  anything under 6 characters, and anything with no digit unless it's at
+  least 15 characters (covers the rare fully-spelled-out address with no
+  house number, e.g. "One Microsoft Way," without letting through short
+  junk). Verified against 18 cases (12 spam-shaped strings, 6 realistic
+  addresses including a PO box and a no-digit spelled-out address) — all
+  passed.
+- `quote_form_error_message()` — one shared human-readable message per
+  error code, used by both the quote form's redirect-based error banner
+  and the scheduler's existing AJAX error display.
+
+Server-side changes:
+- `forms/handle-quote.php` now rejects a submission with a blank turf
+  size or frequency (previously only name/phone/email/address were
+  required server-side — the two dropdowns could be bypassed to submit
+  empty), and rejects an address that fails `looks_like_real_address()`,
+  both via the existing `redirect_with_error()` pattern.
+- `scheduler/book.php` gets the same address check — an in-person
+  installation estimate visit needs a real address at least as much as a
+  cleaning quote does.
+- Fixed a related pre-existing gap while touching this: `handle-quote.php`
+  always redirected errors to `/contact` regardless of which page the
+  visitor actually submitted from (home, `/contact`, or the Google Ads
+  landing page), and no page ever displayed the `?error=` it set — so a
+  rejected submission silently bounced with zero feedback. Added
+  `quote_form_redirect_target()`, which sends the visitor back to
+  whichever of those three known pages they came from (via `Referer`,
+  restricted to an allowlist of this site's own paths — never redirects
+  to an arbitrary Referer, to avoid an open-redirect), and added a
+  `.quote-form__error` banner (styled to match the scheduler's existing
+  error banner) to both `includes/quote-form.php` and
+  `includes/quote-form-ga.php` that renders the friendly message for
+  whatever `?error=` code is present.
+- `assets/js/scheduler.js`'s existing `errorMessages` map gets a new
+  `invalid_address` entry; it already had a generic fallback so this
+  wasn't a functional gap, just a missing specific message.
+
+Verified: `php -l` on all five touched/new PHP files, the full 40-route
+regression (still all 200 with exactly one H1 each), and a live request
+to `/contact?error=invalid_address` rendering the correct banner text.

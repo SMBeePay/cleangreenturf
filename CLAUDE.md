@@ -488,6 +488,23 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   `docs/audit-findings.md` "Domain cutover complete and verified live"
   and "Hero CTA button clipped on mobile" for the full writeups.
 
+- **Address validation added to quote form and scheduler**: a real lead
+  came through the live quote form with "n/a" as the address. All quote-
+  form and scheduler fields except notes were already `required` in
+  HTML, but that's bypassable and the address itself was never checked
+  for being a real address. Added `includes/validation.php`
+  (`looks_like_real_address()` — rejects junk phrases, single-repeated-
+  character strings, anything under 6 characters, and anything with no
+  digit unless it's 15+ characters, verified against 18 spam/real-address
+  test cases) shared by `forms/handle-quote.php` and `scheduler/book.php`.
+  Also made turf size/frequency actually required server-side (previously
+  only client-side), and fixed a related gap: rejected submissions now
+  redirect back to whichever page (home/`/contact`/GA landing) the
+  visitor came from — restricted to an allowlist, never an open redirect
+  — with a real error banner, instead of always bouncing to `/contact`
+  with silent, invisible failure. See `docs/audit-findings.md` "Address
+  validation added to quote form and scheduler."
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

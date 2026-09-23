@@ -453,6 +453,10 @@ blockquote img {
 .quote-form-wrap__head { margin-bottom: var(--space-3); }
 .quote-form-wrap__head h3 { margin-top: 0; }
 .quote-form-wrap__head p { margin-bottom: 0; color: var(--ink-faint); }
+.quote-form__error {
+    background: #fdeceb; border: 1px solid #f3b9b3; color: #8c1d13; border-radius: var(--radius-sm);
+    padding: 0.8em 1em; margin-bottom: var(--space-3); font-size: var(--step--1);
+}
 .quote-form { display: block; }
 .quote-form__row { margin-bottom: var(--space-3); }
 .quote-form__row label {

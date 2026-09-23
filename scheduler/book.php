@@ -26,6 +26,7 @@ require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/scheduler.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
 require_once __DIR__ . '/../includes/google-calendar.php';
+require_once __DIR__ . '/../includes/validation.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
@@ -61,6 +62,9 @@ if ($name === '' || $phone === '' || $email === '' || $address === '' || $slotSt
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     scheduler_json_fail('invalid_email');
+}
+if (!looks_like_real_address($address)) {
+    scheduler_json_fail('invalid_address');
 }
 if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $slotStart)) {
     scheduler_json_fail('invalid_slot');

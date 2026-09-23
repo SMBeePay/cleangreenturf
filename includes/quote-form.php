@@ -18,6 +18,8 @@
  * that's most of the site's lead volume today.
  */
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/validation.php';
+$quoteFormError = trim((string)($_GET['error'] ?? ''));
 ?>
 <!-- quote-form:start -->
 <div class="quote-form-wrap" id="free-quote">
@@ -25,6 +27,9 @@ require_once __DIR__ . '/icons.php';
         <h3>Get Your Free Quote</h3>
         <p>Fast response, no obligation. We usually reply same-day.</p>
     </div>
+    <?php if ($quoteFormError !== ''): ?>
+    <p class="quote-form__error" role="alert"><?= htmlspecialchars(quote_form_error_message($quoteFormError), ENT_QUOTES) ?></p>
+    <?php endif; ?>
     <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate>
         <div class="quote-form__row">
             <label for="qf-name">Name*</label>

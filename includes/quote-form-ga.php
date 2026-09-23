@@ -10,6 +10,8 @@
  * `service` is a fixed hidden field here instead of a visible dropdown.
  */
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/validation.php';
+$quoteFormError = trim((string)($_GET['error'] ?? ''));
 ?>
 <!-- quote-form-ga:start -->
 <div class="quote-form-wrap" id="lander-free-quote">
@@ -17,6 +19,9 @@ require_once __DIR__ . '/icons.php';
         <h3>Get Your Free Turf Cleaning Quote</h3>
         <p>Fast response, no obligation. We usually reply same-day.</p>
     </div>
+    <?php if ($quoteFormError !== ''): ?>
+    <p class="quote-form__error" role="alert"><?= htmlspecialchars(quote_form_error_message($quoteFormError), ENT_QUOTES) ?></p>
+    <?php endif; ?>
     <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate>
         <input type="hidden" name="service" value="cleaning">
         <div class="quote-form__row">

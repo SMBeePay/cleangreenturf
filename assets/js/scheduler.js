@@ -199,6 +199,7 @@
         slot_unavailable: 'That time was just booked by someone else — please pick another.',
         missing_fields: 'Please fill in all the required fields.',
         invalid_email: 'Please enter a valid email address.',
+        invalid_address: 'Please enter your real street address — we need it to schedule the estimate visit.',
         already_cancelled: 'This appointment has already been cancelled.',
         not_found: 'We could not find that appointment.'
     };

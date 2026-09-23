@@ -28,13 +28,29 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
+require_once __DIR__ . '/../includes/validation.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
 $zohoConfig = require __DIR__ . '/../config/zoho.php';
 
+// Send a rejected submission back to whichever page it actually came from
+// (home, /contact, or the Google Ads landing page) rather than always to
+// /contact, so the visitor sees the error next to the form they filled
+// in. Restricted to this site's own known form pages — never redirects to
+// an arbitrary Referer — to avoid turning this into an open redirect.
+function quote_form_redirect_target(): string {
+    $path = parse_url((string)($_SERVER['HTTP_REFERER'] ?? ''), PHP_URL_PATH);
+    $normalized = $path !== null ? rtrim($path, '/') : '';
+    if ($normalized === '') {
+        $normalized = '/';
+    }
+    $known = ['/', '/contact', '/dfw-turf-cleaning-request-ga'];
+    return in_array($normalized, $known, true) ? $normalized : '/contact';
+}
+
 function redirect_with_error(string $reason): never {
-    header('Location: /contact?error=' . urlencode($reason));
+    header('Location: ' . quote_form_redirect_target() . '?error=' . urlencode($reason));
     exit;
 }
 
@@ -62,12 +78,16 @@ if (!in_array($service, ['cleaning', 'repair', 'cleaning_repair'], true)) {
     $service = 'cleaning';
 }
 
-if ($name === '' || $phone === '' || $email === '' || $address === '') {
+if ($name === '' || $phone === '' || $email === '' || $address === '' || $turfSize === '' || $frequency === '') {
     redirect_with_error('missing_fields');
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     redirect_with_error('invalid_email');
+}
+
+if (!looks_like_real_address($address)) {
+    redirect_with_error('invalid_address');
 }
 
 // Strip anything that could be used for header injection via a crafted field.
