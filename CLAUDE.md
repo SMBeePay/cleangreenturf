@@ -505,6 +505,17 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   with silent, invisible failure. See `docs/audit-findings.md` "Address
   validation added to quote form and scheduler."
 
+- **Turf repair mention on Installation page fixed**: "see our turf
+  repair services instead" was rendering as a full-width green button
+  mid-paragraph (a CSS rule meant for standalone `/#free-quote` CTA
+  links also matched this inline one via `:only-child`, which ignores
+  surrounding text nodes) and linked to the homepage quote form instead
+  of the actual `/turf-repair` page. Fixed by pointing the link at
+  `/turf-repair`, which also makes it render as normal inline text since
+  the button CSS only targets the `/#free-quote` href. See
+  `docs/audit-findings.md` "Turf repair mention on the Installation page:
+  button → inline link, and pointed at the right page."
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

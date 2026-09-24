@@ -62,7 +62,7 @@
 <p>We install artificial turf throughout the Dallas Fort-Worth Metroplex — backyards, front yards, side yards, dog runs, play areas, and putting greens. Whether you want a full-yard replacement or a smaller pet-friendly patch, we'll walk the space with you and give you a straight answer on scope and cost before any work starts.</p>
 
 <h3>Installation, Then Ongoing Care</h3>
-<p>Because we're a cleaning company first, our installs are built to be maintained &mdash; and we're the same team you can call for the regular cleanings, odor treatments, and infill top-offs that keep new turf looking new for years. If your turf was installed by someone else and needs a fix instead of a full replacement, see our <a href="/#free-quote">turf repair services</a> instead.</p>
+<p>Because we're a cleaning company first, our installs are built to be maintained &mdash; and we're the same team you can call for the regular cleanings, odor treatments, and infill top-offs that keep new turf looking new for years. If your turf was installed by someone else and needs a fix instead of a full replacement, see our <a href="/turf-repair">turf repair services</a> instead.</p>
 
 <h3>Ready to Get Started?</h3>
 <p>Pick a day and time that works for you and we'll come take a look, measure, and put together a free, no-pressure quote.</p>

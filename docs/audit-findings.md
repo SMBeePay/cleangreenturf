@@ -2062,3 +2062,31 @@ Server-side changes:
 Verified: `php -l` on all five touched/new PHP files, the full 40-route
 regression (still all 200 with exactly one H1 each), and a live request
 to `/contact?error=invalid_address` rendering the correct banner text.
+
+## Turf repair mention on the Installation page: button → inline link, and pointed at the right page
+
+Owner flagged a real visual bug: on `/turf-installation`, the sentence
+"...see our turf repair services instead" rendered the words "turf
+repair services" as a full-width green button in the middle of a
+paragraph, rather than as normal inline linked text. Root cause: a CSS
+rule (`assets/css/style.css` — "Standalone CTA links inside migrated
+content, styled as real buttons") turns any `<a href="/#free-quote">`
+into a button, using `:only-child` to target links that are the sole
+element in their paragraph. `:only-child` only counts element siblings,
+not surrounding text nodes, so it matched here too even though the link
+sits inline in a full sentence with real prose text on both sides — an
+unintended side effect for this occurrence.
+
+Also found the link was pointing at the wrong place: `/#free-quote` (the
+homepage's quote form), when the actual Turf Repair page (`/turf-repair`)
+already exists and is what the sentence is describing — the homepage and
+`/about` both correctly link "repair" mentions there already, so this
+looks like a copy-paste-path miss when `/turf-installation` was written.
+
+Fixed by changing the href from `/#free-quote` to `/turf-repair` in
+`content/pages/turf-installation.php`. That both sends visitors to the
+actual repair page instead of a generic quote form, and — since the
+button CSS only targets the literal `/#free-quote` href — makes it
+render as a normal inline underlined link (`.prose a:not(.btn)`),
+matching every other in-sentence link on the page. Verified the rendered
+HTML, and the full 40-route regression still passes.
