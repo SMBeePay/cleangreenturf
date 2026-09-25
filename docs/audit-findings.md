@@ -2135,3 +2135,31 @@ Verified: `php -l` on all six touched files, `looks_like_real_city()`
 against 15 test cases, the full 40-route regression, the City input
 rendering on `/contact`, the GA landing page, and the scheduler's book
 mode, and its absence on `/reschedule`.
+
+## Turf-size dropdown split further: 2,500+ flagged as needing a closer look
+
+Owner asked to split the turf-size ranges further and call out large
+yards specifically: "over 2,500 probably needs custom pricing or a
+closer eye." Updated the dropdown on both `includes/quote-form.php` and
+`includes/quote-form-ga.php` from Less than 500 / 500–1,000 / 1,000–2,000
+/ 2,000+ to Less than 500 / 500–1,000 / 1,000–1,500 / 1,500–2,500 /
+2,500+.
+
+Went a step further than just the dropdown text, since the actual intent
+was operational (get a closer look at big jobs, not just a finer-grained
+label): `forms/handle-quote.php` now flags any submission where
+`turf_size === '2500+ sq ft'` —
+- Owner notification email subject gets a "⚠️ Large Job (2,500+ sq ft) —"
+  prefix instead of the usual "New Quote Request —", so it stands out at
+  a glance in the inbox.
+- A "*** 2,500+ sq ft — may need custom pricing or a closer look before
+  quoting. ***" line is added at the top of both the owner email body and
+  the Zoho Deal `Description` (both cleaning and repair branches, since
+  `$dealDetails` is shared by both).
+- The Zoho Deal Name also gets a ⚠️ prefix for the cleaning-pipeline case.
+
+Customer-facing copy (the customer confirmation email) is unchanged —
+this is purely an internal routing/attention signal, not a price
+disclosed to the visitor. Verified: `php -l`, the full 40-route
+regression, both forms rendering the five size options correctly, and
+the flag firing only for the exact `2500+ sq ft` value (not `1500-2500`).

@@ -535,6 +535,18 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   `docs/audit-findings.md` "City field added to quote form and
   scheduler."
 
+- **Turf-size dropdown split further; 2,500+ flagged for a closer look**:
+  owner wanted large yards called out specifically ("over 2,500 probably
+  needs custom pricing or a closer eye"). Split the ranges from Less than
+  500/500–1,000/1,000–2,000/2,000+ to Less than 500/500–1,000/1,000–1,500/
+  1,500–2,500/2,500+ on both quote forms, and made `2500+ sq ft`
+  submissions actually stand out operationally, not just cosmetically: a
+  "⚠️ Large Job" subject prefix on the owner email, a note at the top of
+  the email body and Zoho Deal Description, and a ⚠️ prefix on the Zoho
+  Deal Name. Customer-facing copy unchanged. See `docs/audit-findings.md`
+  "Turf-size dropdown split further: 2,500+ flagged as needing a closer
+  look."
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

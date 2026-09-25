@@ -111,9 +111,18 @@ $city = clean_line($city);
 // two same-day leads came through with only a street address and no city.
 $address = "$address, $city";
 
-$subject = 'New Quote Request — ' . $name;
+// The 2,500+ sq ft option is its own bracket (not just the top of "2,000+")
+// because a yard that large probably needs custom pricing or an in-person
+// look rather than a standard quote — flag it up front so it doesn't get
+// answered with the same form-letter price as everything else.
+$isLargeJob = $turfSize === '2500+ sq ft';
+
+$subject = ($isLargeJob ? '⚠️ Large Job (2,500+ sq ft) — ' : 'New Quote Request — ') . $name;
 
 $body = "New turf cleaning quote request from cleangreenturf.com\n\n";
+if ($isLargeJob) {
+    $body .= "*** 2,500+ sq ft — may need custom pricing or a closer look before quoting. ***\n\n";
+}
 $body .= "Name: $name\n";
 $body .= "Phone: $phone\n";
 $body .= "Email: $email\n";
@@ -165,7 +174,8 @@ $leadSource = str_contains($landingPageUrl, '/dfw-turf-cleaning-request-ga')
     ? ZOHO_LEAD_SOURCE_GOOGLE_ADS
     : ZOHO_LEAD_SOURCE_WEBSITE;
 
-$dealDetails = "Phone: $phone\nEmail: $email\nAddress: $address\n"
+$dealDetails = ($isLargeJob ? "*** 2,500+ sq ft — may need custom pricing or a closer look before quoting. ***\n\n" : '')
+    . "Phone: $phone\nEmail: $email\nAddress: $address\n"
     . 'Approx Size of Turf Area: ' . ($turfSize !== '' ? $turfSize : 'Not provided') . "\n"
     . 'Cleaning Frequency: ' . ($frequency !== '' ? $frequency : 'Not specified') . "\n"
     . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
@@ -194,7 +204,7 @@ if ($service === 'repair' || $service === 'cleaning_repair') {
     ]);
 } else {
     zoho_push_lead($zohoConfig, $name, $email, $phone, [
-        'Deal_Name' => "$name — Turf Cleaning Quote",
+        'Deal_Name' => ($isLargeJob ? '⚠️ ' : '') . "$name — Turf Cleaning Quote",
         'Pipeline' => ZOHO_PIPELINE_CLEANING,
         'Stage' => ZOHO_STAGE_CLEANING_NEW,
         'Cleaning_Status' => 'New Inquiry',

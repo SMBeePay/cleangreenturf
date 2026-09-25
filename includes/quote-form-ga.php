@@ -50,8 +50,9 @@ $quoteFormError = trim((string)($_GET['error'] ?? ''));
                 <option value="">Select one</option>
                 <option value="Less than 500 sq ft">Less than 500 sq ft</option>
                 <option value="500-1000 sq ft">500–1,000 sq ft</option>
-                <option value="1000-2000 sq ft">1,000–2,000 sq ft</option>
-                <option value="2000+ sq ft">2,000+ sq ft</option>
+                <option value="1000-1500 sq ft">1,000–1,500 sq ft</option>
+                <option value="1500-2500 sq ft">1,500–2,500 sq ft</option>
+                <option value="2500+ sq ft">2,500+ sq ft</option>
                 <option value="Not sure">Not sure</option>
             </select>
         </div>
