@@ -37,8 +37,12 @@ $quoteFormError = trim((string)($_GET['error'] ?? ''));
             <input type="email" id="qfga-email" name="email" required autocomplete="email">
         </div>
         <div class="quote-form__row">
-            <label for="qfga-address">Full Address*</label>
+            <label for="qfga-address">Street Address*</label>
             <input type="text" id="qfga-address" name="address" required autocomplete="street-address">
+        </div>
+        <div class="quote-form__row">
+            <label for="qfga-city">City*</label>
+            <input type="text" id="qfga-city" name="city" required autocomplete="address-level2">
         </div>
         <div class="quote-form__row">
             <label for="qfga-size">Approx. Size of Your Turf Area*</label>

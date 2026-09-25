@@ -516,6 +516,25 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   `docs/audit-findings.md` "Turf repair mention on the Installation page:
   button → inline link, and pointed at the right page."
 
+- **City field added to quote form and scheduler**: two same-day leads
+  came through with only a street address, no city — the business serves
+  many different DFW-area cities and needs to know which. Split the
+  single "Full Address" field into required Street Address + City on all
+  three lead forms (quote form, GA landing page, scheduler booking).
+  Added `looks_like_real_city()` to `includes/validation.php` (same
+  junk-phrase approach as the address check, verified against 15 cases).
+  Both `forms/handle-quote.php` and `scheduler/book.php` fold City into
+  the existing `$address` variable right after validation, so every
+  downstream use (emails, Zoho, the Google Calendar event location)
+  picks it up automatically. Caught and avoided a real regression before
+  shipping: the scheduler's booking widget is shared with the reschedule
+  page, which never reads address/city at all — making City required
+  there too would have permanently blocked rescheduling for existing
+  appointments (an unfillable required field trips the browser's own
+  form validation), so City only renders in book mode. See
+  `docs/audit-findings.md` "City field added to quote form and
+  scheduler."
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

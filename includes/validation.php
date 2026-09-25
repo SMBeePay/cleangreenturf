@@ -52,12 +52,48 @@ function looks_like_real_address(string $address): bool {
     return true;
 }
 
+/**
+ * Same idea as looks_like_real_address() but for the separate City field —
+ * added after two same-day leads came through with only a street address
+ * ("1333 Windflower Drive") and no city, which the business needs to know
+ * since it serves many different DFW-area cities (plus a few in CA). A
+ * city name is letters/spaces/hyphens/apostrophes, never digits.
+ */
+function looks_like_real_city(string $city): bool {
+    $normalized = strtolower(trim($city));
+    $stripped = trim(preg_replace('/\s+/', ' ', preg_replace("/[^a-z' -]/", '', $normalized)) ?? '');
+
+    $junkPhrases = [
+        'na', 'n a', 'none', 'no', 'nil', 'nope', 'test', 'testing',
+        'asdf', 'xx', 'xxx', 'tbd', 'unknown', 'city', 'my city', 'idk',
+        'notapplicable', 'not applicable', 'null', 'undefined',
+    ];
+    if ($stripped === '' || in_array($stripped, $junkPhrases, true)) {
+        return false;
+    }
+    if (preg_match('/^(.)\1*$/', $stripped)) {
+        return false; // a single repeated character
+    }
+    if (!preg_match('/[a-zA-Z]/', $city)) {
+        return false;
+    }
+    if (mb_strlen($stripped) < 2) {
+        return false;
+    }
+    if (preg_match('/\d/', $city)) {
+        return false; // a city name has no digits — a street address doesn't belong here
+    }
+
+    return true;
+}
+
 /** Human-readable copy for error codes forms/handle-quote.php and scheduler/book.php can return. */
 function quote_form_error_message(string $code): string {
     $messages = [
         'missing_fields' => 'Please fill in all the required fields.',
         'invalid_email' => 'Please enter a valid email address.',
         'invalid_address' => 'Please enter your real street address — we need it to schedule on-site service.',
+        'invalid_city' => 'Please enter the city your property is in.',
         'send_failed' => 'Something went wrong sending your request. Please call us instead.',
     ];
     return $messages[$code] ?? 'Something went wrong. Please try again or call us.';

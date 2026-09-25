@@ -70,6 +70,7 @@ $name = trim((string)($_POST['name'] ?? ''));
 $phone = trim((string)($_POST['phone'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
 $address = trim((string)($_POST['address'] ?? ''));
+$city = trim((string)($_POST['city'] ?? ''));
 $turfSize = trim((string)($_POST['turf_size'] ?? ''));
 $frequency = trim((string)($_POST['frequency'] ?? ''));
 $notes = trim((string)($_POST['notes'] ?? ''));
@@ -78,7 +79,7 @@ if (!in_array($service, ['cleaning', 'repair', 'cleaning_repair'], true)) {
     $service = 'cleaning';
 }
 
-if ($name === '' || $phone === '' || $email === '' || $address === '' || $turfSize === '' || $frequency === '') {
+if ($name === '' || $phone === '' || $email === '' || $address === '' || $city === '' || $turfSize === '' || $frequency === '') {
     redirect_with_error('missing_fields');
 }
 
@@ -90,6 +91,10 @@ if (!looks_like_real_address($address)) {
     redirect_with_error('invalid_address');
 }
 
+if (!looks_like_real_city($city)) {
+    redirect_with_error('invalid_city');
+}
+
 // Strip anything that could be used for header injection via a crafted field.
 function clean_line(string $value): string {
     return trim(preg_replace('/[\r\n]+/', ' ', $value));
@@ -98,6 +103,13 @@ function clean_line(string $value): string {
 $name = clean_line($name);
 $phone = clean_line($phone);
 $address = clean_line($address);
+$city = clean_line($city);
+
+// Fold the separate City field into $address itself right here so every
+// downstream use below (owner email, customer confirmation, Zoho
+// Description) gets the city automatically without touching each one —
+// two same-day leads came through with only a street address and no city.
+$address = "$address, $city";
 
 $subject = 'New Quote Request — ' . $name;
 

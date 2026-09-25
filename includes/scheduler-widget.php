@@ -46,9 +46,15 @@ $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
                 <input type="email" id="sch-email" name="email" required autocomplete="email" value="<?= htmlspecialchars($existing['email'] ?? '') ?>">
             </div>
             <div class="quote-form__row">
-                <label for="sch-address">Property Address*</label>
+                <label for="sch-address">Property <?= $mode === 'reschedule' ? '' : 'Street ' ?>Address*</label>
                 <input type="text" id="sch-address" name="address" required autocomplete="street-address" value="<?= htmlspecialchars($existing['address'] ?? '') ?>">
             </div>
+            <?php if ($mode !== 'reschedule'): ?>
+            <div class="quote-form__row">
+                <label for="sch-city">City*</label>
+                <input type="text" id="sch-city" name="city" required autocomplete="address-level2">
+            </div>
+            <?php endif; ?>
             <div class="quote-form__row">
                 <label for="sch-notes">Anything we should know before we come out?</label>
                 <textarea id="sch-notes" name="notes" rows="3"><?= htmlspecialchars($existing['notes'] ?? '') ?></textarea>

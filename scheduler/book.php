@@ -53,11 +53,12 @@ $name = trim((string)($_POST['name'] ?? ''));
 $phone = trim((string)($_POST['phone'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
 $address = trim((string)($_POST['address'] ?? ''));
+$city = trim((string)($_POST['city'] ?? ''));
 $notes = trim((string)($_POST['notes'] ?? ''));
 $slotStart = trim((string)($_POST['slot_start'] ?? ''));
 $smsOptIn = !empty($_POST['sms_opt_in']);
 
-if ($name === '' || $phone === '' || $email === '' || $address === '' || $slotStart === '') {
+if ($name === '' || $phone === '' || $email === '' || $address === '' || $city === '' || $slotStart === '') {
     scheduler_json_fail('missing_fields');
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -65,6 +66,9 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 if (!looks_like_real_address($address)) {
     scheduler_json_fail('invalid_address');
+}
+if (!looks_like_real_city($city)) {
+    scheduler_json_fail('invalid_city');
 }
 if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $slotStart)) {
     scheduler_json_fail('invalid_slot');
@@ -76,6 +80,13 @@ function scheduler_clean_line(string $value): string {
 $name = scheduler_clean_line($name);
 $phone = scheduler_clean_line($phone);
 $address = scheduler_clean_line($address);
+$city = scheduler_clean_line($city);
+
+// Fold City into $address here so every downstream use below (customer
+// confirmation, owner notification, Zoho Description, the Google Calendar
+// event's location) gets it automatically — see forms/handle-quote.php's
+// identical fold for why.
+$address = "$address, $city";
 
 if (!scheduler_slot_is_valid_and_open($slotStart, $schedulerConfig, $gcalConfig)) {
     scheduler_json_fail('slot_unavailable', 409);

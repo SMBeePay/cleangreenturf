@@ -2090,3 +2090,48 @@ button CSS only targets the literal `/#free-quote` href — makes it
 render as a normal inline underlined link (`.prose a:not(.btn)`),
 matching every other in-sentence link on the page. Verified the rendered
 HTML, and the full 40-route regression still passes.
+
+## City field added to quote form and scheduler
+
+Owner reported two same-day leads with only a street address and no
+city ("1333 Windflower Drive" — no city, state, or zip at all), which
+the business needs since it serves many different DFW-area cities (plus
+a few in California). The single free-text "Full Address" field let
+people type just a street and stop there.
+
+Split the address input into two required fields — Street Address and a
+new City field — on all three lead-capture forms: `includes/quote-
+form.php`, `includes/quote-form-ga.php`, and `includes/scheduler-
+widget.php` (book mode only — see below). Added `looks_like_real_city()`
+to `includes/validation.php`, the same junk-phrase/length approach as
+the existing `looks_like_real_address()` but tuned for a city name
+(letters/spaces/hyphens/apostrophes, no digits) — verified against 15
+cases including "n/a"/"test"/"123" (rejected) and "Fort Worth", "St.
+Louis", "O'Fallon", "Winston-Salem" (accepted).
+
+`forms/handle-quote.php` and `scheduler/book.php` both require the new
+`city` field, validate it, then fold it straight into the existing
+`$address` variable (`"$address, $city"`) immediately after validation —
+so every downstream use (owner email, customer confirmation, Zoho
+`Description`, and for the scheduler, the stored DB row and the Google
+Calendar event's location) picks up the city automatically with no
+per-call-site changes needed.
+
+One real regression caught before shipping: the scheduler's booking
+widget (`includes/scheduler-widget.php`) is shared by both the initial
+booking page and the `/reschedule?token=...` page. Making City
+`required` there too would have blocked rescheduling for every
+already-booked appointment, since `scheduler/reschedule.php` never reads
+address/city from the reschedule form at all (only `slot_start` and
+`sms_opt_in` — the contact fields it shows are pre-filled context, not
+actually submitted) — the field would render permanently blank with no
+way to fill it from a legitimate flow, and a required-but-unfillable
+field would trip the browser's own form validation and block submitting
+a reschedule entirely. Fixed by only rendering the City field in `book`
+mode; reschedule mode keeps showing the one combined `address` field
+(now including city) as before.
+
+Verified: `php -l` on all six touched files, `looks_like_real_city()`
+against 15 test cases, the full 40-route regression, the City input
+rendering on `/contact`, the GA landing page, and the scheduler's book
+mode, and its absence on `/reschedule`.
