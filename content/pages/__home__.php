@@ -88,7 +88,7 @@
 <?php require __DIR__ . '/../../includes/quote-form.php'; ?>
 
 <h3>What Our Customers Say</h3>
-<p>Over 100 5-star reviews and growing</p>
+<p>5.0-star rated by 325+ satisfied customers and growing</p>
 <div class="testimonial-grid">
 <blockquote>
 <p>"This company saved my turf! I had so much calcium buildup from city water deposits and after previous cleanings from the original installer, nothing was working. These folks are the real deal and I can't wait to use them for my future routine cleanings. What a great experience."</p>
