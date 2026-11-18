@@ -29,6 +29,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/mailer.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
 require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/spam-guard.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
@@ -62,6 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Honeypot — bots fill every field, real users never see this one.
 if (!empty($_POST['website'])) {
     // Silently "succeed" so bots don't learn the honeypot worked.
+    spam_guard_log('spam-blocked.log', 'honeypot filled', $_POST);
+    header('Location: /dfw-turf-cleaning-request-success');
+    exit;
+}
+
+// Timing token — see includes/spam-guard.php. Only a forged token or an
+// inhumanly fast submission is dropped; a missing one (stale cached page)
+// is let through.
+$timingStatus = spam_guard_timing_status((string)($_POST['form_ts'] ?? ''));
+if ($timingStatus === 'invalid' || $timingStatus === 'too_fast') {
+    spam_guard_log('spam-blocked.log', "timing: $timingStatus", $_POST);
     header('Location: /dfw-turf-cleaning-request-success');
     exit;
 }
@@ -117,9 +129,22 @@ $address = "$address, $city";
 // answered with the same form-letter price as everything else.
 $isLargeJob = $turfSize === '2500+ sq ft';
 
-$subject = ($isLargeJob ? '⚠️ Large Job (2,500+ sq ft) — ' : 'New Quote Request — ') . $name;
+// Soft spam flag (vendor pitches, links in notes) — the owner still gets
+// the email so a false positive is never lost, but it's clearly labeled,
+// and no Zoho Deal or customer auto-reply is created further down.
+$spamSignals = spam_guard_content_signals($notes, $name, $email);
+$isSuspectedSpam = $spamSignals !== [];
+if ($isSuspectedSpam) {
+    spam_guard_log('spam-flagged.log', 'flagged: ' . implode('; ', $spamSignals), $_POST);
+}
+
+$subject = ($isSuspectedSpam ? '[Possible Spam] ' : '')
+    . ($isLargeJob ? '⚠️ Large Job (2,500+ sq ft) — ' : 'New Quote Request — ') . $name;
 
 $body = "New turf cleaning quote request from cleangreenturf.com\n\n";
+if ($isSuspectedSpam) {
+    $body .= "*** Flagged as possible spam (" . implode('; ', $spamSignals) . "). Not added to Zoho, no auto-reply sent. If this is a real customer, add them to Zoho manually. ***\n\n";
+}
 if ($isLargeJob) {
     $body .= "*** 2,500+ sq ft — may need custom pricing or a closer look before quoting. ***\n\n";
 }
@@ -140,6 +165,11 @@ if (!$sent) {
     // an error (they might not retry).
     record_failed_lead_email('Quote form (' . $service . ')', $subject, $body);
     redirect_with_error('send_failed');
+}
+
+if ($isSuspectedSpam) {
+    header('Location: /dfw-turf-cleaning-request-success');
+    exit;
 }
 
 // Customer-facing "thanks for reaching out" confirmation — best-effort,
