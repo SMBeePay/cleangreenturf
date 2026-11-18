@@ -19,10 +19,9 @@
 <img src="/assets/images/bat-photo5-m7v3qvwpl1hjk71q.webp" alt="Artificial turf cleaning technician at work" loading="lazy" width="1600" height="1200" class="prose__photo--capped">
 
 <div class="stats-strip">
-    <div class="stats-strip__item"><span class="stats-strip__number">300+</span><span class="stats-strip__label">Sq Ft Cleaned</span></div>
-    <div class="stats-strip__item"><span class="stats-strip__number">194K</span><span class="stats-strip__label">Satisfied Customers</span></div>
+    <div class="stats-strip__item"><span class="stats-strip__number">325+</span><span class="stats-strip__label">Satisfied Customers</span></div>
+    <div class="stats-strip__item"><span class="stats-strip__number">247K</span><span class="stats-strip__label">Sq Ft Cleaned</span></div>
     <div class="stats-strip__item"><span class="stats-strip__number">5.0★</span><span class="stats-strip__label">Average Rating</span></div>
-    <div class="stats-strip__item"><span class="stats-strip__number">2</span><span class="stats-strip__label">Regions Served</span></div>
 </div>
 
 <h3>Our Turf Cleaning Process</h3>
@@ -89,7 +88,7 @@
 <?php require __DIR__ . '/../../includes/quote-form.php'; ?>
 
 <h3>What Our Customers Say</h3>
-<p>Over 100 5-star reviews and growing</p>
+<p>5.0-star rated by 325+ satisfied customers and growing</p>
 <div class="testimonial-grid">
 <blockquote>
 <p>"This company saved my turf! I had so much calcium buildup from city water deposits and after previous cleanings from the original installer, nothing was working. These folks are the real deal and I can't wait to use them for my future routine cleanings. What a great experience."</p>

@@ -547,6 +547,16 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   "Turf-size dropdown split further: 2,500+ flagged as needing a closer
   look."
 
+- **Quote-form spam defenses**: vendor pitches ("this isn't a service
+  request, I built you a new site...") were getting past the honeypot.
+  Added `includes/spam-guard.php`: a signed render-timestamp token
+  (forged or <4s submissions silently dropped, logged to
+  `data/spam-blocked.log`; missing token allowed, for stale cached pages)
+  and a soft content flag (links in notes, sales-pitch phrases,
+  agency-sounding names) that still emails the owner with a
+  `[Possible Spam]` subject but skips Zoho and the customer auto-reply.
+  See `docs/audit-findings.md` "Quote-form spam."
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

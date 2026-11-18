@@ -2163,3 +2163,42 @@ this is purely an internal routing/attention signal, not a price
 disclosed to the visitor. Verified: `php -l`, the full 40-route
 regression, both forms rendering the five size options correctly, and
 the flag firing only for the exact `2500+ sq ft` value (not `1500-2500`).
+
+## Quote-form spam: timing token + vendor-pitch flagging
+
+**Trigger:** a growing number of vendor solicitations coming through the
+quote form (e.g. "Porchlight Sites": "this isn't a service request... I put
+together a preview of a new site for you", with a demo link in the notes
+and a non-DFW address). These get past the existing honeypot because
+they're filled in field-by-field by browser automation / AI, not by a raw
+POST bot.
+
+**Added `includes/spam-guard.php`, used by `forms/handle-quote.php` and
+both quote forms (`includes/quote-form.php`, `includes/quote-form-ga.php`):**
+
+1. **Timing token (hard block).** Each form now carries a hidden
+   HMAC-signed render timestamp (`form_ts`; key auto-generated into
+   gitignored `data/form-secret.key`). Submitted in under 4 seconds, or
+   with a forged/tampered token → dropped silently (visitor still sees the
+   success page), logged to `data/spam-blocked.log`. A *missing* token is
+   deliberately let through: Hostinger may serve a cached page from before
+   this field existed, and a real lead must never be lost to that. The
+   honeypot now also logs to the same file.
+2. **Content flag (soft).** Links in the notes, sales-pitch phrases ("not a
+   service request", "web design", "SEO", "put this live", etc.), or an
+   agency-sounding name. **Not dropped**: the owner still gets the email,
+   prefixed `[Possible Spam]` with the reasons listed at the top, but no
+   Zoho Deal is created and no auto-reply goes to the submitter (which
+   also stops spammers using the auto-reply to send their text to
+   arbitrary inboxes). Logged to `data/spam-flagged.log`. If a flagged one
+   is a real customer, add them to Zoho by hand.
+
+Verified locally: too-fast → blocked, forged token → blocked, the actual
+Porchlight message → flagged (4 signals), a normal customer → unflagged,
+a token-less (stale cached page) submission → unflagged.
+
+**Not done / possible next step:** Cloudflare Turnstile (free, usually
+invisible CAPTCHA) would stop most automated browsers outright, but needs
+the owner to create a Cloudflare account and site/secret keys. The
+scheduler booking form was left as-is (it requires a JS calendar slot pick
+and hasn't seen this spam).

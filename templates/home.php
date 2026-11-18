@@ -31,7 +31,7 @@ if (preg_match(
 <section class="page-hero">
     <div class="page-hero__media"><?= $heroImg ?></div>
     <div class="page-hero__text">
-        <span class="page-hero__eyebrow"><?= icon('star') ?> 5.0 Rated &middot; 100+ 5-Star Reviews</span>
+        <span class="page-hero__eyebrow"><?= icon('star') ?> 5.0 Rated &middot; 325+ Satisfied Customers</span>
         <h1><?= $heroH1 ?></h1>
         <?php if ($heroTagline): ?><p class="page-hero__sub"><?= $heroTagline ?></p><?php endif; ?>
         <p class="page-hero__services">Turf Cleaning &middot; Installation &middot; Repair</p>
