@@ -52,4 +52,8 @@ return [
     // different Zoho data center (.eu, .in, .com.au, etc).
     'accounts_domain' => env('ZOHO_ACCOUNTS_DOMAIN', 'https://accounts.zoho.com'),
     'api_domain' => env('ZOHO_API_DOMAIN', 'https://www.zohoapis.com'),
+    // Set ZOHO_ATTRIBUTION_FIELDS=1 once the four lead-source fields exist
+    // on Deals (Lead_Source_Detail, First_Touch_Source, Landing_Page,
+    // GA_Client_ID). See includes/attribution.php.
+    'attribution_fields' => env('ZOHO_ATTRIBUTION_FIELDS', '') === '1',
 ];

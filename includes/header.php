@@ -1,6 +1,8 @@
 <?php
 /** Sitewide header: top utility bar, logo, navigation, phone CTA. */
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/page-cta.php';
+$headerCta = page_cta($route);
 $primaryPhone = $businessInfo['regions']['tx']['phone_display'];
 $primaryPhoneTel = $businessInfo['regions']['tx']['phone_e164'];
 ?>
@@ -22,7 +24,7 @@ $primaryPhoneTel = $businessInfo['regions']['tx']['phone_e164'];
                     <?= htmlspecialchars($primaryPhone) ?>
                 </span>
             </a>
-            <a href="/#free-quote" class="btn btn--primary">Free Quote</a>
+            <a href="<?= htmlspecialchars($headerCta['href']) ?>" class="btn btn--primary"><?= htmlspecialchars($headerCta['short']) ?></a>
         </div>
     </div>
 </header>

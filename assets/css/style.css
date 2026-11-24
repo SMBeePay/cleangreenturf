@@ -393,7 +393,7 @@ main { display: block; }
 
 /* ---- Stats strip ---- */
 .stats-strip {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
     background: var(--forest-950);
     padding: var(--space-5); margin: var(--space-6) 0; color: #fff;
     border-top: 3px solid var(--accent-600);
@@ -401,7 +401,7 @@ main { display: block; }
 .stats-strip__item { text-align: center; }
 .stats-strip__number { font-family: var(--font-display); font-size: var(--step-3); font-weight: 700; color: var(--accent-500); display: block; line-height: 1; margin-bottom: 0.25em; }
 .stats-strip__label { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; font-size: var(--step--1); color: #cfe0d3; font-weight: 500; }
-@media (max-width: 700px) { .stats-strip { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .stats-strip { gap: var(--space-2); padding: var(--space-4) var(--space-3); } .stats-strip__number { font-size: var(--step-2); } }
 
 /* ---- Gallery ---- */
 .gallery {
@@ -518,7 +518,7 @@ blockquote img {
 .site-footer__top {
     max-width: var(--max-width); margin: 0 auto;
     padding: var(--space-7) 1.5rem var(--space-5);
-    display: grid; grid-template-columns: 1.6fr repeat(2, 1fr); gap: var(--space-5);
+    display: grid; grid-template-columns: 1.3fr repeat(4, 1fr); gap: var(--space-5);
 }
 .site-footer h2 { color: #fff; margin-top: 0; font-size: var(--step-1); }
 .site-footer h3 { color: #fff; margin-top: 0; font-size: var(--step--1); letter-spacing: 0.08em; }
@@ -540,7 +540,7 @@ blockquote img {
     border-top: 1px solid rgba(255,255,255,0.12);
     text-align: center; padding: var(--space-3); font-size: var(--step--1); color: #7f9689;
 }
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
     .site-footer__top { grid-template-columns: 1fr 1fr; }
     .site-footer__about { grid-column: 1 / -1; }
 }
@@ -671,3 +671,111 @@ blockquote img {
 .scheduler__confirm, .scheduler__cancelled { text-align: center; padding: var(--space-4) 0; }
 .scheduler__confirm-icon { width: 48px; height: 48px; color: var(--accent-600); margin-bottom: var(--space-2); }
 .scheduler__noscript { color: var(--ink-faint); font-size: var(--step--1); }
+
+/* ---- Install SEO plan components (Phase 1) ---- */
+.lead { font-size: var(--step-1); line-height: 1.45; color: var(--ink); }
+.install-intro {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-5);
+    align-items: start; margin: var(--space-5) 0 var(--space-6);
+}
+@media (min-width: 900px) {
+    .install-intro { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+}
+.install-intro .quote-form-wrap { margin: 0; }
+.install-quote .quote-form-wrap__head h2 { margin-top: 0; font-size: var(--step-1); }
+.install-quote input[type=file] { font: inherit; width: 100%; }
+
+.cta-block { margin: var(--space-4) 0; }
+.cta-block__sub { margin: var(--space-2) 0 0; color: var(--ink-soft); font-size: var(--step--1); }
+
+.breadcrumbs ol { list-style: none; margin: 0 0 var(--space-4); padding: 0; display: flex; flex-wrap: wrap; gap: 0.35em; font-size: var(--step--1); color: var(--ink-faint); }
+.breadcrumbs li + li::before { content: "\203A"; margin-right: 0.35em; }
+.breadcrumbs a { color: var(--ink-soft); }
+
+.city-list { font-weight: 600; }
+
+.faq { border-top: 1px solid var(--border); margin: var(--space-3) 0 var(--space-5); }
+.faq__item { border-bottom: 1px solid var(--border); }
+.faq__item summary {
+    cursor: pointer; list-style: none; padding: var(--space-3) 2rem var(--space-3) 0;
+    font-weight: 700; position: relative;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+    content: "+"; position: absolute; right: 0.25rem; top: 50%; transform: translateY(-50%);
+    font-size: 1.4em; color: var(--green-700); font-weight: 400;
+}
+.faq__item[open] summary::after { content: "\2212"; }
+.faq__answer { padding: 0 0 var(--space-3); }
+.faq__answer p { margin: 0; }
+
+.scheduler-notice {
+    max-width: 1100px; margin: var(--space-4) auto 0; padding: var(--space-3) var(--space-4);
+    background: var(--accent-100); border-left: 4px solid var(--accent-600); border-radius: var(--radius);
+}
+/* Numbered lists show their numbers (install steps, cost drivers). */
+.prose > ol { counter-reset: prose-ol; }
+.prose > ol > li { counter-increment: prose-ol; padding-left: 2.2em; }
+.prose > ol > li::before {
+    content: counter(prose-ol); width: 1.6em; height: 1.6em; top: 0.05em;
+    background: var(--forest-900); color: #fff; border-radius: 50%;
+    font-size: 0.85em; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.prose .breadcrumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; margin: 0 0 var(--space-4); padding: 0; }
+.prose .breadcrumbs li { padding: 0; margin: 0; color: var(--ink-faint); display: inline-flex; align-items: center; gap: 0.4em; }
+.prose .breadcrumbs li::before { content: none; }
+.prose .breadcrumbs li + li::before { content: "\203A"; position: static; width: auto; height: auto; background: none; color: var(--ink-faint); }
+.prose .breadcrumbs a { font-weight: 500; }
+
+/* Install pages: shorter hero on phones so the price answer and quote form
+   come up sooner (answer-first layout, install SEO plan). Other pages unchanged. */
+@media (max-width: 640px) {
+    .page-hero--compact { min-height: 0; margin-bottom: var(--space-4); }
+    .page-hero--compact .page-hero__text { padding-top: var(--space-5); padding-bottom: var(--space-5); }
+    .page-hero--compact .page-hero__text h1 { font-size: clamp(1.9rem, 8.5vw, 2.4rem); }
+    .page-hero--compact .page-hero__eyebrow { display: none; }
+}
+
+/* ---- Install SEO plan, Phase 2 ---- */
+.last-updated { font-size: var(--step--1); color: var(--ink-faint); margin: calc(var(--space-2) * -1) 0 var(--space-4); }
+.table-wrap { overflow-x: auto; margin: var(--space-3) 0; }
+.price-table { width: 100%; border-collapse: collapse; background: var(--paper); font-size: var(--step-0); }
+.price-table th, .price-table td { padding: 0.7em 0.9em; text-align: left; border-bottom: 1px solid var(--border); }
+.price-table th { background: var(--forest-900); color: #fff; font-family: var(--font-display); font-weight: 500; letter-spacing: 0.03em; }
+.price-table td:not(:first-child), .price-table th:not(:first-child) { text-align: right; white-space: nowrap; }
+.price-table tbody tr:nth-child(even) { background: var(--cream); }
+
+.calculator {
+    display: grid; gap: var(--space-5); margin: var(--space-4) 0 var(--space-5);
+    background: var(--paper); border: 1px solid var(--border); border-top: 4px solid var(--accent-600);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg); box-shadow: var(--shadow); padding: var(--space-5);
+}
+@media (min-width: 900px) { .calculator { grid-template-columns: 1fr 1fr; align-items: start; } }
+.calculator__helper { font-size: var(--step--1); color: var(--ink-soft); margin: var(--space-1) 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em; }
+.calculator__helper input { width: 5.5em; }
+.calculator__range { font-family: var(--font-display); font-size: var(--step-3); color: var(--forest-900); line-height: 1.1; margin: 0 0 var(--space-2); }
+.calculator__note { font-size: var(--step--1); color: var(--ink-soft); }
+.calculator__form-title { font-size: var(--step-1); margin: var(--space-4) 0 var(--space-3); }
+
+/* Header fits the extra "Turf Installation" nav item (install SEO plan Section 6). */
+.site-nav__list > li > a, .site-nav__dropdown-label { white-space: nowrap; }
+@media (min-width: 901px) and (max-width: 1400px) {
+    .site-nav__list { gap: var(--space-3); }
+    .site-header__phone small { display: none; }
+}
+@media (min-width: 901px) and (max-width: 1150px) {
+    .site-header__phone span { font-size: 0.85em; }
+    .site-header__phone svg { display: none; }
+    .site-nav__list { gap: var(--space-2); letter-spacing: 0.02em; }
+}
+.site-header__phone span, .site-header__phone small { white-space: nowrap; }
+.site-nav__dropdown--single { width: 250px; }
+@media (min-width: 901px) and (max-width: 1150px) {
+    .site-header__logo span { display: none; }
+}
+.prose > p.last-updated { font-size: var(--step--1); color: var(--ink-faint); }
+.guide-list { display: grid; gap: var(--space-3); margin: var(--space-4) 0; }
+@media (min-width: 760px) { .guide-list { grid-template-columns: 1fr 1fr; } }
+.guide-list__item h2 { font-size: var(--step-1); margin: 0 0 var(--space-1); }
+.guide-list__item p { margin: 0; font-size: var(--step--1); }
+.compare-table td:not(:first-child), .compare-table th:not(:first-child) { text-align: left; white-space: normal; }

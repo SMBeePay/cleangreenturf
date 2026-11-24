@@ -27,6 +27,7 @@ require_once __DIR__ . '/../includes/scheduler.php';
 require_once __DIR__ . '/../includes/zoho-crm.php';
 require_once __DIR__ . '/../includes/google-calendar.php';
 require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/attribution.php';
 
 $businessInfo = require __DIR__ . '/../config/business-info.php';
 $mailConfig = require __DIR__ . '/../config/mail.php';
@@ -77,6 +78,8 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $slotStart)) {
 function scheduler_clean_line(string $value): string {
     return trim(preg_replace('/[\r\n]+/', ' ', $value));
 }
+$attribution = attribution_from_post();
+
 $name = scheduler_clean_line($name);
 $phone = scheduler_clean_line($phone);
 $address = scheduler_clean_line($address);
@@ -128,7 +131,8 @@ $ownerSubject = 'New Estimate Booked — ' . $name . ' — ' . $prettyWhen;
 $ownerBody = "New turf installation estimate booked online.\n\n"
     . "Name: $name\nPhone: $phone\nEmail: $email\nAddress: $address\nWhen: $prettyWhen\n"
     . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n\n"
-    . 'Manage: ' . $businessInfo['domain'] . "/admin/index.php\n";
+    . 'Manage: ' . $businessInfo['domain'] . "/admin/index.php\n\n"
+    . attribution_text_block($attribution);
 
 $ownerNotified = send_transactional_email(
     $mailConfig,
@@ -160,12 +164,13 @@ zoho_push_lead($zohoConfig, $name, $email, $phone, [
     'Description' => "Phone: $phone\nEmail: $email\nAddress: $address\nScheduled: $prettyWhen\n"
         . 'SMS reminder opt-in: ' . ($smsOptIn ? 'Yes' : 'No') . "\n"
         . 'Notes: ' . ($notes !== '' ? $notes : 'None') . "\n"
-        . 'Reschedule/cancel link: ' . $rescheduleUrl,
+        . 'Reschedule/cancel link: ' . $rescheduleUrl . "\n\n"
+        . attribution_text_block($attribution),
     'Lead_Channel' => ZOHO_LEAD_CHANNEL_SCHEDULER,
-    'Lead_Source' => ZOHO_LEAD_SOURCE_WEBSITE,
+    'Lead_Source' => attribution_lead_source($attribution, false),
     'Landing_Page_URL' => $landingPageUrl,
     'Service_Line' => ZOHO_SERVICE_LINE_INSTALLATION,
-]);
+] + attribution_zoho_fields($attribution, $zohoConfig));
 
 $slotEndDateTime = (clone $slotDateTime)->modify('+' . (int)$schedulerConfig['slot_minutes'] . ' minutes');
 $gcalEventId = gcal_create_event($gcalConfig, [

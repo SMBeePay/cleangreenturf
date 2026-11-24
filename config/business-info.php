@@ -46,6 +46,9 @@ return [
     'service_areas' => [
         'dfw' => ['Addison', 'Allen', 'Celina', 'Dallas', 'Frisco', 'McKinney', 'Plano', 'Prosper', 'Richardson', 'The Colony', 'Rockwall', 'Royse City'],
         'austin' => ['Austin', 'Round Rock', 'Cedar Park', 'Pflugerville', 'Georgetown', 'San Marcos', 'Kyle', 'Buda', 'Leander', 'Lakeway', 'Hutto'],
+        // East DFW turf-installation cluster (install SEO plan, Section 2.3).
+        // City pages for these come in Phase 3; for now they're schema areaServed only.
+        'install' => ['Royse City', 'Rockwall', 'Heath', 'Fate', 'Forney', 'Wylie', 'McKinney', 'Sachse'],
         'ca' => ['Antioch', 'Berkeley', 'Brentwood', 'Clayton', 'Concord', 'Danville', 'Discovery Bay', 'Dublin', 'Fremont', 'Livermore', 'Oakland', 'Walnut Creek', 'San Ramon'],
     ],
 

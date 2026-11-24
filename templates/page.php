@@ -8,6 +8,9 @@
  * image (e.g. /about) or no leading image+h1 pattern at all.
  */
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/page-cta.php';
+require_once __DIR__ . '/../includes/breadcrumbs.php';
+$pageCta = page_cta($route);
 
 ob_start();
 require __DIR__ . '/../content/pages/' . $route['slug'] . '.php';
@@ -22,7 +25,7 @@ if (preg_match('/^\s*(?:(<img\b[^>]*>)\s*)?<h1[^>]*>(.*?)<\/h1>/is', $content, $
 }
 ?>
 <?php if ($heroH1 !== null): ?>
-<section class="page-hero<?= $heroImg ? '' : ' page-hero--plain' ?>">
+<section class="page-hero<?= $heroImg ? '' : ' page-hero--plain' ?><?= ($route['cta'] ?? '') === 'installation' ? ' page-hero--compact' : '' ?>">
     <?php if ($heroImg): ?>
     <div class="page-hero__media"><?= $heroImg ?></div>
     <?php endif; ?>
@@ -30,7 +33,7 @@ if (preg_match('/^\s*(?:(<img\b[^>]*>)\s*)?<h1[^>]*>(.*?)<\/h1>/is', $content, $
         <span class="page-hero__eyebrow"><?= icon('leaf') ?> Clean Green Turf</span>
         <h1><?= $heroH1 ?></h1>
         <div class="page-hero__ctas">
-            <a href="/#free-quote" class="btn btn--primary">Get a Free Quote</a>
+            <a href="<?= htmlspecialchars($pageCta['href']) ?>" class="btn btn--primary"><?= htmlspecialchars($pageCta['label']) ?></a>
             <a href="tel:<?= htmlspecialchars($businessInfo['regions']['tx']['phone_e164']) ?>" class="btn btn--ghost">
                 <?= icon('phone') ?> <?= htmlspecialchars($businessInfo['regions']['tx']['phone_display']) ?>
             </a>
@@ -40,6 +43,10 @@ if (preg_match('/^\s*(?:(<img\b[^>]*>)\s*)?<h1[^>]*>(.*?)<\/h1>/is', $content, $
 <?php endif; ?>
 
 <div class="prose">
+<?php render_breadcrumbs($route, $currentPath, trim(strip_tags((string)$heroH1))); ?>
+<?php if (!empty($route['date_modified'])): ?>
+<p class="last-updated">Last updated <time datetime="<?= htmlspecialchars($route['date_modified']) ?>"><?= htmlspecialchars(date('F j, Y', strtotime($route['date_modified']))) ?></time></p>
+<?php endif; ?>
 <?= $content ?>
 </div>
 

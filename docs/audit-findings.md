@@ -2163,3 +2163,102 @@ this is purely an internal routing/attention signal, not a price
 disclosed to the visitor. Verified: `php -l`, the full 40-route
 regression, both forms rendering the five size options correctly, and
 the flag firing only for the exact `2500+ sq ft` value (not `1500-2500`).
+
+## Quote-form spam: timing token + vendor-pitch flagging
+
+**Trigger:** a growing number of vendor solicitations coming through the
+quote form (e.g. "Porchlight Sites": "this isn't a service request... I put
+together a preview of a new site for you", with a demo link in the notes
+and a non-DFW address). These get past the existing honeypot because
+they're filled in field-by-field by browser automation / AI, not by a raw
+POST bot.
+
+**Added `includes/spam-guard.php`, used by `forms/handle-quote.php` and
+both quote forms (`includes/quote-form.php`, `includes/quote-form-ga.php`):**
+
+1. **Timing token (hard block).** Each form now carries a hidden
+   HMAC-signed render timestamp (`form_ts`; key auto-generated into
+   gitignored `data/form-secret.key`). Submitted in under 4 seconds, or
+   with a forged/tampered token → dropped silently (visitor still sees the
+   success page), logged to `data/spam-blocked.log`. A *missing* token is
+   deliberately let through: Hostinger may serve a cached page from before
+   this field existed, and a real lead must never be lost to that. The
+   honeypot now also logs to the same file.
+2. **Content flag (soft).** Links in the notes, sales-pitch phrases ("not a
+   service request", "web design", "SEO", "put this live", etc.), or an
+   agency-sounding name. **Not dropped**: the owner still gets the email,
+   prefixed `[Possible Spam]` with the reasons listed at the top, but no
+   Zoho Deal is created and no auto-reply goes to the submitter (which
+   also stops spammers using the auto-reply to send their text to
+   arbitrary inboxes). Logged to `data/spam-flagged.log`. If a flagged one
+   is a real customer, add them to Zoho by hand.
+
+Verified locally: too-fast → blocked, forged token → blocked, the actual
+Porchlight message → flagged (4 signals), a normal customer → unflagged,
+a token-less (stale cached page) submission → unflagged.
+
+**Not done / possible next step:** Cloudflare Turnstile (free, usually
+invisible CAPTCHA) would stop most automated browsers outright, but needs
+the owner to create a Cloudflare account and site/secret keys. The
+scheduler booking form was left as-is (it requires a JS calendar slot pick
+and hasn't seen this spam).
+
+## Install SEO Phase 1: attribution, schema, hub rewrite
+
+**Trigger:** first organic installation lead (Nov 20) came from ChatGPT
+(GA4: `chatgpt.com` / `ai-assistant` -> `/turf-installation` -> scheduler),
+but Zoho had no record of where it came from. Owner supplied a full install
+SEO/AEO spec; this is Phase 1 of 5. Full mapping and status in
+`BUILD_NOTES.md`.
+
+**Shipped:**
+- **Lead attribution on every form** (quote, Google Ads, scheduler, new
+  install form): 90-day first/last-touch cookies, hidden fields, a "Lead
+  source" block in every owner email and Zoho Description. Four dedicated
+  Zoho fields gated behind `ZOHO_ATTRIBUTION_FIELDS=1` until they exist.
+- **GA4 events:** phone_click, cta_click, estimate_form_start,
+  estimate_form_submit (only after server acceptance).
+- **Schema:** business node now HomeAndConstructionBusiness with a stable
+  `@id`, exact name (was "Clean Green Turf — Texas / DFW"); BreadcrumbList
+  sitewide; Service + FAQPage on the hub, FAQ generated from the visible
+  accordion so it can't drift.
+- **Hub rewrite** to the spec's answer-first copy ($9 to $13/sq ft), with a
+  short install quote form (photo upload) beside the answer. Unconfirmed
+  facts in `config/site-facts.php`; placeholders hide their block.
+- **Removed the "Installation Work by Our Team" gallery.** Owner confirmed
+  there's no own-install portfolio yet, so the photos can't be presented as
+  our jobs (some of the original uploads had a competitor watermark).
+- **Technical:** trailing-slash URLs now 301 (were duplicate 200s);
+  thank-you page noindex + out of sitemap; sitemap lastmod from git;
+  explicit AI crawlers in robots.txt; `main.js`/`scheduler.js` cache-busted
+  (were not, so a deploy could leave old JS in visitors' caches); hero
+  preload + 800px mobile hero (local Lighthouse: hub 73 -> 94, LCP 5.0 s
+  -> 2.9 s).
+- Ordered lists in content now show their numbers (were square bullets),
+  which also affects `/turf-repair` and `/turf-sports-field-maintenance`.
+
+**Found, not fixed (hosting):** Hostinger's firewall returns 403 to a
+Bingbot user agent and 429 to GPTBot. Needs checking in Bing Webmaster
+Tools and hPanel. **Blocked:** NAP change (decision D1, McKinney vs Royse
+City).
+
+## Install SEO Phases 2-4: money pages, city pages, guides
+
+Owner decisions (Nov 24): McKinney stays the public address; putting
+greens may run above $9 to $13 (page states no price, no schema Offer,
+calculator shows no range); 3" base rock, no minimum job size and 2 to 4
+day installs confirmed; turf from TurfHub (warranty terms not published,
+so the site only says the manufacturer's warranty applies).
+
+Added 21 URLs (5 money pages, areas + 8 cities, 7 guides + index) and
+`/llms.txt`; details and the full acceptance table in `BUILD_NOTES.md`.
+Copy changes from the spec: Royse City's "our home base" line dropped (D1),
+Sachse's "minimum job size" phrase dropped (no minimum), putting-greens
+meta/opening rewritten without a price (D2), base-prep guide reads "We use
+a crushed-rock base..." so the fact forms a sentence.
+
+Bug found and fixed in testing: the footer grid used `repeat(auto-fit, ...)`
+beside an `fr` column, which is invalid CSS, so browsers dropped the rule
+and the footer stacked into one column. Also tuned header spacing so the
+new "Turf Installation" nav item fits from 960px up (logo text hides
+901-1150px, phone caption hides 901-1400px).

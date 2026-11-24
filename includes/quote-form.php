@@ -19,6 +19,7 @@
  */
 require_once __DIR__ . '/icons.php';
 require_once __DIR__ . '/validation.php';
+require_once __DIR__ . '/spam-guard.php';
 $quoteFormError = trim((string)($_GET['error'] ?? ''));
 ?>
 <!-- quote-form:start -->
@@ -30,7 +31,7 @@ $quoteFormError = trim((string)($_GET['error'] ?? ''));
     <?php if ($quoteFormError !== ''): ?>
     <p class="quote-form__error" role="alert"><?= htmlspecialchars(quote_form_error_message($quoteFormError), ENT_QUOTES) ?></p>
     <?php endif; ?>
-    <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate>
+    <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate data-lead-form="quote">
         <div class="quote-form__row">
             <label for="qf-name">Name*</label>
             <input type="text" id="qf-name" name="name" required autocomplete="name">
@@ -87,6 +88,7 @@ $quoteFormError = trim((string)($_GET['error'] ?? ''));
             <label for="qf-notes">Any additional notes we should know about?</label>
             <textarea id="qf-notes" name="notes" rows="4"></textarea>
         </div>
+        <?= spam_guard_field() ?>
         <!-- honeypot spam trap, hidden via CSS — real users never fill this in -->
         <div class="quote-form__hp" aria-hidden="true">
             <label for="qf-website">Leave this field blank</label>

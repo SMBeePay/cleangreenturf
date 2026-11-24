@@ -30,7 +30,7 @@ $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
             <div class="scheduler-slots" data-scheduler-slots hidden aria-live="polite"></div>
         </div>
 
-        <form class="scheduler-form" data-scheduler-form hidden>
+        <form class="scheduler-form" data-scheduler-form<?= $mode === 'reschedule' ? '' : ' data-lead-form="scheduler"' ?> hidden>
             <p class="scheduler-form__selected">Selected time: <strong data-selected-slot-label></strong></p>
             <input type="hidden" name="slot_start" value="">
             <div class="quote-form__row">
@@ -90,4 +90,4 @@ $phoneDisplay = $businessInfo['regions']['tx']['phone_display'];
 
     <noscript><p class="scheduler__noscript">Please enable JavaScript to use the scheduler, or call us at <?= htmlspecialchars($phoneDisplay) ?> to book your free estimate.</p></noscript>
 </div>
-<script src="/assets/js/scheduler.js" defer></script>
+<script src="/assets/js/scheduler.js?v=<?= filemtime(__DIR__ . '/../assets/js/scheduler.js') ?>" defer></script>

@@ -547,6 +547,39 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   "Turf-size dropdown split further: 2,500+ flagged as needing a closer
   look."
 
+- **Quote-form spam defenses**: vendor pitches ("this isn't a service
+  request, I built you a new site...") were getting past the honeypot.
+  Added `includes/spam-guard.php`: a signed render-timestamp token
+  (forged or <4s submissions silently dropped, logged to
+  `data/spam-blocked.log`; missing token allowed, for stale cached pages)
+  and a soft content flag (links in notes, sales-pitch phrases,
+  agency-sounding names) that still emails the owner with a
+  `[Possible Spam]` subject but skips Zoho and the customer auto-reply.
+  See `docs/audit-findings.md` "Quote-form spam."
+
+- **Install SEO/AEO plan, Phase 1 of 5 (owner spec, Nov 24)**: first
+  organic install lead came from ChatGPT. See `BUILD_NOTES.md` for the full
+  spec-to-repo mapping and per-item status. Shipped: lead attribution on
+  every form (cookies + hidden fields -> owner email + Zoho Description;
+  dedicated Zoho fields behind `ZOHO_ATTRIBUTION_FIELDS=1`), GA4 events,
+  sitewide HomeAndConstructionBusiness + BreadcrumbList schema, hub rewrite
+  (`content/pages/turf-installation.php`) with Service/FAQPage schema and a
+  short install quote form (`forms/handle-install-quote.php`, photo upload),
+  facts register (`config/site-facts.php`, `php bin/check-facts.php`),
+  forward links via `maybe_link()` so later-phase pages light up
+  automatically, trailing-slash 301s, thank-you page noindex, sitemap
+  lastmod from git, AI crawlers in robots.txt. Blocked on owner decision
+  D1 (public address). Found: Hostinger 403s Bingbot UA / 429s GPTBot.
+- **Install SEO/AEO Phases 2-4 shipped (Nov 24)** after owner decisions
+  (McKinney kept; putting greens may exceed the range so that page has no
+  price; 3" base rock, no minimum, 2-4 days). Cost page, calculator
+  (`assets/js/calculator.js` -> install handler), backyard/pet/putting-green
+  pages, areas + 8 city pages (`config/install-cities.php`, overlap check
+  `php bin/check-city-overlap.php`), 7 guides + `/guides`, `/llms.txt`,
+  "Turf Installation" nav dropdown and footer columns. 62 routes, 60 in the
+  sitemap. Open items listed in `BUILD_NOTES.md` "Still open"; Phase 5
+  (case studies, second-ring cities) not started.
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

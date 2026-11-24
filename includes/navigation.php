@@ -20,6 +20,19 @@ $navServices = [
     '/turf-installation' => 'Turf Installation',
     '/turf-repair' => 'Turf Repair',
 ];
+// Install SEO plan Section 6: "Turf Installation" dropdown. Items only
+// show once their page exists (route_exists), so nothing links ahead.
+require_once __DIR__ . '/links.php';
+$navInstall = array_filter([
+    '/turf-installation' => 'Turf Installation Overview',
+    '/turf-installation/backyard-lawn-replacement' => 'Backyard Lawns',
+    '/turf-installation/pet-turf' => 'Pet Turf',
+    '/turf-installation/putting-greens' => 'Putting Greens',
+    '/turf-installation/cost' => 'Installation Cost',
+    '/turf-installation/cost-calculator' => 'Cost Calculator',
+    '/turf-installation/areas' => 'Areas We Install',
+    '/guides' => 'Installation Guides',
+], fn($path) => route_exists($path), ARRAY_FILTER_USE_KEY);
 $navTxCities = [
     '/addison-tx-turf-cleaning' => 'Addison, TX',
     '/allen-tx-turf-cleaning' => 'Allen, TX',
@@ -41,6 +54,14 @@ $navTxCities = [
             <span class="site-nav__dropdown-label">Services</span>
             <ul class="site-nav__dropdown site-nav__dropdown--single">
                 <?php foreach ($navServices as $href => $label): ?>
+                <li><a href="<?= htmlspecialchars($href) ?>"<?= $currentPath === $href ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($label) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+        <li class="site-nav__has-dropdown">
+            <a href="/turf-installation"<?= str_starts_with($currentPath, '/turf-installation') || str_starts_with($currentPath, '/guides') ? ' aria-current="page"' : '' ?>>Turf Installation</a>
+            <ul class="site-nav__dropdown site-nav__dropdown--single">
+                <?php foreach ($navInstall as $href => $label): ?>
                 <li><a href="<?= htmlspecialchars($href) ?>"<?= $currentPath === $href ? ' aria-current="page"' : '' ?>><?= htmlspecialchars($label) ?></a></li>
                 <?php endforeach; ?>
             </ul>
