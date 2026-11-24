@@ -570,8 +570,15 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   automatically, trailing-slash 301s, thank-you page noindex, sitemap
   lastmod from git, AI crawlers in robots.txt. Blocked on owner decision
   D1 (public address). Found: Hostinger 403s Bingbot UA / 429s GPTBot.
-  Phases 2-5 (cost page + calculator, service-type pages, 8 city pages,
-  7 guides) not started.
+- **Install SEO/AEO Phases 2-4 shipped (Nov 24)** after owner decisions
+  (McKinney kept; putting greens may exceed the range so that page has no
+  price; 3" base rock, no minimum, 2-4 days). Cost page, calculator
+  (`assets/js/calculator.js` -> install handler), backyard/pet/putting-green
+  pages, areas + 8 city pages (`config/install-cities.php`, overlap check
+  `php bin/check-city-overlap.php`), 7 guides + `/guides`, `/llms.txt`,
+  "Turf Installation" nav dropdown and footer columns. 62 routes, 60 in the
+  sitemap. Open items listed in `BUILD_NOTES.md` "Still open"; Phase 5
+  (case studies, second-ring cities) not started.
 
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the

@@ -37,7 +37,7 @@ where each phase stands. Read with `CLAUDE.md` (project rules) and
 |---|---|---|
 | T-01 Attribution | Done | `assets/js/main.js` keeps 90-day first-touch (`cgt_ft`) and last-touch (`cgt_lt`) cookies and fills hidden fields on every `[data-lead-form]` at submit (quote form, Google Ads form, scheduler, new install form). `includes/attribution.php` writes a "Lead source" block into every owner email and Zoho Deal Description. The four new Zoho fields are only sent once `ZOHO_ATTRIBUTION_FIELDS=1` is set in `.env` (they don't exist in Zoho yet). Verified with a real browser from `?utm_source=chatgpt.com&utm_medium=ai-assistant`. |
 | T-02 GA4 events | Done | `phone_click`, `cta_click` (+`cta_location`), `estimate_form_start`, `estimate_form_submit` (fires only after the server accepted the lead). Verified in `dataLayer`. Andrew marks key events in GA4. `calculator_complete` comes with the calculator (Phase 2). |
-| T-03 NAP | **Blocked on D1** | Site + schema still say McKinney; Google profile says Royse City. Changing NAP is one edit in `config/business-info.php` once decided. |
+| T-03 NAP | Done | D1: McKinney kept (Google profile is tied to it). Name/address/phone identical in header, footer, schema and the estimate page. |
 | T-04 Sitewide schema | Done | Business node is now `HomeAndConstructionBusiness` with `@id` `/#business`, exact name "Clean Green Turf", areaServed = existing DFW cleaning cities + the 8 install cities. BreadcrumbList on every page below home. `sameAs` lists Facebook + Instagram only (no GBP/Yelp URL on file yet). |
 | T-05 Per-page schema | Done for hub | Service (with $9 to $13 `UnitPriceSpecification` from site-facts) + FAQPage + BreadcrumbList. |
 | T-06 Titles/metas/H1s | Done for hub | Title 54 chars, meta 138, one H1. |
@@ -76,12 +76,45 @@ Re-run PageSpeed Insights on the live hub after deploy; target is LCP 2.5 s or l
 2. **GPTBot gets 429 (rate-limited).** OAI-SearchBot and ChatGPT-User (the ones that power ChatGPT answers and links) get 200. GPTBot is OpenAI's training crawler; being throttled there is lower priority but worth knowing.
 3. **Search Console baseline (last 28 days, the most Windsor's trial allows):** install demand is barely visible yet. "artificial turf installation" 9 impressions at position 5.3; "turf installation near me" 2 at 6.5; Frisco and Celina install queries show up at position 50+, and neither city is in the 8-city plan. Full list in `docs/install-seo/gsc-baseline-2026-11-24.md`.
 
-## Open decisions (from spec Section 11)
+## Phases 2 to 4 (shipped Nov 24, after owner decisions)
 
-- **D1** public address: McKinney (site) vs Royse City (Google profile). Blocks T-03.
-- **D2** putting greens in scope at $9 to $13? (Phase 2)
-- **D3** "usually the same day" response claim. Currently used in the install CTA line (the existing quote form already says "We usually reply same-day").
-- **D4** guide byline: person or company. (Phase 4)
-- Facts still needed: run `php bin/check-facts.php`.
-- Zoho: add `Lead_Source_Detail`, `First_Touch_Source`, `Landing_Page`, `GA_Client_ID` on Deals, then set `ZOHO_ATTRIBUTION_FIELDS=1` in the server `.env`. Consider an "AI Assistant" option on `Lead_Source`.
-- Existing site claims the spec's no-claims rule would forbid ("5.0 Rated by 325+ Customers" trust bar, homepage stats). These are owner-approved and outside the install pages, so left alone; the install pages themselves make no rating or count claims in their own copy, but the sitewide trust bar does appear on them. Flagged for Andrew.
+Owner answers (Nov 24): **D1** keep McKinney (the Google profile is tied
+to it), so NAP/schema are unchanged and T-03 is done. **D2** putting
+greens might cost more than the range. Facts: 3-inch base rock, no minimum
+job size, 2 to 4 days confirmed; turf comes from TurfHub (Carrollton). Not
+worried about the Zoho fields (left gated off).
+
+| Phase | Pages | Notes |
+|---|---|---|
+| 2 Money pages | `/turf-installation/cost`, `/cost-calculator`, `/backyard-lawn-replacement`, `/pet-turf`, `/putting-greens` | Cost table computed from site-facts (exact arithmetic, as in the spec). Calculator: `assets/js/calculator.js`, rates via data attributes, lead form posts to `forms/handle-install-quote.php` with `form_source=calculator` (email optional; Zoho Contact skipped when no email). Putting greens: no price on the page, no Offer in schema, meta rewritten without the price (D2); the calculator shows no range for greens. Header "Turf Installation" dropdown and footer columns list only pages that exist. |
+| 3 City pages | `/turf-installation/areas` + royse-city, rockwall, heath, fate, forney, wylie, mckinney, sachse | One template (`content/pages/install-city.php`) + `config/install-cities.php`. `php bin/check-city-overlap.php`: worst pair 49.2% (limit 60%), PASS. Royse City "home base" line and Sachse "minimum job size" phrase dropped (D1, no minimum). Each city page links to its existing cleaning page where one exists. |
+| 4 Guides | 7 guides + `/guides` index, `/llms.txt` | Article schema with dates and company byline (D4 open, company is the default). FAQPage only on the heat guide, the only guide with a visible FAQ in the spec. In the "choose an installer" guide our warranty line sits under "What we can tell you about ourselves" instead of inside the question list for other installers. |
+
+### Acceptance checks (spec Section 10), all phases
+
+| Check | Result |
+|---|---|
+| Every new URL 200, one H1, spec title/meta, self canonical | Pass (62 routes). Four spec titles run 63 to 65 chars (backyard + three longer city names); kept as written. |
+| Tokens resolve; unconfirmed listed | Pass. `php bin/check-facts.php`: scope_included, infill_default, repair_experience_line, warranty_text (shown with defaults), turf_brands, license_insurance (hidden). |
+| Only $9, $13 and size-table arithmetic | Pass. |
+| No review counts/ratings/awards in install copy | Pass for install page copy. The sitewide trust bar ("5.0 Rated by 325+ Customers") still renders on them; flagged below. |
+| JSON-LD valid; FAQ schema matches visible text | Pass on every route (parsed + FAQ compared word for word). Rich Results Test is a manual step after deploy. |
+| Sitemap + robots | 60 URLs; AI crawlers allowed. |
+| Mobile sticky bar + form event | Pass. |
+| ChatGPT UTM test reaches the CRM payload | Pass (owner email + Zoho Description; dedicated fields gated). |
+| PageSpeed | See the Lighthouse table; re-run PSI on live after deploy. |
+| City overlap under 60% | Pass, 49.2%. |
+| No em dashes / filler in new copy | Pass. |
+| NAP identical | Pass (McKinney everywhere). |
+
+## Still open
+
+- **D3** "usually the same day" in the install CTA line (the existing quote form already says "We usually reply same-day").
+- **D4** guide byline: company now; a named person is a one-line change in `includes/schema.php`.
+- **Warranty:** TurfHub's terms aren't published online. The site says only that the manufacturer's warranty applies and terms come with the quote. Add real terms (and any workmanship warranty) to `config/site-facts.php`.
+- **Still-default facts** to confirm: scope list, infill (silica sand + antimicrobial pet option), repair-experience line. Not filled: turf brands, insurance/license line.
+- **City details**: spec says Andrew should read each city's local notes and correct anything that doesn't match his neighborhoods (`config/install-cities.php`).
+- **Bingbot 403 / GPTBot 429** on Hostinger (see Findings).
+- **Trust bar on install pages** shows the sitewide rating line; the spec's no-claims rule would say hide it there. Owner call.
+- **Phase 5** (proof): case-study template and real project blocks once installs finish; second-ring cities (Frisco and Celina already show install searches).
+- Zoho dedicated attribution fields: owner not worried; left gated off.

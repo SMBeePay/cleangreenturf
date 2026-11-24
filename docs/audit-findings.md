@@ -2241,3 +2241,24 @@ SEO/AEO spec; this is Phase 1 of 5. Full mapping and status in
 Bingbot user agent and 429 to GPTBot. Needs checking in Bing Webmaster
 Tools and hPanel. **Blocked:** NAP change (decision D1, McKinney vs Royse
 City).
+
+## Install SEO Phases 2-4: money pages, city pages, guides
+
+Owner decisions (Nov 24): McKinney stays the public address; putting
+greens may run above $9 to $13 (page states no price, no schema Offer,
+calculator shows no range); 3" base rock, no minimum job size and 2 to 4
+day installs confirmed; turf from TurfHub (warranty terms not published,
+so the site only says the manufacturer's warranty applies).
+
+Added 21 URLs (5 money pages, areas + 8 cities, 7 guides + index) and
+`/llms.txt`; details and the full acceptance table in `BUILD_NOTES.md`.
+Copy changes from the spec: Royse City's "our home base" line dropped (D1),
+Sachse's "minimum job size" phrase dropped (no minimum), putting-greens
+meta/opening rewritten without a price (D2), base-prep guide reads "We use
+a crushed-rock base..." so the fact forms a sentence.
+
+Bug found and fixed in testing: the footer grid used `repeat(auto-fit, ...)`
+beside an `fr` column, which is invalid CSS, so browsers dropped the rule
+and the footer stacked into one column. Also tuned header spacing so the
+new "Turf Installation" nav item fits from 960px up (logo text hides
+901-1150px, phone caption hides 901-1400px).
