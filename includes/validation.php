@@ -95,6 +95,7 @@ function quote_form_error_message(string $code): string {
         'invalid_address' => 'Please enter your real street address — we need it to schedule on-site service.',
         'invalid_city' => 'Please enter the city your property is in.',
         'send_failed' => 'Something went wrong sending your request. Please call us instead.',
+        'upload_too_large' => 'Those photos are too large to upload together. Try one or two smaller photos, or send the form without them and we\'ll ask for pictures.',
     ];
     return $messages[$code] ?? 'Something went wrong. Please try again or call us.';
 }

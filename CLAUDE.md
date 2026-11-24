@@ -557,6 +557,22 @@ Phase 1 (preserve) is largely built and passing local smoke tests:
   `[Possible Spam]` subject but skips Zoho and the customer auto-reply.
   See `docs/audit-findings.md` "Quote-form spam."
 
+- **Install SEO/AEO plan, Phase 1 of 5 (owner spec, Nov 24)**: first
+  organic install lead came from ChatGPT. See `BUILD_NOTES.md` for the full
+  spec-to-repo mapping and per-item status. Shipped: lead attribution on
+  every form (cookies + hidden fields -> owner email + Zoho Description;
+  dedicated Zoho fields behind `ZOHO_ATTRIBUTION_FIELDS=1`), GA4 events,
+  sitewide HomeAndConstructionBusiness + BreadcrumbList schema, hub rewrite
+  (`content/pages/turf-installation.php`) with Service/FAQPage schema and a
+  short install quote form (`forms/handle-install-quote.php`, photo upload),
+  facts register (`config/site-facts.php`, `php bin/check-facts.php`),
+  forward links via `maybe_link()` so later-phase pages light up
+  automatically, trailing-slash 301s, thank-you page noindex, sitemap
+  lastmod from git, AI crawlers in robots.txt. Blocked on owner decision
+  D1 (public address). Found: Hostinger 403s Bingbot UA / 429s GPTBot.
+  Phases 2-5 (cost page + calculator, service-type pages, 8 city pages,
+  7 guides) not started.
+
 **Not done yet:**
 - **Scheduler follow-ups**: (1) Twilio credentials added to `.env` by the
   owner — not yet verified with a real live send (see "Scheduler reminder

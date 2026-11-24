@@ -26,7 +26,8 @@ function send_transactional_email(
     string $subject,
     string $body,
     ?string $replyToEmail = null,
-    ?string $replyToName = null
+    ?string $replyToName = null,
+    array $attachments = []   // [['path' => tmp path, 'name' => filename], ...] — SMTP path only
 ): bool {
     if (!empty($mailConfig['host']) && !empty($mailConfig['username']) && !empty($mailConfig['password'])) {
         $mailer = new PHPMailer(true);
@@ -51,6 +52,9 @@ function send_transactional_email(
             if ($replyToEmail !== null) {
                 $mailer->addReplyTo($replyToEmail, $replyToName ?? '');
             }
+            foreach ($attachments as $file) {
+                $mailer->addAttachment($file['path'], $file['name']);
+            }
             $mailer->Subject = $subject;
             $mailer->Body = $body;
             $mailer->isHTML(false);
@@ -72,6 +76,11 @@ function send_transactional_email(
     ];
     if ($replyToEmail !== null) {
         $headers[] = 'Reply-To: ' . ($replyToName ?? '') . ' <' . $replyToEmail . '>';
+    }
+    if ($attachments !== []) {
+        // Plain mail() fallback can't carry attachments; say so in the body
+        // rather than dropping the photos silently.
+        $body .= "\n\n(" . count($attachments) . " photo(s) were uploaded but could not be attached because the SMTP send failed. Ask the customer to text them.)";
     }
     return mail($toEmail, $subject, $body, implode("\r\n", $headers));
 }

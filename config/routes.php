@@ -128,6 +128,8 @@ return [
         'title' => 'Expert Artificial Turf Cleaning in Texas | Clean Green Turf',
         'description' => 'Thank you for filling out our online form. We will be back to you shortly with your turf cleaning quote',
         'schema_types' => ['WebPage'],
+        // Post-submit thank-you page: noindex + out of the sitemap (install SEO plan T-10).
+        'robots' => 'noindex, follow',
     ],
     '/discovery-bay-ca-turf-cleaning' => [
         'slug' => 'discovery-bay-ca-turf-cleaning',
@@ -218,6 +220,8 @@ return [
         'slug' => 'schedule-turf-installation-estimate',
         'template' => 'page',
         'title' => 'Schedule a Free Turf Installation Estimate | Clean Green Turf',
+        'cta' => 'installation',
+        'breadcrumb' => [['Turf Installation', '/turf-installation'], ['Schedule an Estimate', '/schedule-turf-installation-estimate']],
         'description' => 'Pick a day and time for a free in-person artificial turf installation estimate in the DFW metroplex. Fast confirmation, text reminder the day before.',
         'schema_types' => ['WebPage'],
     ],
@@ -238,9 +242,14 @@ return [
     '/turf-installation' => [
         'slug' => 'turf-installation',
         'template' => 'page',
-        'title' => 'Artificial Turf Installation in DFW, TX | Clean Green Turf',
-        'description' => 'Full artificial turf installation for backyards, front yards, and pet runs across the DFW Metroplex — proper base prep, drainage, and seaming. Schedule a free in-person estimate.',
+        'title' => 'Artificial Turf Installation in DFW | Clean Green Turf',
+        'description' => 'Artificial turf installation across DFW. Installed pricing runs $9 to $13 per square foot. See what drives the price and get a free quote.',
         'schema_types' => ['WebPage'],
+        // Install SEO plan (Phase 1): Service + FAQPage + BreadcrumbList.
+        'service_schema' => ['area' => 'Dallas-Fort Worth'],
+        'breadcrumb' => [['Turf Installation', '/turf-installation']],
+        'cta' => 'installation',
+        'mobile_cta_href' => '#install-quote',
     ],
     '/turf-repair' => [
         'slug' => 'turf-repair',

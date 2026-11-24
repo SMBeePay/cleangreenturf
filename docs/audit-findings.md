@@ -2202,3 +2202,42 @@ invisible CAPTCHA) would stop most automated browsers outright, but needs
 the owner to create a Cloudflare account and site/secret keys. The
 scheduler booking form was left as-is (it requires a JS calendar slot pick
 and hasn't seen this spam).
+
+## Install SEO Phase 1: attribution, schema, hub rewrite
+
+**Trigger:** first organic installation lead (Nov 20) came from ChatGPT
+(GA4: `chatgpt.com` / `ai-assistant` -> `/turf-installation` -> scheduler),
+but Zoho had no record of where it came from. Owner supplied a full install
+SEO/AEO spec; this is Phase 1 of 5. Full mapping and status in
+`BUILD_NOTES.md`.
+
+**Shipped:**
+- **Lead attribution on every form** (quote, Google Ads, scheduler, new
+  install form): 90-day first/last-touch cookies, hidden fields, a "Lead
+  source" block in every owner email and Zoho Description. Four dedicated
+  Zoho fields gated behind `ZOHO_ATTRIBUTION_FIELDS=1` until they exist.
+- **GA4 events:** phone_click, cta_click, estimate_form_start,
+  estimate_form_submit (only after server acceptance).
+- **Schema:** business node now HomeAndConstructionBusiness with a stable
+  `@id`, exact name (was "Clean Green Turf — Texas / DFW"); BreadcrumbList
+  sitewide; Service + FAQPage on the hub, FAQ generated from the visible
+  accordion so it can't drift.
+- **Hub rewrite** to the spec's answer-first copy ($9 to $13/sq ft), with a
+  short install quote form (photo upload) beside the answer. Unconfirmed
+  facts in `config/site-facts.php`; placeholders hide their block.
+- **Removed the "Installation Work by Our Team" gallery.** Owner confirmed
+  there's no own-install portfolio yet, so the photos can't be presented as
+  our jobs (some of the original uploads had a competitor watermark).
+- **Technical:** trailing-slash URLs now 301 (were duplicate 200s);
+  thank-you page noindex + out of sitemap; sitemap lastmod from git;
+  explicit AI crawlers in robots.txt; `main.js`/`scheduler.js` cache-busted
+  (were not, so a deploy could leave old JS in visitors' caches); hero
+  preload + 800px mobile hero (local Lighthouse: hub 73 -> 94, LCP 5.0 s
+  -> 2.9 s).
+- Ordered lists in content now show their numbers (were square bullets),
+  which also affects `/turf-repair` and `/turf-sports-field-maintenance`.
+
+**Found, not fixed (hosting):** Hostinger's firewall returns 403 to a
+Bingbot user agent and 429 to GPTBot. Needs checking in Bing Webmaster
+Tools and hPanel. **Blocked:** NAP change (decision D1, McKinney vs Royse
+City).

@@ -4,6 +4,7 @@
 // alt text (the originals all had alt="", a pre-existing gap). ?>
 <img src="/assets/images/img-1438-amq1qlojlqtwkxyo.webp" alt="Artificial turf cleaning technician at work" loading="eager" width="1440" height="499">
 <h1>Thank You for Contacting Us!</h1>
+<span data-ga-event="estimate_form_submit" data-form-type="quote" hidden></span>
 <p>We will respond within 24 hours of your request!</p>
 
 <h3>Check out what our customers have to say about us</h3>

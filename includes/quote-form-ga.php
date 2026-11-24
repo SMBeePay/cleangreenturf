@@ -23,7 +23,7 @@ $quoteFormError = trim((string)($_GET['error'] ?? ''));
     <?php if ($quoteFormError !== ''): ?>
     <p class="quote-form__error" role="alert"><?= htmlspecialchars(quote_form_error_message($quoteFormError), ENT_QUOTES) ?></p>
     <?php endif; ?>
-    <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate>
+    <form class="quote-form" action="/forms/handle-quote.php" method="post" novalidate data-lead-form="quote_google_ads">
         <input type="hidden" name="service" value="cleaning">
         <div class="quote-form__row">
             <label for="qfga-name">Name*</label>

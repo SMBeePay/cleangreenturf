@@ -230,6 +230,7 @@
                 }
                 bookingEl.hidden = true;
                 confirmEl.hidden = false;
+                if (!token && window.cgtTrack) { window.cgtTrack('estimate_form_submit', { form_type: 'scheduler' }); }
                 var whenEl = confirmEl.querySelector('[data-confirm-when]');
                 if (whenEl) { whenEl.textContent = data.when || ''; }
                 var smsLineEl = confirmEl.querySelector('[data-confirm-sms-line]');
