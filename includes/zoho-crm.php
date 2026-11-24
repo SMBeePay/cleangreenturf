@@ -223,7 +223,9 @@ function zoho_push_lead(array $zohoConfig, string $name, string $email, string $
     }
     $dealFields['Account_Name'] = ['id' => $accountId];
 
-    $contactId = zoho_upsert_contact($zohoConfig, $name, $email, $phone);
+    // Contacts are matched on Email; with no email (the cost calculator
+    // makes it optional) skip the Contact and keep the Deal + Account.
+    $contactId = $email === '' ? null : zoho_upsert_contact($zohoConfig, $name, $email, $phone);
     if ($contactId !== null) {
         $dealFields['Contact_Name'] = ['id' => $contactId];
     }

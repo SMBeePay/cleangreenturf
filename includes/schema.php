@@ -102,14 +102,28 @@ foreach ($schemaTypes as $type) {
             'description' => $route['description'] ?? '',
         ];
     } elseif ($type === 'Article') {
-        $schemaGraph[] = [
+        $schemaGraph[] = array_filter([
             '@type' => 'Article',
-            'headline' => $route['title'],
+            'headline' => $route['schema_headline'] ?? $route['title'],
             'description' => $route['description'] ?? '',
             'url' => $canonicalUrl,
+            'mainEntityOfPage' => $canonicalUrl,
             'datePublished' => $route['date_published'] ?? null,
-            'author' => ['@type' => 'Organization', 'name' => $businessInfo['name']],
+            'dateModified' => $route['date_modified'] ?? ($route['date_published'] ?? null),
+            'author' => ['@type' => 'Organization', 'name' => $businessInfo['name'], 'url' => $businessInfo['domain'] . '/'],
             'publisher' => ['@id' => $businessInfo['domain'] . '/#organization'],
+        ], fn($v) => $v !== null);
+    } elseif ($type === 'WebApplication') {
+        $schemaGraph[] = [
+            '@type' => 'WebApplication',
+            'name' => $pageHeading,
+            'description' => $route['description'] ?? '',
+            'url' => $canonicalUrl,
+            'applicationCategory' => 'UtilitiesApplication',
+            'operatingSystem' => 'Any',
+            'browserRequirements' => 'Requires JavaScript',
+            'isAccessibleForFree' => true,
+            'provider' => ['@id' => $businessInfo['domain'] . '/#business'],
         ];
     } elseif ($type === 'WebPage') {
         $schemaGraph[] = [
@@ -124,7 +138,7 @@ foreach ($schemaTypes as $type) {
 // Service (install pages): route 'service_schema' => ['area' => 'Dallas-Fort Worth'].
 // Price range comes from config/site-facts.php, never hard-coded.
 if (!empty($route['service_schema'])) {
-    $schemaGraph[] = [
+    $serviceNode = [
         '@type' => 'Service',
         'serviceType' => 'Artificial turf installation',
         'name' => $pageHeading,
@@ -143,6 +157,12 @@ if (!empty($route['service_schema'])) {
             ],
         ],
     ];
+    // Pages whose price can fall outside the published range (putting greens)
+    // set 'price' => false: no Offer, so the schema never states a wrong price.
+    if (($route['service_schema']['price'] ?? true) === false) {
+        unset($serviceNode['offers']);
+    }
+    $schemaGraph[] = $serviceNode;
 }
 
 // FAQPage: built from the visible FAQ block (includes/faq.php), word for word.

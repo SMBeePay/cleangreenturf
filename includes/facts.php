@@ -49,10 +49,10 @@ function fact_lc(string $id): string {
     return $text === '' ? '' : mb_strtolower(mb_substr($text, 0, 1)) . mb_substr($text, 1);
 }
 
-/** Installed price for an area, rounded to the nearest $100, formatted "$9,000". */
+/** Installed price for an area, formatted "$6,750" (exact arithmetic, as in the spec's size table). */
 function fact_price_for(int $sqft, string $which): string {
     $rate = (float)fact_raw($which === 'high' ? 'price_high_per_sqft' : 'price_low_per_sqft');
-    return '$' . number_format((int)(round($sqft * $rate / 100) * 100));
+    return '$' . number_format((int)round($sqft * $rate));
 }
 
 /** Unconfirmed facts used on the current page (for the debug comment). */

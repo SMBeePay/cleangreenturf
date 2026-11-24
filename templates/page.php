@@ -44,6 +44,9 @@ if (preg_match('/^\s*(?:(<img\b[^>]*>)\s*)?<h1[^>]*>(.*?)<\/h1>/is', $content, $
 
 <div class="prose">
 <?php render_breadcrumbs($route, $currentPath, trim(strip_tags((string)$heroH1))); ?>
+<?php if (!empty($route['date_modified'])): ?>
+<p class="last-updated">Last updated <time datetime="<?= htmlspecialchars($route['date_modified']) ?>"><?= htmlspecialchars(date('F j, Y', strtotime($route['date_modified']))) ?></time></p>
+<?php endif; ?>
 <?= $content ?>
 </div>
 

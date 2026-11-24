@@ -13,7 +13,7 @@ $schedulerConfig = require __DIR__ . '/../../config/scheduler.php';
 ?>
 <?php if (($_GET['quote'] ?? '') === 'sent'): ?>
 <div class="scheduler-notice" role="status">
-    <span data-ga-event="estimate_form_submit" data-form-type="install_quote" hidden></span>
+    <span data-ga-event="estimate_form_submit" data-form-type="<?= ($_GET['from'] ?? '') === 'calculator' ? 'calculator' : 'install_quote' ?>" hidden></span>
     <strong>Got it, thanks.</strong> We'll come back with a price range for your yard. If you'd like us to come out and measure, pick a time below.
 </div>
 <?php endif; ?>

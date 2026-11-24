@@ -44,6 +44,39 @@ function slugify_city($city) {
             </ul>
         </div>
 
+        <?php
+        // Install SEO plan Section 6: "Areas we serve" + "Guides" columns.
+        // Only pages that exist are listed, so the columns fill in phase by phase.
+        require_once __DIR__ . '/links.php';
+        $footerInstallCities = require __DIR__ . '/../config/install-cities.php';
+        $footerInstallAreas = array_filter(
+            array_combine(array_map(fn($slug) => '/turf-installation/' . $slug, array_keys($footerInstallCities)), array_column($footerInstallCities, 'name')),
+            fn($path) => route_exists($path), ARRAY_FILTER_USE_KEY
+        );
+        $footerGuides = array_filter(require __DIR__ . '/../config/install-guides.php', fn($path) => route_exists($path), ARRAY_FILTER_USE_KEY);
+        ?>
+        <?php if ($footerInstallAreas): ?>
+        <div class="site-footer__areas">
+            <h3><?= route_exists('/turf-installation/areas') ? '<a href="/turf-installation/areas">Turf Installation Areas</a>' : 'Turf Installation Areas' ?></h3>
+            <ul>
+                <?php foreach ($footerInstallAreas as $href => $city): ?>
+                <li><a href="<?= htmlspecialchars($href) ?>"><?= htmlspecialchars($city) ?>, TX</a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($footerGuides): ?>
+        <div class="site-footer__areas">
+            <h3><?= route_exists('/guides') ? '<a href="/guides">Installation Guides</a>' : 'Installation Guides' ?></h3>
+            <ul>
+                <?php foreach ($footerGuides as $href => $label): ?>
+                <li><a href="<?= htmlspecialchars($href) ?>"><?= htmlspecialchars($label) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+
         <div class="site-footer__areas">
             <h3>Turf Cleaning Resources</h3>
             <ul>
